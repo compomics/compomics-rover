@@ -1,0 +1,207 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<form xmlns="http://www.intellij.com/uidesigner/form/" version="1" bind-to-class="com.compomics.rover.gui.multiwizard.ParameterPanel">
+  <grid id="27dc6" binding="jpanContent" layout-manager="GridBagLayout">
+    <constraints>
+      <xy x="20" y="109" width="844" height="407"/>
+    </constraints>
+    <properties/>
+    <border type="none"/>
+    <children>
+      <vspacer id="2180">
+        <constraints>
+          <grid row="18" column="0" row-span="1" col-span="1" vsize-policy="6" hsize-policy="1" anchor="0" fill="2" indent="0" use-parent-layout="false"/>
+          <gridbag weightx="0.0" weighty="0.0"/>
+        </constraints>
+      </vspacer>
+      <component id="3d4f8" class="javax.swing.JLabel" binding="lblConfidence">
+        <constraints>
+          <grid row="0" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+          <gridbag top="5" left="5" bottom="5" right="5" weightx="0.0" weighty="0.0"/>
+        </constraints>
+        <properties>
+          <font name="Tahoma"/>
+          <text value="- Set peptide identification confidence level"/>
+        </properties>
+      </component>
+      <component id="b0fec" class="javax.swing.JLabel" binding="selectANumberOfLabel">
+        <constraints>
+          <grid row="1" column="0" row-span="2" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+          <gridbag top="5" left="5" bottom="5" right="5" weightx="0.0" weighty="0.0"/>
+        </constraints>
+        <properties>
+          <font name="Tahoma"/>
+          <text value="- Select a number of proteins to build the reference set"/>
+        </properties>
+      </component>
+      <component id="2bef" class="javax.swing.JRadioButton" binding="numberOfMostAbundantRadioButton" default-binding="true">
+        <constraints>
+          <grid row="1" column="6" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+          <gridbag weightx="0.0" weighty="0.0"/>
+        </constraints>
+        <properties>
+          <font name="Tahoma"/>
+          <selected value="true"/>
+          <text value="Number of most abundant proteins"/>
+        </properties>
+      </component>
+      <component id="679a7" class="javax.swing.JSpinner" binding="spinReference" custom-create="true">
+        <constraints>
+          <grid row="1" column="19" row-span="1" col-span="1" vsize-policy="0" hsize-policy="6" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
+          <gridbag top="5" left="5" bottom="5" right="5" weightx="0.0" weighty="0.0"/>
+        </constraints>
+        <properties/>
+      </component>
+      <component id="45378" class="javax.swing.JLabel">
+        <constraints>
+          <grid row="3" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+          <gridbag top="5" left="5" bottom="5" right="5" weightx="0.0" weighty="0.0"/>
+        </constraints>
+        <properties>
+          <font name="Tahoma"/>
+          <text value="- Ratios from the reference proteins must be true"/>
+        </properties>
+      </component>
+      <component id="b21" class="javax.swing.JLabel">
+        <constraints>
+          <grid row="4" column="0" row-span="13" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+          <gridbag top="5" left="5" bottom="5" right="5" weightx="0.0" weighty="0.0"/>
+        </constraints>
+        <properties>
+          <font name="Tahoma"/>
+          <text value="- Set protein database type"/>
+        </properties>
+      </component>
+      <component id="1ea5f" class="javax.swing.JTextField" binding="txtCalibratedSD">
+        <constraints>
+          <grid row="17" column="19" row-span="1" col-span="1" vsize-policy="0" hsize-policy="6" anchor="8" fill="1" indent="0" use-parent-layout="false">
+            <preferred-size width="150" height="-1"/>
+          </grid>
+          <gridbag top="5" left="5" bottom="5" right="5" weightx="0.0" weighty="0.0"/>
+        </constraints>
+        <properties>
+          <horizontalAlignment value="4"/>
+          <text value="0.14277725"/>
+        </properties>
+      </component>
+      <component id="e4192" class="javax.swing.JLabel">
+        <constraints>
+          <grid row="17" column="0" row-span="1" col-span="7" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+          <gridbag top="5" left="5" bottom="5" right="5" weightx="0.0" weighty="0.0"/>
+        </constraints>
+        <properties>
+          <font name="Tahoma"/>
+          <text value="- Set the calibrated standard deviation for log2 scale ratios for 1/1 ratio mixtures on the mass spectrometer"/>
+        </properties>
+      </component>
+      <component id="c03f8" class="javax.swing.JRadioButton" binding="allProteinsRadioButton" default-binding="true">
+        <constraints>
+          <grid row="2" column="6" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+          <gridbag weightx="0.0" weighty="0.0"/>
+        </constraints>
+        <properties>
+          <font name="Tahoma"/>
+          <text value="all proteins"/>
+        </properties>
+      </component>
+      <component id="d1e27" class="javax.swing.JCheckBox" binding="chbValidInReferenceSet">
+        <constraints>
+          <grid row="3" column="6" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+          <gridbag top="5" left="5" bottom="5" right="5" weightx="0.0" weighty="0.0"/>
+        </constraints>
+        <properties>
+          <selected value="true"/>
+          <text value=""/>
+        </properties>
+      </component>
+      <component id="cd075" class="javax.swing.JSeparator">
+        <constraints>
+          <grid row="11" column="2" row-span="6" col-span="2" vsize-policy="6" hsize-policy="6" anchor="0" fill="3" indent="0" use-parent-layout="false"/>
+          <gridbag top="2" left="2" bottom="2" right="2" weightx="0.0" weighty="0.0"/>
+        </constraints>
+        <properties>
+          <orientation value="1"/>
+        </properties>
+      </component>
+      <component id="b1b3a" class="javax.swing.JRadioButton" binding="uniprotRadioButton" default-binding="true">
+        <constraints>
+          <grid row="11" column="6" row-span="1" col-span="12" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+          <gridbag weightx="0.0" weighty="0.0"/>
+        </constraints>
+        <properties>
+          <font name="Tahoma"/>
+          <selected value="true"/>
+          <text value="Uniprot"/>
+        </properties>
+      </component>
+      <component id="3f600" class="javax.swing.JRadioButton" binding="IPIRadioButton" default-binding="true">
+        <constraints>
+          <grid row="12" column="6" row-span="1" col-span="24" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+          <gridbag weightx="0.0" weighty="0.0"/>
+        </constraints>
+        <properties>
+          <font name="Tahoma"/>
+          <text value="IPI"/>
+        </properties>
+      </component>
+      <component id="b1d1d" class="javax.swing.JRadioButton" binding="NCBIRadioButton" default-binding="true">
+        <constraints>
+          <grid row="14" column="6" row-span="1" col-span="24" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+          <gridbag weightx="0.0" weighty="0.0"/>
+        </constraints>
+        <properties>
+          <font name="Tahoma"/>
+          <text value="NCBI"/>
+        </properties>
+      </component>
+      <component id="e406" class="javax.swing.JRadioButton" binding="TAIRRadioButton" default-binding="true">
+        <constraints>
+          <grid row="15" column="6" row-span="1" col-span="24" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+          <gridbag weightx="0.0" weighty="0.0"/>
+        </constraints>
+        <properties>
+          <font name="Tahoma"/>
+          <text value="TAIR"/>
+        </properties>
+      </component>
+      <component id="5bbd7" class="javax.swing.JRadioButton" binding="nonOfTheAboveRadioButton" default-binding="true">
+        <constraints>
+          <grid row="16" column="6" row-span="1" col-span="24" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+          <gridbag weightx="0.0" weighty="0.0"/>
+        </constraints>
+        <properties>
+          <font name="Tahoma"/>
+          <text value="Non of the above"/>
+        </properties>
+      </component>
+      <component id="31333" class="javax.swing.JSeparator">
+        <constraints>
+          <grid row="1" column="3" row-span="2" col-span="3" vsize-policy="6" hsize-policy="6" anchor="0" fill="3" indent="0" use-parent-layout="false"/>
+          <gridbag top="2" left="2" bottom="2" right="2" weightx="0.0" weighty="0.0"/>
+        </constraints>
+        <properties>
+          <orientation value="1"/>
+        </properties>
+      </component>
+      <component id="7b3a9" class="javax.swing.JSpinner" binding="spinConfidence" custom-create="true">
+        <constraints>
+          <grid row="0" column="6" row-span="1" col-span="1" vsize-policy="0" hsize-policy="6" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+          <gridbag top="5" left="5" bottom="5" right="5" weightx="0.0" weighty="0.0"/>
+        </constraints>
+        <properties/>
+      </component>
+    </children>
+  </grid>
+  <buttonGroups>
+    <group name="referenceSetSizeRbtnGroup">
+      <member id="c03f8"/>
+      <member id="2bef"/>
+    </group>
+    <group name="buttonGroup1">
+      <member id="b1b3a"/>
+      <member id="3f600"/>
+      <member id="b1d1d"/>
+      <member id="e406"/>
+      <member id="5bbd7"/>
+    </group>
+  </buttonGroups>
+</form>

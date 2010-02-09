@@ -1,0 +1,730 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<form xmlns="http://www.intellij.com/uidesigner/form/" version="1" bind-to-class="com.compomics.rover.gui.QuantitationValidationGUI">
+  <grid id="27dc6" binding="contentPane" layout-manager="GridBagLayout">
+    <constraints>
+      <xy x="20" y="20" width="1507" height="400"/>
+    </constraints>
+    <properties>
+      <background color="-1"/>
+    </properties>
+    <border type="none"/>
+    <children>
+      <tabbedpane id="7d374" binding="tabbedPane">
+        <constraints>
+          <grid row="0" column="0" row-span="1" col-span="1" vsize-policy="3" hsize-policy="3" anchor="0" fill="3" indent="0" use-parent-layout="false">
+            <preferred-size width="200" height="200"/>
+          </grid>
+          <gridbag weightx="1.0" weighty="1.0"/>
+        </constraints>
+        <properties>
+          <background color="-1"/>
+        </properties>
+        <border type="none"/>
+        <children>
+          <grid id="a6077" binding="tabProtein" layout-manager="GridBagLayout">
+            <constraints>
+              <tabbedpane title="Protein"/>
+            </constraints>
+            <properties/>
+            <border type="none"/>
+            <children>
+              <splitpane id="6ec63">
+                <constraints>
+                  <grid row="0" column="0" row-span="1" col-span="1" vsize-policy="3" hsize-policy="3" anchor="0" fill="3" indent="0" use-parent-layout="false">
+                    <preferred-size width="200" height="200"/>
+                  </grid>
+                  <gridbag weightx="1.0" weighty="1.0"/>
+                </constraints>
+                <properties>
+                  <continuousLayout value="true"/>
+                  <dividerLocation value="172"/>
+                  <enabled value="true"/>
+                  <oneTouchExpandable value="true"/>
+                </properties>
+                <border type="none"/>
+                <children>
+                  <grid id="b6b17" binding="leftPanel" layout-manager="GridBagLayout">
+                    <constraints>
+                      <splitpane position="left"/>
+                    </constraints>
+                    <properties>
+                      <background color="-1"/>
+                    </properties>
+                    <border type="none"/>
+                    <children>
+                      <scrollpane id="bc655">
+                        <constraints>
+                          <grid row="5" column="0" row-span="1" col-span="9" vsize-policy="7" hsize-policy="7" anchor="0" fill="3" indent="0" use-parent-layout="false"/>
+                          <gridbag weightx="1.0" weighty="1.0"/>
+                        </constraints>
+                        <properties/>
+                        <border type="none"/>
+                        <children>
+                          <component id="3d8c4" class="javax.swing.JList" binding="proteinList" custom-create="true">
+                            <constraints/>
+                            <properties>
+                              <selectionMode value="0"/>
+                            </properties>
+                          </component>
+                        </children>
+                      </scrollpane>
+                      <component id="fa91" class="javax.swing.JButton" binding="showSelectionButton" default-binding="true">
+                        <constraints>
+                          <grid row="6" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
+                          <gridbag top="5" left="5" bottom="5" right="5" weightx="0.0" weighty="0.0"/>
+                        </constraints>
+                        <properties>
+                          <borderPainted value="true"/>
+                          <contentAreaFilled value="false"/>
+                          <focusPainted value="false"/>
+                          <icon value="viewSelection.gif"/>
+                          <iconTextGap value="0"/>
+                          <label value=""/>
+                          <text value=""/>
+                          <toolTipText value="Show all selected proteins"/>
+                        </properties>
+                      </component>
+                      <component id="107f9" class="javax.swing.JLabel" binding="jLabelTotaleNumber" custom-create="true">
+                        <constraints>
+                          <grid row="0" column="0" row-span="1" col-span="9" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+                          <gridbag top="5" left="5" bottom="5" right="5" weightx="0.0" weighty="0.0"/>
+                        </constraints>
+                        <properties>
+                          <enabled value="true"/>
+                          <text value="# proteins: 99999"/>
+                        </properties>
+                      </component>
+                      <component id="151b3" class="javax.swing.JLabel" binding="jLabelValidated" custom-create="true">
+                        <constraints>
+                          <grid row="2" column="0" row-span="1" col-span="9" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+                          <gridbag top="5" left="5" bottom="5" right="5" weightx="0.0" weighty="0.0"/>
+                        </constraints>
+                        <properties>
+                          <text value="validated"/>
+                        </properties>
+                      </component>
+                      <component id="d4a10" class="javax.swing.JButton" binding="showAllProteinsButton" default-binding="true">
+                        <constraints>
+                          <grid row="6" column="1" row-span="1" col-span="3" vsize-policy="0" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
+                          <gridbag top="5" left="5" bottom="5" right="5" weightx="0.0" weighty="0.0"/>
+                        </constraints>
+                        <properties>
+                          <contentAreaFilled value="false"/>
+                          <focusPainted value="false"/>
+                          <icon value="viewAll.gif"/>
+                          <iconTextGap value="0"/>
+                          <label value=""/>
+                          <text value=""/>
+                          <toolTipText value="Show all proteins"/>
+                        </properties>
+                      </component>
+                      <component id="d146f" class="javax.swing.JLabel" binding="jLabelSelected" custom-create="true">
+                        <constraints>
+                          <grid row="1" column="0" row-span="1" col-span="9" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+                          <gridbag top="5" left="5" bottom="5" right="5" weightx="0.0" weighty="0.0"/>
+                        </constraints>
+                        <properties>
+                          <text value="# selected proteins : 99999"/>
+                        </properties>
+                      </component>
+                      <component id="b4cc" class="javax.swing.JButton" binding="addAllProteinsInButton" default-binding="true">
+                        <constraints>
+                          <grid row="7" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
+                          <gridbag top="5" left="5" bottom="5" right="5" weightx="0.0" weighty="0.0"/>
+                        </constraints>
+                        <properties>
+                          <contentAreaFilled value="false"/>
+                          <focusPainted value="false"/>
+                          <icon value="plus.gif"/>
+                          <iconTextGap value="0"/>
+                          <label value=""/>
+                          <text value=""/>
+                          <toolTipText value="Add proteins from list to selection"/>
+                        </properties>
+                      </component>
+                      <component id="914eb" class="javax.swing.JButton" binding="deleteAllProteinsInButton" default-binding="true">
+                        <constraints>
+                          <grid row="7" column="3" row-span="1" col-span="3" vsize-policy="0" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
+                          <gridbag top="5" left="5" bottom="5" right="5" weightx="0.0" weighty="0.0"/>
+                        </constraints>
+                        <properties>
+                          <contentAreaFilled value="false"/>
+                          <focusPainted value="false"/>
+                          <icon value="min.gif"/>
+                          <iconTextGap value="0"/>
+                          <label value=""/>
+                          <text value=""/>
+                          <toolTipText value="Delete proteins in list from selection"/>
+                        </properties>
+                      </component>
+                      <component id="d40bd" class="javax.swing.JComboBox" binding="cmbOrder" custom-create="true">
+                        <constraints>
+                          <grid row="3" column="0" row-span="1" col-span="9" vsize-policy="0" hsize-policy="2" anchor="8" fill="1" indent="0" use-parent-layout="false"/>
+                          <gridbag top="5" left="5" bottom="5" right="5" weightx="0.0" weighty="0.0"/>
+                        </constraints>
+                        <properties/>
+                      </component>
+                      <component id="88629" class="javax.swing.JComboBox" binding="cmbRatioTypes" custom-create="true">
+                        <constraints>
+                          <grid row="4" column="3" row-span="1" col-span="6" vsize-policy="0" hsize-policy="2" anchor="8" fill="1" indent="0" use-parent-layout="false"/>
+                          <gridbag top="5" left="5" bottom="5" right="5" weightx="0.0" weighty="0.0"/>
+                        </constraints>
+                        <properties/>
+                      </component>
+                      <component id="c4e96" class="javax.swing.JLabel" binding="lblRatioType">
+                        <constraints>
+                          <grid row="4" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+                          <gridbag top="5" left="5" bottom="5" right="5" weightx="0.0" weighty="0.0"/>
+                        </constraints>
+                        <properties>
+                          <text value="Type ?"/>
+                        </properties>
+                      </component>
+                    </children>
+                  </grid>
+                  <grid id="338a2" binding="rightPanel" layout-manager="GridBagLayout">
+                    <constraints>
+                      <splitpane position="right"/>
+                    </constraints>
+                    <properties>
+                      <background color="-1"/>
+                    </properties>
+                    <border type="none"/>
+                    <children>
+                      <component id="32be4" class="javax.swing.JLabel" binding="lblProteinInfo">
+                        <constraints>
+                          <grid row="0" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+                          <gridbag top="5" left="5" bottom="5" right="5" weightx="0.0" weighty="0.0"/>
+                        </constraints>
+                        <properties>
+                          <text value="No protein selected"/>
+                        </properties>
+                      </component>
+                      <splitpane id="7e512">
+                        <constraints>
+                          <grid row="1" column="0" row-span="1" col-span="5" vsize-policy="3" hsize-policy="3" anchor="0" fill="3" indent="0" use-parent-layout="false">
+                            <preferred-size width="200" height="200"/>
+                          </grid>
+                          <gridbag weightx="1.0" weighty="1.0"/>
+                        </constraints>
+                        <properties>
+                          <continuousLayout value="false"/>
+                          <dividerLocation value="95"/>
+                          <dividerSize value="6"/>
+                          <oneTouchExpandable value="true"/>
+                          <orientation value="0"/>
+                        </properties>
+                        <border type="none"/>
+                        <children>
+                          <grid id="21872" binding="jpanExtraProteinInfo" custom-create="true" layout-manager="GridBagLayout">
+                            <constraints>
+                              <splitpane position="left"/>
+                            </constraints>
+                            <properties>
+                              <background color="-1"/>
+                            </properties>
+                            <border type="none"/>
+                            <children/>
+                          </grid>
+                          <grid id="1bd8a" layout-manager="GridBagLayout">
+                            <constraints>
+                              <splitpane position="right"/>
+                            </constraints>
+                            <properties/>
+                            <border type="none"/>
+                            <children>
+                              <splitpane id="60485">
+                                <constraints>
+                                  <grid row="0" column="0" row-span="1" col-span="1" vsize-policy="3" hsize-policy="3" anchor="0" fill="3" indent="0" use-parent-layout="false">
+                                    <preferred-size width="200" height="200"/>
+                                  </grid>
+                                  <gridbag weightx="1.0" weighty="1.0"/>
+                                </constraints>
+                                <properties>
+                                  <dividerLocation value="453"/>
+                                  <oneTouchExpandable value="true"/>
+                                </properties>
+                                <border type="none"/>
+                                <children>
+                                  <scrollpane id="69f77">
+                                    <constraints>
+                                      <splitpane position="left"/>
+                                    </constraints>
+                                    <properties/>
+                                    <border type="none"/>
+                                    <children>
+                                      <grid id="ca504" binding="jpanProteinRatioGroups" custom-create="true" layout-manager="GridBagLayout">
+                                        <constraints/>
+                                        <properties>
+                                          <background color="-1"/>
+                                        </properties>
+                                        <border type="none"/>
+                                        <children/>
+                                      </grid>
+                                    </children>
+                                  </scrollpane>
+                                  <grid id="a256d" binding="jpanProteinGraphWrapper" layout-manager="GridBagLayout">
+                                    <constraints>
+                                      <splitpane position="right"/>
+                                    </constraints>
+                                    <properties/>
+                                    <border type="none"/>
+                                    <children>
+                                      <grid id="a451d" binding="jpanGraphButtons" layout-manager="GridBagLayout">
+                                        <constraints>
+                                          <grid row="1" column="0" row-span="1" col-span="1" vsize-policy="3" hsize-policy="3" anchor="0" fill="3" indent="0" use-parent-layout="false"/>
+                                          <gridbag weightx="1.0" weighty="0.0"/>
+                                        </constraints>
+                                        <properties>
+                                          <background color="-1"/>
+                                        </properties>
+                                        <border type="none"/>
+                                        <children>
+                                          <component id="b613b" class="javax.swing.JButton" binding="graphExtenderLeft">
+                                            <constraints>
+                                              <grid row="0" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+                                              <gridbag weightx="0.0" weighty="0.0"/>
+                                            </constraints>
+                                            <properties>
+                                              <contentAreaFilled value="false"/>
+                                              <focusPainted value="false"/>
+                                              <icon value="1leftarrow.png"/>
+                                              <label value=""/>
+                                              <margin top="3" left="3" bottom="3" right="3"/>
+                                              <text value=""/>
+                                              <toolTipText value="Move the left graph border to the left"/>
+                                            </properties>
+                                          </component>
+                                          <component id="f8d80" class="javax.swing.JButton" binding="graphExtenderRight">
+                                            <constraints>
+                                              <grid row="0" column="5" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="4" fill="0" indent="0" use-parent-layout="false"/>
+                                              <gridbag weightx="0.0" weighty="0.0"/>
+                                            </constraints>
+                                            <properties>
+                                              <contentAreaFilled value="false"/>
+                                              <focusPainted value="false"/>
+                                              <icon value="1rightarrow.png"/>
+                                              <label value=""/>
+                                              <margin top="3" left="3" bottom="3" right="3"/>
+                                              <text value=""/>
+                                              <toolTipText value="Move the right graph border to the right"/>
+                                            </properties>
+                                          </component>
+                                          <component id="1bba" class="javax.swing.JButton" binding="graphExtenderLeftPlus">
+                                            <constraints>
+                                              <grid row="0" column="1" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
+                                              <gridbag weightx="0.0" weighty="0.0"/>
+                                            </constraints>
+                                            <properties>
+                                              <contentAreaFilled value="false"/>
+                                              <focusPainted value="false"/>
+                                              <icon value="1rightarrow.png"/>
+                                              <label value=""/>
+                                              <margin top="3" left="3" bottom="3" right="3"/>
+                                              <text value=""/>
+                                              <toolTipText value="Move the left graph border to the right"/>
+                                            </properties>
+                                          </component>
+                                          <component id="2b1f6" class="javax.swing.JButton" binding="graphExtenderRightMin">
+                                            <constraints>
+                                              <grid row="0" column="4" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
+                                              <gridbag weightx="0.0" weighty="0.0"/>
+                                            </constraints>
+                                            <properties>
+                                              <contentAreaFilled value="false"/>
+                                              <focusPainted value="false"/>
+                                              <icon value="1leftarrow.png"/>
+                                              <label value=""/>
+                                              <margin top="3" left="3" bottom="3" right="3"/>
+                                              <text value=""/>
+                                              <toolTipText value="Move the right graph border to the left"/>
+                                            </properties>
+                                          </component>
+                                          <component id="1ad89" class="javax.swing.JCheckBox" binding="showRealDistributionCheckBox" default-binding="true">
+                                            <constraints>
+                                              <grid row="0" column="2" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="4" fill="0" indent="0" use-parent-layout="false"/>
+                                              <gridbag weightx="1.0" weighty="0.0"/>
+                                            </constraints>
+                                            <properties>
+                                              <background color="-1"/>
+                                              <selected value="true"/>
+                                              <text value="Show &quot;real&quot; distribution"/>
+                                            </properties>
+                                          </component>
+                                          <component id="3caaa" class="javax.swing.JCheckBox" binding="showHuberEstimatedDistributionCheckBox" default-binding="true">
+                                            <constraints>
+                                              <grid row="0" column="3" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+                                              <gridbag weightx="1.0" weighty="0.0"/>
+                                            </constraints>
+                                            <properties>
+                                              <background color="-1"/>
+                                              <selected value="true"/>
+                                              <text value="Show Huber estimated distribution"/>
+                                            </properties>
+                                          </component>
+                                        </children>
+                                      </grid>
+                                      <grid id="8a57b" binding="jpanProteinGraph" custom-create="true" layout-manager="GridBagLayout">
+                                        <constraints>
+                                          <grid row="0" column="0" row-span="1" col-span="1" vsize-policy="3" hsize-policy="3" anchor="0" fill="3" indent="0" use-parent-layout="false"/>
+                                          <gridbag weightx="1.0" weighty="1.0"/>
+                                        </constraints>
+                                        <properties>
+                                          <background color="-1"/>
+                                        </properties>
+                                        <border type="none"/>
+                                        <children/>
+                                      </grid>
+                                    </children>
+                                  </grid>
+                                </children>
+                              </splitpane>
+                            </children>
+                          </grid>
+                        </children>
+                      </splitpane>
+                      <component id="66dc2" class="javax.swing.JButton" binding="addToSelectionButton" default-binding="true">
+                        <constraints>
+                          <grid row="0" column="4" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="4" fill="0" indent="0" use-parent-layout="false"/>
+                          <gridbag top="5" left="5" bottom="5" right="5" weightx="0.0" weighty="0.0"/>
+                        </constraints>
+                        <properties>
+                          <contentAreaFilled value="false"/>
+                          <focusPainted value="false"/>
+                          <icon value="addSelection.gif"/>
+                          <margin top="3" left="3" bottom="3" right="3"/>
+                          <text value=""/>
+                        </properties>
+                      </component>
+                      <component id="ecae8" class="javax.swing.JButton" binding="goToBrowserButton">
+                        <constraints>
+                          <grid row="0" column="2" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="4" fill="0" indent="0" use-parent-layout="false"/>
+                          <gridbag top="5" left="5" bottom="5" right="5" weightx="0.0" weighty="0.0"/>
+                        </constraints>
+                        <properties>
+                          <contentAreaFilled value="false"/>
+                          <focusPainted value="false"/>
+                          <icon value="homepage.png"/>
+                          <label value=""/>
+                          <margin top="3" left="3" bottom="3" right="3"/>
+                          <text value=""/>
+                          <toolTipText value="Open this protein in your default browser"/>
+                        </properties>
+                      </component>
+                      <grid id="6f1c3" binding="jpanProteinMeanOptions" layout-manager="GridBagLayout">
+                        <constraints>
+                          <grid row="2" column="0" row-span="1" col-span="5" vsize-policy="3" hsize-policy="3" anchor="0" fill="3" indent="0" use-parent-layout="false"/>
+                          <gridbag weightx="0.0" weighty="0.0"/>
+                        </constraints>
+                        <properties>
+                          <background color="-1"/>
+                        </properties>
+                        <border type="none"/>
+                        <children>
+                          <component id="208b4" class="javax.swing.JButton" binding="showRovButton" default-binding="true">
+                            <constraints>
+                              <grid row="0" column="4" row-span="45" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
+                              <gridbag top="5" left="5" bottom="5" right="5" weightx="0.0" weighty="0.0"/>
+                            </constraints>
+                            <properties>
+                              <contentAreaFilled value="false"/>
+                              <focusPainted value="false"/>
+                              <icon value="edu_science.png"/>
+                              <margin top="3" left="3" bottom="3" right="3"/>
+                              <text value=""/>
+                              <toolTipText value="Show rov file info for selected proteins"/>
+                            </properties>
+                          </component>
+                          <component id="1fd12" class="javax.swing.JButton" binding="filterProteinsButton" default-binding="true">
+                            <constraints>
+                              <grid row="0" column="0" row-span="45" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
+                              <gridbag top="5" left="5" bottom="5" right="5" weightx="0.0" weighty="0.0"/>
+                            </constraints>
+                            <properties>
+                              <contentAreaFilled value="false"/>
+                              <focusPainted value="false"/>
+                              <icon value="wizard.png"/>
+                              <label value=""/>
+                              <margin top="3" left="3" bottom="3" right="3"/>
+                              <text value=""/>
+                              <toolTipText value="Filter proteins"/>
+                            </properties>
+                          </component>
+                          <component id="1ac9f" class="javax.swing.JButton" binding="miscButton">
+                            <constraints>
+                              <grid row="0" column="1" row-span="45" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
+                              <gridbag top="5" left="5" bottom="5" right="5" weightx="0.0" weighty="0.0"/>
+                            </constraints>
+                            <properties>
+                              <contentAreaFilled value="false"/>
+                              <focusPainted value="false"/>
+                              <icon value="misc.png"/>
+                              <label value=""/>
+                              <margin top="3" left="3" bottom="3" right="3"/>
+                              <text value=""/>
+                              <toolTipText value="Reference set parameters"/>
+                            </properties>
+                          </component>
+                          <component id="b0a07" class="javax.swing.JRadioButton" binding="defaultRatioRadioButton" default-binding="true">
+                            <constraints>
+                              <grid row="0" column="5" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+                              <gridbag top="5" left="5" bottom="5" right="5" weightx="0.0" weighty="0.0"/>
+                            </constraints>
+                            <properties>
+                              <background color="-1"/>
+                              <selected value="true"/>
+                              <text value="Default ratio"/>
+                            </properties>
+                          </component>
+                          <component id="60417" class="javax.swing.JButton" binding="misc_infoButton">
+                            <constraints>
+                              <grid row="0" column="2" row-span="45" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
+                              <gridbag top="5" left="5" bottom="5" right="5" weightx="0.0" weighty="0.0"/>
+                            </constraints>
+                            <properties>
+                              <contentAreaFilled value="false"/>
+                              <focusPainted value="false"/>
+                              <icon value="misc_info.png"/>
+                              <label value=""/>
+                              <margin top="3" left="3" bottom="3" right="3"/>
+                              <text value=""/>
+                              <toolTipText value="Reference set info"/>
+                            </properties>
+                          </component>
+                          <component id="e8edc" class="javax.swing.JButton" binding="logButton">
+                            <constraints>
+                              <grid row="0" column="3" row-span="45" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
+                              <gridbag top="5" left="5" bottom="5" right="5" weightx="0.0" weighty="0.0"/>
+                            </constraints>
+                            <properties>
+                              <contentAreaFilled value="false"/>
+                              <focusPainted value="false"/>
+                              <icon value="log.png"/>
+                              <label value=""/>
+                              <margin top="3" left="3" bottom="3" right="3"/>
+                              <text value=""/>
+                              <toolTipText value="View log"/>
+                            </properties>
+                          </component>
+                          <component id="d7e6f" class="javax.swing.JCheckBox" binding="useOnlyValidRatiosCheckBox" default-binding="true">
+                            <constraints>
+                              <grid row="43" column="6" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+                              <gridbag top="5" left="5" bottom="5" right="5" weightx="0.0" weighty="0.0"/>
+                            </constraints>
+                            <properties>
+                              <background color="-1"/>
+                              <text value="Use only valid ratios"/>
+                            </properties>
+                          </component>
+                          <component id="b1afb" class="javax.swing.JCheckBox" binding="useOnlyUniquelyIdentifiedCheckBox" default-binding="true">
+                            <constraints>
+                              <grid row="0" column="6" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+                              <gridbag top="5" left="5" bottom="5" right="5" weightx="0.0" weighty="0.0"/>
+                            </constraints>
+                            <properties>
+                              <background color="-1"/>
+                              <text value="Use only uniquely identified (blue) peptides"/>
+                            </properties>
+                          </component>
+                          <component id="7799c" class="javax.swing.JCheckBox" binding="log2CheckBox" default-binding="true">
+                            <constraints>
+                              <grid row="0" column="7" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+                              <gridbag top="5" left="5" bottom="5" right="5" weightx="1.0" weighty="0.0"/>
+                            </constraints>
+                            <properties>
+                              <background color="-1"/>
+                              <text value="log 2"/>
+                            </properties>
+                          </component>
+                          <component id="6f62e" class="javax.swing.JCheckBox" binding="useOriginalCheckBox">
+                            <constraints>
+                              <grid row="22" column="7" row-span="22" col-span="1" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+                              <gridbag top="5" left="5" bottom="5" right="5" weightx="1.0" weighty="0.0"/>
+                            </constraints>
+                            <properties>
+                              <background color="-1"/>
+                              <text value="Use original ratios"/>
+                            </properties>
+                          </component>
+                          <component id="dd662" class="javax.swing.JRadioButton" binding="normalizedRatioRadioButton" default-binding="true">
+                            <constraints>
+                              <grid row="43" column="5" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+                              <gridbag top="5" left="5" bottom="5" right="5" weightx="0.0" weighty="0.0"/>
+                            </constraints>
+                            <properties>
+                              <background color="-1"/>
+                              <selected value="false"/>
+                              <text value="Normalized ratio"/>
+                            </properties>
+                          </component>
+                          <component id="57247" class="javax.swing.JButton" binding="restartButton">
+                            <constraints>
+                              <grid row="0" column="8" row-span="44" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
+                              <gridbag weightx="0.0" weighty="0.0"/>
+                            </constraints>
+                            <properties>
+                              <contentAreaFilled value="false"/>
+                              <focusPainted value="false"/>
+                              <focusTraversalPolicyProvider value="true"/>
+                              <icon value="restart.png"/>
+                              <label value=""/>
+                              <margin top="3" left="3" bottom="3" right="3"/>
+                              <text value=""/>
+                              <toolTipText value="Create new analysis for a new dataset"/>
+                            </properties>
+                          </component>
+                          <component id="305be" class="javax.swing.JButton" binding="exportButton">
+                            <constraints>
+                              <grid row="0" column="11" row-span="44" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
+                              <gridbag weightx="0.0" weighty="0.0"/>
+                            </constraints>
+                            <properties>
+                              <contentAreaFilled value="false"/>
+                              <focusPainted value="false"/>
+                              <focusTraversalPolicyProvider value="true"/>
+                              <icon value="filesave.png"/>
+                              <label value=""/>
+                              <margin top="3" left="3" bottom="3" right="3"/>
+                              <text value=""/>
+                              <toolTipText value="Export proteins"/>
+                            </properties>
+                          </component>
+                          <component id="9f406" class="javax.swing.JButton" binding="loadRoverFileButton" default-binding="true">
+                            <constraints>
+                              <grid row="0" column="13" row-span="44" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
+                              <gridbag weightx="0.0" weighty="0.0"/>
+                            </constraints>
+                            <properties>
+                              <contentAreaFilled value="false"/>
+                              <focusPainted value="false"/>
+                              <icon value="rover.gif"/>
+                              <label value=""/>
+                              <margin top="3" left="3" bottom="3" right="3"/>
+                              <text value=""/>
+                              <toolTipText value="Import a .rover file"/>
+                            </properties>
+                          </component>
+                          <component id="9b302" class="javax.swing.JButton" binding="reconstructButton" default-binding="true">
+                            <constraints>
+                              <grid row="0" column="12" row-span="44" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
+                              <gridbag weightx="0.0" weighty="0.0"/>
+                            </constraints>
+                            <properties>
+                              <contentAreaFilled value="false"/>
+                              <icon value="recon.png"/>
+                              <margin top="3" left="3" bottom="3" right="3"/>
+                              <text value=""/>
+                              <toolTipText value="Reconstruct protein from different sources"/>
+                            </properties>
+                          </component>
+                        </children>
+                      </grid>
+                      <component id="75793" class="javax.swing.JButton" binding="showPossibleIsoformsButton" default-binding="true">
+                        <constraints>
+                          <grid row="0" column="3" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="4" fill="0" indent="0" use-parent-layout="false"/>
+                          <gridbag top="5" left="5" bottom="5" right="5" weightx="0.0" weighty="0.0"/>
+                        </constraints>
+                        <properties>
+                          <contentAreaFilled value="false"/>
+                          <focusPainted value="false"/>
+                          <icon value="isoform.gif"/>
+                          <margin top="3" left="3" bottom="3" right="3"/>
+                          <text value=""/>
+                          <toolTipText value="Show possible isoforms"/>
+                        </properties>
+                      </component>
+                      <component id="1f806" class="javax.swing.JButton" binding="setValidatedButton" default-binding="true">
+                        <constraints>
+                          <grid row="0" column="1" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
+                          <gridbag top="5" left="5" bottom="5" right="5" weightx="0.0" weighty="0.0"/>
+                        </constraints>
+                        <properties>
+                          <contentAreaFilled value="false"/>
+                          <focusPainted value="false"/>
+                          <margin top="3" left="3" bottom="3" right="3"/>
+                          <text value=""/>
+                        </properties>
+                      </component>
+                    </children>
+                  </grid>
+                </children>
+              </splitpane>
+            </children>
+          </grid>
+          <grid id="7652d" binding="tabRov" layout-manager="GridBagLayout">
+            <constraints>
+              <tabbedpane title="Rov file"/>
+            </constraints>
+            <properties/>
+            <border type="none"/>
+            <children>
+              <splitpane id="35e0">
+                <constraints>
+                  <grid row="0" column="0" row-span="1" col-span="1" vsize-policy="3" hsize-policy="3" anchor="0" fill="3" indent="0" use-parent-layout="false">
+                    <preferred-size width="200" height="200"/>
+                  </grid>
+                  <gridbag weightx="1.0" weighty="1.0"/>
+                </constraints>
+                <properties/>
+                <border type="none"/>
+                <children>
+                  <grid id="bd3d2" binding="jpanRatioInRovTab" custom-create="true" layout-manager="GridBagLayout">
+                    <constraints>
+                      <splitpane position="right"/>
+                    </constraints>
+                    <properties/>
+                    <border type="none"/>
+                    <children/>
+                  </grid>
+                  <grid id="e14e5" layout-manager="GridBagLayout">
+                    <constraints>
+                      <splitpane position="left"/>
+                    </constraints>
+                    <properties>
+                      <background color="-1"/>
+                    </properties>
+                    <border type="none"/>
+                    <children>
+                      <scrollpane id="92e7f">
+                        <constraints>
+                          <grid row="0" column="0" row-span="1" col-span="1" vsize-policy="7" hsize-policy="7" anchor="0" fill="3" indent="0" use-parent-layout="false"/>
+                          <gridbag weightx="1.0" weighty="1.0"/>
+                        </constraints>
+                        <properties/>
+                        <border type="none"/>
+                        <children>
+                          <component id="415b7" class="javax.swing.JTree" binding="treeRovFiles" custom-create="true">
+                            <constraints/>
+                            <properties/>
+                          </component>
+                        </children>
+                      </scrollpane>
+                      <component id="b04ea" class="javax.swing.JCheckBox" binding="chbShowOnlyNonValid">
+                        <constraints>
+                          <grid row="1" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+                          <gridbag weightx="0.0" weighty="0.0"/>
+                        </constraints>
+                        <properties>
+                          <background color="-1"/>
+                          <text value="Show only false ratios"/>
+                        </properties>
+                      </component>
+                    </children>
+                  </grid>
+                </children>
+              </splitpane>
+            </children>
+          </grid>
+        </children>
+      </tabbedpane>
+    </children>
+  </grid>
+  <buttonGroups>
+    <group name="maxQuantRatioTypeRbtnGroup">
+      <member id="b0a07"/>
+      <member id="dd662"/>
+      <member id="21bb2"/>
+      <member id="643fd"/>
+    </group>
+  </buttonGroups>
+</form>
