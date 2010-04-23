@@ -1,112 +1,192 @@
 <?xml version="1.0"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
-	<modelVersion>4.0.0</modelVersion>
-	<groupId>com.compomics</groupId>
-	<artifactId>rover</artifactId>
-	<packaging>jar</packaging>
-	<version>${version.number}</version>
-	<name>rover</name>
-	<url>http://rover.googlecode.com</url>
+    <modelVersion>4.0.0</modelVersion>
+    <groupId>com.compomics</groupId>
+    <artifactId>rover</artifactId>
+    <packaging>jar</packaging>
+    <version>${version.number}</version>
+    <name>rover</name>
+    <url>http://code.google.com/p/compomics-rover/</url>
 
-<!-- Set the version number for the whole project -->
-	<properties>
-		<version.number>1.5</version.number>
-	</properties>
-    
-<!-- Licence -->
-	<licenses>
-		<license>
-			<name>The Apache Software License, Version 2.0</name>
-			<url>LICENSE-2.0.txt</url>
-		</license>
-	</licenses>
-    
-<!-- Build -->
-	<build>
-<!-- Copy the resources required during building -->
-		<resources>
-			<resource>
-				<directory>src/main/resources/</directory>
-				<includes>
-					<include>test.txt</include>
-				</includes>
-			</resource>
-		</resources>
+    <!-- Set the version number for the whole project -->
+    <properties>
+        <version.number>2.0</version.number>
+        <logging.level.default>ALL</logging.level.default>
+        <logging.file.path.name>rover-log4j.log</logging.file.path.name>
+        <logging.file.max.size>5000KB</logging.file.max.size>
+        <logging.pattern>[%d{dd-MMM-yyyy HH:mm:ss} - %p] "%m" (%C:%L)%n</logging.pattern>
+    </properties>
 
+    <!-- Licence -->
+    <licenses>
+        <license>
+            <name>The Apache Software License, Version 2.0</name>
+            <url>LICENSE-2.0.txt</url>
+        </license>
+    </licenses>
+
+    <!-- Build -->
+    <build>
+        <!-- Copy the resources required during building -->
+        <resources>
+            <resource>
+                <directory>src/main/resources/</directory>
+                <includes>
+                    <include>test.txt</include>
+                </includes>
+            </resource>
+        </resources>
 
 
         <!-- Plugins -->
         <plugins>
             <!-- Compiler plugin -->
-			<plugin>
-				<artifactId>maven-compiler-plugin</artifactId>
-				<configuration>
-					<source>1.5</source>
-					<target>1.5</target>
-					<showDeprecation>true</showDeprecation>
-					<debug>true</debug>
-				</configuration>
-			</plugin>
+            <plugin>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <configuration>
+                    <source>1.5</source>
+                    <target>1.5</target>
+                    <showDeprecation>true</showDeprecation>
+                    <debug>true</debug>
+                </configuration>
+            </plugin>
 
             <!-- Jar plugin -->
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-jar-plugin</artifactId>
-				<configuration>
-					<archive>
-						<manifest>
-							<mainClass>com.compomics.rover.gui.wizard.WizardFrameHolder</mainClass>
-							<addClasspath>true</addClasspath>
-							<classpathPrefix>lib</classpathPrefix>
-						</manifest>
-					</archive>
-					<outputDirectory>${project.build.directory}/rover-${project.version}</outputDirectory>
-				</configuration>
-			</plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-jar-plugin</artifactId>
+                <configuration>
+                    <archive>
+                        <manifest>
+                            <mainClass>com.compomics.rover.general.RoverStarter</mainClass>
+                            <addClasspath>true</addClasspath>
+                            <classpathPrefix>lib</classpathPrefix>
+                        </manifest>
+                    </archive>
+                    <outputDirectory>${project.build.directory}/rover-${project.version}</outputDirectory>
+                </configuration>
+            </plugin>
 
-            <!-- Dependency plugin -->
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-dependency-plugin</artifactId>
-				<executions>
-					<execution>
-						<id>copy-dependencies</id>
-						<phase>package</phase>
-						<goals>
-							<goal>copy-dependencies</goal>
-						</goals>
-						<configuration>
-							<outputDirectory>${project.build.directory}/rover-${project.version}/lib</outputDirectory>
-							<overWriteReleases>true</overWriteReleases>
-							<overWriteSnapshots>true</overWriteSnapshots>
-							<excludeTransitive>false</excludeTransitive>
-						</configuration>
-					</execution>
-				</executions>
-			</plugin>
+             <!-- Dependency plugin -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-dependency-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>copy-dependencies</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>copy-dependencies</goal>
+                        </goals>
+                        <configuration>
+                            <outputDirectory>${project.build.directory}/rover-${project.version}/lib</outputDirectory>
+                            <overWriteReleases>true</overWriteReleases>
+                            <overWriteSnapshots>true</overWriteSnapshots>
+                            <excludeTransitive>false</excludeTransitive>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+
+             <!-- Dependency plugin -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-dependency-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>copy-dependencies</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>copy-dependencies</goal>
+                        </goals>
+                        <configuration>
+                            <outputDirectory>${project.build.directory}/rover-${project.version}/lib</outputDirectory>
+                            <overWriteReleases>true</overWriteReleases>
+                            <overWriteSnapshots>true</overWriteSnapshots>
+                            <excludeTransitive>false</excludeTransitive>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
 
             <!-- Resources plugin -->
-			<plugin>
-				<artifactId>maven-resources-plugin</artifactId>
-				<version>2.3</version>
-				<executions>
-					<execution>
-						<id>copy-resources</id>
-						<phase>package</phase>
-						<goals>
-							<goal>copy-resources</goal>
-						</goals>
-						<configuration>
-							<outputDirectory>${project.build.directory}/rover-${project.version}</outputDirectory>
-							<resources>
-								<resource>
-									<directory>src/main/resources/</directory>
-								</resource>
-							</resources>
-						</configuration>
-					</execution>
-				</executions>
-			</plugin>
+            <plugin>
+                <artifactId>maven-resources-plugin</artifactId>
+                <version>2.3</version>
+                <executions>
+                    <execution>
+                        <id>copy-resources</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>copy-resources</goal>
+                        </goals>
+                        <configuration>
+                            <outputDirectory>${project.build.directory}/rover-${project.version}</outputDirectory>
+                            <resources>
+                                <resource>
+                                    <directory>manual/</directory>
+                                    <includes>
+                                        <include>rover.pdf</include>
+                                    </includes>
+                                </resource>
+                            </resources>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+
+            <!-- Resources plugin - classes -->
+            <plugin>
+                <artifactId>maven-resources-plugin</artifactId>
+                <version>2.3</version>
+                <executions>
+                    <execution>
+                        <id>copy-resources2</id>
+                        <phase>compile</phase>
+                        <goals>
+                            <goal>copy-resources</goal>
+                        </goals>
+                        <configuration>
+                            <overwrite>true</overwrite>
+                            <outputDirectory>target/classes</outputDirectory>
+                            <resources>
+                                <resource>
+                                    <directory>src/main/resources</directory>
+                                    <filtering>true</filtering>
+                                </resource>
+                            </resources>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+
+
+            <!-- Resources plugin -->
+            <plugin>
+                <artifactId>maven-resources-plugin</artifactId>
+                <version>2.3</version>
+                <!-- Copy resources into appropriate folder upon packaging -->
+                <executions>
+                    <!-- Copy main resources into test classpath when running the tests -->
+                    <execution>
+                        <id>copy-test-resources</id>
+                        <phase>generate-test-resources</phase>
+                        <goals>
+                            <goal>copy-resources</goal>
+                        </goals>
+                        <configuration>
+                            <overwrite>true</overwrite>
+                            <outputDirectory>src/test/resources</outputDirectory>
+                            <resources>
+                                <resource>
+                                    <directory>src/main/resources</directory>
+                                    <filtering>true</filtering>
+                                </resource>
+                            </resources>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
 
             <!-- Create javadoc on build -->
             <plugin>
@@ -139,11 +219,12 @@
                 </executions>
             </plugin>
 
-		</plugins>
-	</build>    
+           
+        </plugins>
+    </build>
+
 
     <!-- Repositores -->
-	<!-- Repositores -->
     <repositories>
         <!-- UGent Genesis Maven 1 repository -->
         <repository>
@@ -153,18 +234,18 @@
             <layout>legacy</layout>
         </repository>
 
-		<!-- UGent Genesis Maven 2 repository -->
-		        <repository>
-		            <id>genesis-maven2-repository</id>
-		            <name>Genesis maven2 repository</name>
-		            <url>http://genesis.UGent.be/maven2</url>
-		            <layout>default</layout>
-		        </repository>
+        <!-- UGent Genesis Maven 2 repository -->
+        <repository>
+            <id>genesis-maven2-repository</id>
+            <name>Genesis maven2 repository</name>
+            <url>http://genesis.UGent.be/maven2</url>
+            <layout>default</layout>
+        </repository>
 
     </repositories>
 
     <!-- Dependencies -->
-	<dependencies>
+    <dependencies>
         <!-- This project depends on the junit JAR file.
           -->
         <dependency>
@@ -227,7 +308,7 @@
         <dependency>
             <groupId>com.compomics</groupId>
             <artifactId>utilities</artifactId>
-            <version>3.0</version>
+            <version>3.0.3</version>
             <type>jar</type>
         </dependency>
 
@@ -236,15 +317,21 @@
         <dependency>
             <groupId>com.compomics</groupId>
             <artifactId>ms-lims</artifactId>
-            <version>7.2</version>
+            <version>7.3</version>
             <type>jar</type>
+            <exclusions>
+                <exclusion>
+                    <artifactId>peptizer</artifactId>
+                    <groupId>com.compomics</groupId>
+                </exclusion>
+            </exclusions>
         </dependency>
         <!-- This project depends on the Mascot Datfile JAR file.
         -->
         <dependency>
             <groupId>com.compomics</groupId>
             <artifactId>mascotdatfile</artifactId>
-            <version>3.0</version>
+            <version>3.0.1</version>
             <type>jar</type>
         </dependency>
         <!-- This project depends on the commons-io JAR file.
@@ -261,6 +348,15 @@
             <groupId>commons-logging</groupId>
             <artifactId>commons-logging</artifactId>
             <version>1.1</version>
+            <type>jar</type>
+        </dependency>
+
+        <!-- This project depends on the apache log4j framework.
+          -->
+        <dependency>
+            <groupId>log4j</groupId>
+            <artifactId>log4j</artifactId>
+            <version>1.2.12</version>
             <type>jar</type>
         </dependency>
         <!-- This project depends on the commons-math JAR file.
@@ -311,16 +407,22 @@
             <version>1.0.4</version>
             <type>jar</type>
         </dependency>
-        
+        <!-- This project depends on the jgoodies JAR file.
+          -->
+        <dependency>
+            <groupId>com.jgoodies</groupId>
+            <artifactId>looks</artifactId>
+            <version>2.2.2</version>
+            <type>jar</type>
+        </dependency>
+    </dependencies>
 
-	</dependencies>
+    <distributionManagement>
+        <repository>
+            <id>genesis-maven2-repo</id>
+            <name>Genesis Maven2 Repository</name>
+            <url>scp://genesis.ugent.be/home/maven/public_html/maven2</url>
+        </repository>
+    </distributionManagement>
 
-        <distributionManagement>
-      <repository>
-          <id>genesis-maven2-repo</id>
-          <name>Genesis Maven Repository</name>
-          <url>scp://genesis.ugent.be/home/maven/public_html/maven2</url>
-      </repository>
-  </distributionManagement>
-    
 </project>
