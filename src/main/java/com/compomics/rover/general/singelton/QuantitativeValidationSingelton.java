@@ -6,6 +6,8 @@
  */
 package com.compomics.rover.general.singelton;
 
+import org.apache.log4j.Logger;
+
 import com.compomics.rover.general.quantitation.QuantitativeProtein;
 import com.compomics.rover.general.quantitation.RatioType;
 import com.compomics.rover.general.quantitation.ReferenceSet;
@@ -32,6 +34,8 @@ import sun.net.www.protocol.http.AuthCache;
  * This singelton holds some information that is used the QuantitationValidationGui, ProteinBarCodePanel, QuantiativeProtein ... classes
  */
 public class QuantitativeValidationSingelton {
+	// Class specific log4j logger for QuantitativeValidationSingelton instances.
+	 private static Logger logger = Logger.getLogger(QuantitativeValidationSingelton.class);
     /**
      * Singelton instance
      */
@@ -80,11 +84,11 @@ public class QuantitativeValidationSingelton {
     /**
      * The right border of the graph. This is also the end for the colored gradient in the protein bar
      */
-    private int iRightGraphBorder = 3;
+    private int iRightGraphBorder = 2;
     /**
      * The left border of the graph. This is also the start for the colored gradient in the protein bar
      */
-    private int iLeftGraphBorder = 0;
+    private int iLeftGraphBorder = -2;
     /**
      * The reference set
      */
@@ -123,16 +127,55 @@ public class QuantitativeValidationSingelton {
      * The location where the file chooser should open
      */
     private String iFileLocationOpener;
+    /**
+     * The ratio types
+     */
     private Vector<String> iRatioTypes;
+    /**
+     * The component types
+     */
     private Vector<String> iComponentsTypes;
+    /**
+     * the mathed ratio types
+     */
     private Vector<RatioType> iMatchedRatioTypes = new Vector<RatioType>();
+    /**
+     * The rover sources of the original selection of files
+     */
     private Vector<RoverSource> iOriginalRoverSources;
+    /**
+     * boolean that indicate if multiple sources are used
+     */
     private boolean iMultipleSources = false;
+    /**
+     * Vector with the titles for the different sources
+     */
     private Vector<String> iTitlesForDifferentSources;
+    /**
+     * Map with the protein accessions and the sequences
+     */
     private HashMap iSequenceMap = new HashMap();
+    /**
+     * Vector with the RatioGroupCollection
+     */
     private Vector<RatioGroupCollection> iOriginalCollections;
+    /**
+     * Vector with protein accessions
+     */
     private Vector<String> iProteinAccessions;
+    /**
+     * Vector with booleans that indicate if the corresponding indexes are used in the visualization
+     */
     private Vector<Boolean> iSelectedIndexes;
+    /**
+     * String with the location of the fasta database
+     */
+    private String iFastaDatabaseLocation;
+    /**
+     * boolean that indicates if normalization was performed
+     */
+    private boolean iNormalization = false;
+    private boolean iMsLimsPre7_2 = false;
 
 
     public static QuantitativeValidationSingelton getInstance() {
@@ -606,6 +649,11 @@ public class QuantitativeValidationSingelton {
         this.iRoverSources.add(aRoverSource);
     }
 
+
+    public void removeLastRoverDataType() {
+        this.iRoverSources.removeElementAt(iRoverSources.size() - 1);
+    }
+
     /**
      * Getter for the MaxQuant Score type
      * @return MaxQuantScoreType
@@ -629,7 +677,7 @@ public class QuantitativeValidationSingelton {
      * @param lZvalue the Z-value
      * @return double a p value
      */
-    public double calculateTwoSidedPvalueForZvalue(double lZvalue) {
+    public double calculateOneSidedPvalueForZvalue(double lZvalue) {
         lZvalue = lZvalue / Math.sqrt(2.0);
         double lPvalue = 0.0;
         try {
@@ -650,7 +698,7 @@ public class QuantitativeValidationSingelton {
      * @param lZvalue the Z-value
      * @return double a p value
      */
-    public double calculateOneSidedPvalueForZvalue(double lZvalue) {
+    public double calculateTwoSidedPvalueForZvalue(double lZvalue) {
         lZvalue = lZvalue / Math.sqrt(2.0);
         double lPvalue = 0.0;
         try {
@@ -798,5 +846,29 @@ public class QuantitativeValidationSingelton {
 
     public void setUseOriginalRatio(boolean iUseOriginalRatio) {
         this.iUseOriginalRatio = iUseOriginalRatio;
+    }
+
+    public void setFastaDatabaseLocation(String fastaDatabaseLocation) {
+        this.iFastaDatabaseLocation = fastaDatabaseLocation;
+    }
+
+    public String getFastaDatabaseLocation() {
+        return iFastaDatabaseLocation;
+    }
+
+    public boolean isNormalization() {
+        return iNormalization;
+    }
+
+    public void setNormalization(boolean iNormalization) {
+        this.iNormalization = iNormalization;
+    }
+
+    public void setMsLimsPre7_2(boolean msLimsPre7_2) {
+        this.iMsLimsPre7_2 = msLimsPre7_2;
+    }
+
+    public boolean getMsLimsPre7_2() {
+        return iMsLimsPre7_2;
     }
 }

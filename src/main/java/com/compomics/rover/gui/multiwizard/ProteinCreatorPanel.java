@@ -1,25 +1,30 @@
 package com.compomics.rover.gui.multiwizard;
 
+import org.apache.log4j.Logger;
+
+import com.compomics.rover.general.enumeration.RoverSource;
 import com.compomics.rover.general.interfaces.WizardPanel;
 import com.compomics.rover.general.interfaces.Ratio;
 import com.compomics.rover.general.quantitation.*;
 import com.compomics.rover.general.quantitation.sorters.QuantitativeProteinSorterByRatioGroupNumbers;
 import com.compomics.rover.general.quantitation.sorters.QuantitativeProteinSorterByAccession;
+import com.compomics.rover.general.quantitation.sorters.RatioSorterByIntensity;
+import com.compomics.rover.general.quantitation.sorters.RatioSorterBySummedIntensities;
 import com.compomics.rover.general.singelton.QuantitativeValidationSingelton;
 import com.compomics.rover.general.enumeration.ProteinDatabaseType;
 import com.compomics.rover.general.sequenceretriever.UniprotSequenceRetriever;
 import com.compomics.rover.general.sequenceretriever.IpiSequenceRetriever;
 import com.compomics.rover.general.sequenceretriever.NcbiSequenceRetriever;
 import com.compomics.rover.general.sequenceretriever.TairSequenceRetriever;
+import com.compomics.rover.gui.MatchRatioWithComponent;
 import com.compomics.rover.gui.QuantitationValidationGUI;
 import com.compomics.util.sun.SwingWorker;
 import be.proteomics.statlib.descriptive.BasicStats;
+import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
 
 import javax.swing.*;
-import java.util.Vector;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
+import java.io.*;
+import java.util.*;
 import java.awt.*;
 
 /**
@@ -30,6 +35,8 @@ import java.awt.*;
  * To change this template use File | Settings | File Templates.
  */
 public class ProteinCreatorPanel implements WizardPanel {
+	// Class specific log4j logger for ProteinCreatorPanel instances.
+	 private static Logger logger = Logger.getLogger(ProteinCreatorPanel.class);
     private JPanel jpanContent;
     private JProgressBar progressBar;
     private WizardFrameHolder iParent;
@@ -72,14 +79,14 @@ public class ProteinCreatorPanel implements WizardPanel {
                 Vector<String> lRatioTypesList = iParent.getNewRatioTypes();
                 String[] lRatioTypes = new String[lRatioTypesList.size()];
                 lRatioTypesList.toArray(lRatioTypes);
-                Vector<String> lComponentTypesList = iParent.getNewRatioTypes();
+                Vector<String> lComponentTypesList = iParent.getNewComponentsType();
                 String[] lComponentTypes = new String[lComponentTypesList.size()];
                 lComponentTypesList.toArray(lComponentTypes);
                 Vector<RatioGroupCollection> lCollections = iParent.getCollections();
                 Vector<QuantitativeProtein> lQuantProtein = new Vector<QuantitativeProtein>();
                 progressBar.setIndeterminate(true);
                 progressBar.setStringPainted(true);
-                progressBar.setString("Creating proteins and reference set ... ");
+                progressBar.setString("Creating proteins ... ");
 
 
                 //1. create all the distiller proteins
@@ -111,9 +118,14 @@ public class ProteinCreatorPanel implements WizardPanel {
 
                     //ToDo delete me
                 }
-
+                progressBar.setString("Calculating razor peptides ... ");
                 calculateRazorPeptides(lQuantProtein);
+                iQuantitativeValidationSingelton.setAllProteins(lQuantProtein);
 
+                progressBar.setString("Doing location and scale normalization ... ");
+                doNormalization(lQuantProtein, lRatioTypesList);
+
+                progressBar.setString("Creating reference set ... ");
                 //10. create a reference set with the "household" proteins with the most ratiogroups
                 ReferenceSet lReferenceSet = new ReferenceSet(new ArrayList<QuantitativeProtein>(), lRatioTypes, lComponentTypes);
                 //sort by the ratio group numbers
@@ -131,11 +143,12 @@ public class ProteinCreatorPanel implements WizardPanel {
                 }
                 //set the refernce set
                 iQuantitativeValidationSingelton.setReferenceSet(lReferenceSet);
-
+                //lReferenceSet.calculateStatisticsByRandomSampling();
 
                 //sort by the protein accession
                 Collections.sort(lQuantProtein, new QuantitativeProteinSorterByAccession());
                 progressBar.setIndeterminate(false);
+
                 downloadProteinSequences(lQuantProtein);
 
                 //_____Do garbage collection______
@@ -144,65 +157,7 @@ public class ProteinCreatorPanel implements WizardPanel {
 
                 progressBar.setIndeterminate(true);
                 progressBar.setStringPainted(true);
-                progressBar.setString("Doing statistics ... ");
-
-                //find for every data set and for every ratio type the stdev and mean
-                double[][] lStDevs = new double[iParent.getRoverSources().size()][lRatioTypes.length];
-                double[][] lMeans = new double[iParent.getRoverSources().size()][lRatioTypes.length];
-                for (int l = 0; l < iParent.getRoverSources().size(); l++) {
-                    for (int m = 0; m < lRatioTypes.length; m++) {
-                        HashMap<String, Double> lResult = huberStatistics(lQuantProtein, lRatioTypes[m], l);
-                        lStDevs[l][m] = lResult.get("stdev");
-                        lMeans[l][m] = lResult.get("mean");
-                        System.out.println("Set " + (l + 1) + " type: " + lRatioTypes[m] + " StDev: " + lStDevs[l][m] + " Mean: " + lMeans[l][m]);
-                    }
-                }
-
-                //now calculate the average SD and mean for every ratio type
-                double[] lAverageStDevs = new double[lRatioTypes.length];
-                double[] lAverageMeans = new double[lRatioTypes.length];
-
-                for (int m = 0; m < lRatioTypes.length; m++) {
-                    double lMean = 0.0;
-                    double lSD = 0.0;
-                    for (int l = 0; l < iParent.getRoverSources().size(); l++) {
-                        lMean = lMean + lMeans[l][m];
-                        lSD = lSD + lStDevs[l][m];
-                    }
-
-                    lAverageMeans[m] = lMean / (double) iParent.getRoverSources().size();
-                    lAverageStDevs[m] = lSD / (double) iParent.getRoverSources().size();
-                    System.out.println(lRatioTypes[m] + " average StDev: " + lAverageStDevs[m] + " average mean: " + lAverageMeans[m]);
-                }
-
-
-                //now recalculate the ratios
-                for (int i = 0; i < lCollections.size(); i++) {
-
-                    for (int j = 0; j < lCollections.get(i).size(); j++) {
-                        //get the ratio group
-                        RatioGroup lRatioGroup = lCollections.get(i).get(j);
-                        for (int k = 0; k < lRatioGroup.getNumberOfRatios(); k++) {
-                            Ratio lRatio = lRatioGroup.getRatio(k);
-                            String lRatioType = lRatio.getType();
-                            for (int m = 0; m < lRatioTypes.length; m++) {
-                                if (lRatioTypes[m].equalsIgnoreCase(lRatioType)) {
-                                    //change the ratio
-                                    double lTempRatio = lRatio.getRatio(true);
-                                    int lIndex = lCollections.get(i).getIndex();
-                                    double lZscore = (lTempRatio - lMeans[lIndex][m]) / lStDevs[lIndex][m];
-                                    //reset the SD
-                                    lTempRatio = lAverageMeans[m] + (lAverageStDevs[m] * lZscore);
-                                    //System.out.println(lRatio.getRatio(true) +  " z: " + lZscore + " aveM: " + lAverageMeans[m] + " aveSD: " + lAverageStDevs[m] + " => " + lTempRatio);
-                                    lRatio.setRecalculatedRatio(lTempRatio);
-                                    //System.out.println(lRatio.getRatio(true) + " " + lRatio.getRatio(false));
-                                }
-                            }
-
-                        }
-
-                    }
-                }
+                
 
                 //_____Do garbage collection______
                 System.gc();
@@ -225,58 +180,301 @@ public class ProteinCreatorPanel implements WizardPanel {
     }
 
 
-    /**
-     * This method will do the huber statistics for this reference set an for every ratio type
-     */
-    public HashMap<String, Double> huberStatistics(Vector<QuantitativeProtein> iReferenceProteins, String lType, int lIndex) {
+    public void doNormalization(Vector<QuantitativeProtein> lProteins, Vector<String> lTypes) {
+        iQuantitativeValidationSingelton.setNormalization(true);
+        for (int i = 0; i < lTypes.size(); i++) {
 
-        int iUsedRatios = 0;
+            String lUnregulatedComponent = null;
 
-        // Okay, do the stats on the log2 ratios.
 
-        Vector<Double> lLog2Ratios = new Vector<Double>();
-        //we will first look for the ratios where we want to do statistics on
-        for (int i = 0; i < iReferenceProteins.size(); i++) {
-            Vector<RatioGroup> lRatioGroups = iReferenceProteins.get(i).getRatioGroups();
-            for (int j = 0; j < lRatioGroups.size(); j++) {
-                if (lRatioGroups.get(j).getParentCollection().getIndex() == lIndex) {
-                    if (iQuantitativeValidationSingelton.isRatioValidInReferenceSet()) {
-                        //check if the ratio is valid
-                        Ratio lRatio = lRatioGroups.get(j).getRatioByType(lType);
+            double lStDevOld = Double.MAX_VALUE;
+            double lCoefVarOld = Double.MAX_VALUE;
+            double lStDevNew = 0.0;
+            double lCoefVarNew = 0.0;
+            double lCoefVarDiff = 1.0;
+            int lCycles = 0;
+            Vector<Vector<Double>> lAllCalculatedMADs = new Vector<Vector<Double>>();
+
+            //get the ratios
+            Vector<Vector<Ratio>> lValidUniqueRatios = new Vector<Vector<Ratio>>();
+            Vector<Vector<Ratio>> lAllRatios = new Vector<Vector<Ratio>>();
+            Vector<Vector<Boolean>> lAllRatiosTakenForNormalizationVector = new Vector<Vector<Boolean>>();
+            for (int l = 0; l < iParent.getRoverSources().size(); l++) {
+                Vector<RatioType> lRatioTypes = iQuantitativeValidationSingelton.getMatchedRatioTypes();
+                String lRatioType = "";
+                for (int j = 0; j < lRatioTypes.size(); j++) {
+                    if (lRatioTypes.get(j).getType().equalsIgnoreCase(lTypes.get(i))) {
+                        lUnregulatedComponent = lRatioTypes.get(j).getUnregulatedComponentsBySet().get(l);
+                        lRatioType = lRatioTypes.get(j).getType();
+                    }
+                }
+                //get the ratios
+                Vector<Ratio> lValidUniqueRatiosForSource = new Vector<Ratio>();
+                Vector<Ratio> lAllRatiosForSource = new Vector<Ratio>();
+                Vector<Boolean> lAllRatiosTakenForNormalizationVectorForSource = new Vector<Boolean>();
+
+                lAllRatios.add(lAllRatiosForSource);
+                lAllRatiosTakenForNormalizationVector.add(lAllRatiosTakenForNormalizationVectorForSource);
+                lValidUniqueRatios.add(lValidUniqueRatiosForSource);
+
+                for (int j = 0; j < lProteins.size(); j++) {
+                    for (int k = 0; k < lProteins.get(j).getRatioGroups().size(); k++) {
+                        Ratio lRatio = lProteins.get(j).getRatioGroups().get(k).getRatioByType(lTypes.get(i));
                         if (lRatio != null) {
-                            if (lRatio.getValid()) {
-                                if (!Double.isNaN(lRatio.getRatio(true)) && !Double.isInfinite(lRatio.getRatio(true))) {
-                                    lLog2Ratios.add(lRatio.getRatio(true));
-                                    iUsedRatios = iUsedRatios + 1;
+                            if (lRatio.getParentRatioGroup().getParentCollection().getIndex() == l) {
+                                if (!lAllRatios.get(l).contains(lRatio)) {
+                                    lAllRatiosForSource.add(lRatio);
+                                    lAllRatiosTakenForNormalizationVectorForSource.add(false);
                                 }
-                            }
-                        }
-                    } else {
-                        Ratio lRatio = lRatioGroups.get(j).getRatioByType(lType);
-                        if (lRatio != null) {
-                            if (!Double.isNaN(lRatio.getRatio(true)) && !Double.isInfinite(lRatio.getRatio(true))) {
-                                lLog2Ratios.add(lRatio.getRatio(true));
-                                iUsedRatios = iUsedRatios + 1;
+                                if (lRatio.getValid()) {
+                                    if (!lValidUniqueRatios.get(l).contains(lRatio)) {
+                                        lValidUniqueRatiosForSource.add(lRatio);
+                                    }
+                                }
                             }
                         }
                     }
                 }
+
+
+                //sort the ratios by intesities
+                RatioSorterByIntensity lSorter = new RatioSorterByIntensity(lUnregulatedComponent, lRatioType);
+                Collections.sort(lAllRatiosForSource, lSorter);
+                Collections.sort(lValidUniqueRatiosForSource, lSorter);
+            }
+            try {
+
+                //Calendar now = Calendar.getInstance();
+                //PrintWriter out = new PrintWriter(new FileWriter("C:\\" + "multiRoverOut" + now.getTimeInMillis() + ".csv"));
+                //out.println("Normalization cycles\tOld MAD Sd\tOld MAD mean\tOld Coef of var\tNew MAD SD\tNew MAD mean\tNew coef of var");
+
+
+                while (lCoefVarDiff > 0.0005) {
+                    //while (lCycles < 20) {
+
+
+                    //Create the holders for the divided ratio vectors
+                    Vector<Vector<Ratio>> lDividedValidUniqueRatios = new Vector<Vector<Ratio>>();
+                    Vector<Vector<Ratio>> lDividedValidUniqueSlidingWindowRatios = new Vector<Vector<Ratio>>();
+                    Vector<Double> lDividedValidUniqueMADS = new Vector<Double>();
+                    Vector<Double> lScalingFactor = new Vector<Double>();
+                    Vector<Vector<Ratio>> lDividedAllRatios = new Vector<Vector<Ratio>>();
+                    DescriptiveStatistics lOldMADs = new DescriptiveStatistics();
+                    DescriptiveStatistics lNewMADs = new DescriptiveStatistics();
+                    Vector<Double> lIntensities = new Vector<Double>();
+
+
+                    for (int r = 0; r < iParent.getRoverSources().size(); r++) {
+                        Vector<RatioType> lRatioTypes = iQuantitativeValidationSingelton.getMatchedRatioTypes();
+                        String lRatioTypeTitle = "";
+                        RatioType lRatioType = null;
+                        for (int j = 0; j < lRatioTypes.size(); j++) {
+                            if (lRatioTypes.get(j).getType().equalsIgnoreCase(lTypes.get(i))) {
+                                lUnregulatedComponent = lRatioTypes.get(j).getUnregulatedComponentsBySet().get(r);
+                                lRatioTypeTitle = lRatioTypes.get(j).getType();
+                                lRatioType = lRatioTypes.get(j);
+                            }
+                        }
+                        for (int p = 0; p < lAllRatiosTakenForNormalizationVector.get(r).size(); p++) {
+                            lAllRatiosTakenForNormalizationVector.get(r).set(p, false);
+                        }
+
+
+                        if (lCycles == 0) {
+                            //only do a normalization if its the first cycle
+                            //calculate log 2 median
+                            double[] lRatios = new double[lValidUniqueRatios.get(r).size()];
+                            for (int m = 0; m < lValidUniqueRatios.get(r).size(); m++) {
+                                lRatios[m] = lValidUniqueRatios.get(r).get(m).getRatio(true);
+                            }
+                            double lMedian = BasicStats.median(lRatios, false);
+                            //calculate the wanted log 2 median
+                            double lWantedMedian = lRatioType.getMedian();
+                            lWantedMedian = Math.log(lWantedMedian) / Math.log(2);
+
+                            //use this median to correct every ratio
+                            for (int m = 0; m < lAllRatios.get(r).size(); m++) {
+                                Ratio lRatio = lAllRatios.get(r).get(m);
+                                double lRatioValue = lRatio.getRatio(true);
+                                lRatioValue = lRatioValue + (lWantedMedian - lMedian);
+                                lRatio.setRecalculatedRatio(lRatioValue);
+                            }
+
+                        }
+
+
+                        //calculate the size of each of the 20 groups
+                        int lHalfGroupSize = 200;
+                        if (lCycles != 0) {
+                            lHalfGroupSize = (int) (lHalfGroupSize * ((lCycles) / 0.6));
+                        }
+                        int lJumpFactor = 50;
+                        int lGroupSize = lHalfGroupSize * 2 + lJumpFactor;
+                        int lNumberOfGroups = (int) (lValidUniqueRatios.get(r).size() / Double.valueOf(lJumpFactor));
+                        int lLastIndexAdded = -1;
+                        int lMaximumIndexToAdd = 0;
+
+                        //divide the ratios in to groups
+                        double lUpperLast = Double.MIN_VALUE;
+                        for (int j = 0; j < lNumberOfGroups; j++) {
+                            Vector<Ratio> lTempRatiosSlidingGroupUnique = new Vector<Ratio>();
+                            Vector<Ratio> lTempRatiosSmallGroupUnique = new Vector<Ratio>();
+                            Vector<Ratio> lTempRatiosAll = new Vector<Ratio>();
+                            for (int k = 0; k < lGroupSize; k++) {
+                                int lIndex = k + (j * lJumpFactor) - ((lGroupSize - lJumpFactor) / 2);
+                                if (lIndex >= 0 && lIndex < lValidUniqueRatios.get(r).size()) {
+                                    lTempRatiosSlidingGroupUnique.add(lValidUniqueRatios.get(r).get(lIndex));
+                                }
+                                if (k >= ((lGroupSize - lJumpFactor) / 2) && k < ((lGroupSize - lJumpFactor) / 2) + lJumpFactor) {
+                                    lTempRatiosSmallGroupUnique.add(lValidUniqueRatios.get(r).get(lIndex));
+                                    lTempRatiosAll.add(lValidUniqueRatios.get(r).get(lIndex));
+                                    lAllRatiosTakenForNormalizationVector.get(r).set(lIndex, true);
+                                    lMaximumIndexToAdd = lAllRatios.indexOf(lValidUniqueRatios.get(r).get(lIndex));
+                                }
+                            }
+                            //we sorted the valid unique ratio, now we want to use the lower and upper intensities to create a subset of all ratios
+                            Ratio o2 = lTempRatiosSmallGroupUnique.get(lTempRatiosSmallGroupUnique.size() - 1);
+
+                            double lUpper = o2.getParentRatioGroup().getIntensityForComponent(lUnregulatedComponent);
+                            if (lUpper == 0.0) {
+                                lUpper = o2.getParentRatioGroup().getSummedIntensityForRatioType(lRatioTypeTitle);
+                            }
+                            lIntensities.add(lUpper);
+                            boolean lAddingStarted = false;
+                            if (j == lNumberOfGroups - 1) {
+                                lUpper = Double.MAX_VALUE;
+                                lMaximumIndexToAdd = lAllRatios.get(r).size() - 1;
+                            }
+                            for (int k = lLastIndexAdded + 1; k < lMaximumIndexToAdd; k++) {
+                                if (!lAllRatiosTakenForNormalizationVector.get(r).get(k)) {
+                                    double lInt = lAllRatios.get(r).get(k).getParentRatioGroup().getIntensityForComponent(lUnregulatedComponent);
+                                    if (lInt == 0.0) {
+                                        lInt = lAllRatios.get(r).get(k).getParentRatioGroup().getSummedIntensityForRatioType(lRatioTypeTitle);
+                                    }
+                                    if (lUpperLast <= lInt && lInt < lUpper) {
+                                        if (!lTempRatiosAll.contains(lAllRatios.get(r).get(k))) {
+                                            //it's not yet added anywhere
+                                            lTempRatiosAll.add(lAllRatios.get(r).get(k));
+                                            lAllRatiosTakenForNormalizationVector.get(r).set(k, true);
+                                            lAddingStarted = true;
+                                            lLastIndexAdded = k;
+                                        }
+                                    } else {
+                                        //if we already added some things and now not anymore, we can stop this loop
+                                        if (lAddingStarted) {
+                                            k = lAllRatios.get(r).size();
+                                        }
+                                    }
+                                }
+                            }
+                            lUpperLast = lUpper;
+                            lLastIndexAdded = lAllRatios.indexOf(lTempRatiosAll.get(lTempRatiosAll.size() - 1));
+
+                            lDividedAllRatios.add(lTempRatiosAll);
+                            lDividedValidUniqueRatios.add(lTempRatiosSmallGroupUnique);
+                            lDividedValidUniqueSlidingWindowRatios.add(lTempRatiosSlidingGroupUnique);
+                            double lMad = calculateMAD(lTempRatiosSlidingGroupUnique);
+                            lOldMADs.addValue(lMad);
+                            lDividedValidUniqueMADS.add(lMad);
+                        }
+                    }
+
+                    if (lCycles == 0) {
+                        lAllCalculatedMADs.add(lIntensities);
+                        lAllCalculatedMADs.add(lDividedValidUniqueMADS);
+                    }
+
+                    //calculate the scaling factor
+                    double lRootedMADProduct = 0.0;
+                    double lTempProduct = 1.0;
+                    double lGroupCounts = (double) lDividedValidUniqueMADS.size();
+                    for (int j = 0; j < lDividedValidUniqueMADS.size(); j++) {
+                        if (lDividedValidUniqueMADS.get(j) != 0.0) {
+                            lTempProduct = lTempProduct * Math.pow(lDividedValidUniqueMADS.get(j), (1.0 / lGroupCounts));
+                        }
+                    }
+
+                    lRootedMADProduct = lTempProduct;
+
+                    lScalingFactor = new Vector<Double>();
+                    for (int j = 0; j < lDividedValidUniqueMADS.size(); j++) {
+                        if (lDividedValidUniqueMADS.get(j) != 0.0) {
+                            lScalingFactor.add(lDividedValidUniqueMADS.get(j) / lRootedMADProduct);
+                        } else {
+                            lScalingFactor.add(1.0);
+                        }
+                    }
+
+
+                    //use the new scaling factors
+                    for (int j = 0; j < lScalingFactor.size(); j++) {
+                        for (int k = 0; k < lDividedAllRatios.get(j).size(); k++) {
+                            Ratio lRatio = lDividedAllRatios.get(j).get(k);
+                            double lRatioValue = lRatio.getRatio(true);
+                            lRatioValue = lRatioValue / lScalingFactor.get(j);
+                            lRatio.setRecalculatedRatio(lRatioValue);
+                            lRatio.setNormalizationPart(j);
+                            if (lCycles == 0) {
+                                lRatio.setPreNormalizedMAD(lDividedValidUniqueMADS.get(j));
+                            }
+                        }
+                    }
+
+
+                    //calculate the new MADs
+                    Vector<Double> lTempMADs = new Vector<Double>();
+                    for (int j = 0; j < lScalingFactor.size(); j++) {
+                        double lNewMAD = 0.0;
+                        lNewMAD = calculateMAD(lDividedValidUniqueSlidingWindowRatios.get(j));
+                        lNewMADs.addValue(lNewMAD);
+                        lTempMADs.add(lNewMAD);
+                        for (int k = 0; k < lDividedAllRatios.get(j).size(); k++) {
+                            Ratio lRatio = lDividedAllRatios.get(j).get(k);
+                            lRatio.setNormalizedMAD(lNewMAD);
+                        }
+                    }
+
+                    lStDevNew = lNewMADs.getStandardDeviation();
+                    lStDevOld = lOldMADs.getStandardDeviation();
+
+                    lCoefVarNew = Math.abs(lStDevNew / lNewMADs.getMean());
+                    lCoefVarOld = Math.abs(lStDevOld / lOldMADs.getMean());
+                    lCoefVarDiff = Math.abs(lCoefVarNew - lCoefVarOld);
+
+                    
+                    //out.println("|   " + (lCycles + 1) + "   |   " + lStDevOld + "   |   " + lOldMADs.getMean() + "   |   " + lCoefVarOld + "   |   " + lStDevNew + "   |   " + lNewMADs.getMean() + "   |   " + lCoefVarNew + "   |");
+
+                    lAllCalculatedMADs.add(lTempMADs);
+
+                    lCycles = lCycles + 1;
+                }
+
+                /*
+                for (int y = 0; y < lAllCalculatedMADs.get(0).size(); y++) {
+                    //System.out.print("\n");
+                    out.print("\n");
+                    for (int x = 0; x < lAllCalculatedMADs.size(); x++) {
+                        //System.out.print(lAllCalculatedMADs.get(x).get(y) + ",");
+                        out.print(lAllCalculatedMADs.get(x).get(y) + ",");
+                    }
+                }
+                out.flush();
+                out.close();      */
+            } catch (Exception e) {
+                logger.error(e.getMessage(), e);
             }
         }
-        //we have the ratios to do the statistics on
-        double[] log2Ratios = new double[lLog2Ratios.size()];
-        for (int i = 0; i < lLog2Ratios.size(); i++) {
-            log2Ratios[i] = lLog2Ratios.get(i);
-        }
-        //do the statistics
-        double[] estimators = BasicStats.hubers(log2Ratios, 1e-06, false);
-
-        HashMap<String, Double> lResult = new HashMap();
-        lResult.put("mean", estimators[0]);
-        lResult.put("stdev", estimators[1]);
-        lResult.put("iterations", estimators[2]);
-        return lResult;
     }
+
+    public double calculateMAD(Vector<Ratio> lRatios) {
+        double[] lRatioDoubles = new double[lRatios.size()];
+        for (int i = 0; i < lRatios.size(); i++) {
+            lRatioDoubles[i] = lRatios.get(i).getRatio(true);
+        }
+        return BasicStats.mad(lRatioDoubles, false);
+    }
+
+
 
 
     /**
@@ -332,30 +530,82 @@ public class ProteinCreatorPanel implements WizardPanel {
         progressBar.setStringPainted(true);
         progressBar.setMaximum(aProteins.size());
         progressBar.setIndeterminate(false);
-        for (int i = 0; i < aProteins.size(); i++) {
-            progressBar.setValue(progressBar.getValue() + 1);
-            QuantitativeProtein lProtein = aProteins.get(i);
-
+        Vector<QuantitativeProtein> lProteins = (Vector<QuantitativeProtein>) aProteins.clone();
+        if (iQuantitativeValidationSingelton.getDatabaseType().equals(ProteinDatabaseType.LOCAL)) {
+            progressBar.setString("Finding protein sequences in local FASTA file");
+            //find the sequences in the fasta file
             try {
-                if (lProtein.getSequence() == null) {
-                    if (iQuantitativeValidationSingelton.getDatabaseType().equals(ProteinDatabaseType.UNIPROT)) {
-                        lProtein.setSequence((new UniprotSequenceRetriever(lProtein.getAccession())).getSequence());
-                    } else if (iQuantitativeValidationSingelton.getDatabaseType().equals(ProteinDatabaseType.IPI)) {
-                        lProtein.setSequence((new IpiSequenceRetriever(lProtein.getAccession())).getSequence());
-                    } else if (iQuantitativeValidationSingelton.getDatabaseType().equals(ProteinDatabaseType.NCBI)) {
-                        lProtein.setSequence((new NcbiSequenceRetriever(lProtein.getAccession())).getSequence());
-                    } else if (iQuantitativeValidationSingelton.getDatabaseType().equals(ProteinDatabaseType.TAIR)) {
-                        lProtein.setSequence((new TairSequenceRetriever(lProtein.getAccession())).getSequence());
+                //create the reader
+                FileReader fDbReader = new FileReader(iQuantitativeValidationSingelton.getFastaDatabaseLocation());
+                //create the line reader
+                LineNumberReader lnreader = new LineNumberReader(fDbReader);
+                //the current line
+                String lLine = "";
+                //create the header and the sequence strings
+                String lHeader = "";
+                String lSequence = "";
+                int lCounter = 0;
+
+                while ((lLine = lnreader.readLine()) != null) {
+                    lCounter = lCounter + 1;
+                    if (lLine.startsWith(">")) {
+                        //find the previous one
+                        if (lHeader.length() != 0 && lSequence.length() != 0) {
+                            for (int i = 0; i < lProteins.size(); i++) {
+                                if (lHeader.indexOf(lProteins.get(i).getAccession()) >= 0) {
+                                    progressBar.setValue(progressBar.getValue() + 1);
+                                    QuantitativeProtein lProtein = lProteins.get(i);
+                                    lProtein.setSequence(lSequence);
+                                    lProtein.setSequenceLength(lSequence.length());
+                                    lProtein.getPeptideGroups(true);
+                                    lProteins.remove(lProtein);
+                                    i = lProteins.size();
+                                }
+                            }
+                        }
+                        lSequence = "";
+                        lHeader = lLine;
+                    } else if (!lLine.equalsIgnoreCase("\n")) {
+                        lSequence = lSequence + lLine.replace("\n", "");
                     }
                 }
-                if (lProtein.getSequence() != null && lProtein.getSequence().length() > 0) {
-                    iQuantitativeValidationSingelton.addProteinSequence(lProtein.getAccession(), lProtein.getSequence());
+
+
+            } catch (IOException e) {
+                logger.error(e.getMessage(), e);
+            }
+
+        } else {
+
+            for (int i = 0; i < lProteins.size(); i++) {
+                progressBar.setValue(progressBar.getValue() + 1);
+                QuantitativeProtein lProtein = lProteins.get(i);
+
+                try {
+                    if (lProtein.getSequence() == null) {
+                        if (iQuantitativeValidationSingelton.getDatabaseType().equals(ProteinDatabaseType.UNIPROT)) {
+                            lProtein.setSequence((new UniprotSequenceRetriever(lProtein.getAccession())).getSequence());
+                        } else if (iQuantitativeValidationSingelton.getDatabaseType().equals(ProteinDatabaseType.IPI)) {
+                            lProtein.setSequence((new IpiSequenceRetriever(lProtein.getAccession())).getSequence());
+                        } else if (iQuantitativeValidationSingelton.getDatabaseType().equals(ProteinDatabaseType.NCBI)) {
+                            lProtein.setSequence((new NcbiSequenceRetriever(lProtein.getAccession())).getSequence());
+                        } else if (iQuantitativeValidationSingelton.getDatabaseType().equals(ProteinDatabaseType.TAIR)) {
+                            lProtein.setSequence((new TairSequenceRetriever(lProtein.getAccession())).getSequence());
+                        }
+                    }
+                    if (lProtein.getSequence() != null && lProtein.getSequence().length() > 0) {
+                        lProtein.getPeptideGroups(true);
+                        lProtein.setSequenceLength(lProtein.getSequence().length());
+                        iQuantitativeValidationSingelton.addProteinSequence(lProtein.getAccession(), lProtein.getSequence());
+                        lProtein.setSequence("");
+                    }
+                } catch (Exception e) {
+                    logger.error(e.getMessage(), e);
                 }
-            } catch (Exception e) {
-                //sequence not found
-                //e.printStackTrace();
             }
         }
+
+
     }
 
     {

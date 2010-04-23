@@ -1,5 +1,7 @@
 package com.compomics.rover.general.enumeration;
 
+import org.apache.log4j.Logger;
+
 /**
  * Created by IntelliJ IDEA.
  * User: niklaas
@@ -12,5 +14,5 @@ package com.compomics.rover.general.enumeration;
  * This enumeration holds different types of protein databases.
  */
 public enum ProteinDatabaseType {
-    UNIPROT, IPI, NCBI, TAIR, MIPS_CYGD, UNKNOWN
+    UNIPROT, IPI, NCBI, TAIR, MIPS_CYGD, LOCAL, UNKNOWN
 }

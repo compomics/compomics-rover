@@ -1,13 +1,17 @@
 package com.compomics.rover.general.quantitation;
 
+import org.apache.log4j.Logger;
+
+import com.compomics.rover.general.quantitation.sorters.RatioSorterByIntensity;
+import com.compomics.rover.general.quantitation.sorters.RatioSorterByRatio;
 import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
 import org.jfree.data.xy.XYSeries;
 import org.jfree.data.xy.XYSeriesCollection;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Vector;
 import java.util.HashMap;
-import java.util.Arrays;
 
 import com.compomics.rover.general.quantitation.RatioGroup;
 import com.compomics.rover.general.interfaces.Ratio;
@@ -27,6 +31,8 @@ import com.compomics.rover.general.singelton.QuantitativeValidationSingelton;
  * This class holds the proteins that make the reference set.
  */
 public class ReferenceSet {
+	// Class specific log4j logger for ReferenceSet instances.
+	 private static Logger logger = Logger.getLogger(ReferenceSet.class);
 
     /**
      * An ArrayList with QuantiativeProteins that represent the reference set
@@ -79,6 +85,7 @@ public class ReferenceSet {
      */
     private int[] iUsedRatiosByType;
 
+    /*
     private Vector<HashMap> iRandomMeansMapVector = new Vector<HashMap>();
     private Vector<HashMap> iRandomSDMapVector = new Vector<HashMap>();
     private Vector<HashMap> iRandomOriginalRatioMeansMapVector = new Vector<HashMap>();
@@ -87,6 +94,9 @@ public class ReferenceSet {
     private Vector<HashMap> iRandomIntMeanMapVector = new Vector<HashMap>();
     private Vector<HashMap> iRandomIntMedianMapVector = new Vector<HashMap>();
     private Vector<HashMap> iRandomIntSumMapVector = new Vector<HashMap>();
+    private HashMap iRatiosByType = new HashMap();
+    private HashMap iOriginalRatiosByType = new HashMap(); */
+    private boolean iUpdating = false;
 
 
 
@@ -122,26 +132,31 @@ public class ReferenceSet {
      * @return HashMap with "delta", "stDev", "significance"
      */
     public HashMap getStatisticalMeasermentForRatio(String aType, Ratio aRatio){
-        HashMap mapResult = new HashMap();
+        if(!iUpdating){
+            iUpdating = true;
+            HashMap mapResult = new HashMap();
 
-        if(iHuberEstimators == null){
-            //the huber statistic is not done, do it now
-            this.huberStatistics();
-        }
-
-        //add huber estimated distrubution
-        for(int i = 0; i<iRatioTypes.length; i++){
-            if(iRatioTypes[i].equalsIgnoreCase(aType)){
-                HashMap mapHuber = iHuberEstimators[i];
-                double lStDev = (Double)mapHuber.get("stdev");
-                double lMean = (Double)mapHuber.get("mean");
-                double delta = Math.round((aRatio.getRatio(true)-lMean)*1000.0)/1000.0;
-                mapResult.put("delta", delta);
-                mapResult.put("stDev", lStDev);
-                mapResult.put("significance", Math.round((delta/lStDev)*1000.0)/1000.0);
+            if(iHuberEstimators == null){
+                //the huber statistic is not done, do it now
+                this.huberStatistics();
             }
+
+            //add huber estimated distrubution
+            for(int i = 0; i<iRatioTypes.length; i++){
+                if(iRatioTypes[i].equalsIgnoreCase(aType)){
+                    HashMap mapHuber = iHuberEstimators[i];
+                    double lStDev = (Double)mapHuber.get("stdev");
+                    double lMean = (Double)mapHuber.get("mean");
+                    double delta = Math.round((aRatio.getRatio(true)-lMean)*1000.0)/1000.0;
+                    mapResult.put("delta", delta);
+                    mapResult.put("stDev", lStDev);
+                    mapResult.put("significance", Math.round((delta/lStDev)*1000.0)/1000.0);
+                }
+            }
+            iUpdating = false;
+            return mapResult;
         }
-        return mapResult;
+        return null;
     }
 
 
@@ -233,53 +248,57 @@ public class ReferenceSet {
      * Method that creates the DescriptiveStatistics for every ratio type
      */
     public void createDescriptiveStatistics(){
-
-        //create the int[] to store the number of used ratios
-        if(iUsedRatiosByType == null){
-            iUsedRatiosByType = new int[iRatioTypes.length];
-            for(int i = 0; i<iUsedRatiosByType.length; i ++){
-                iUsedRatiosByType[i] = 0;
+        if(!iUpdating){
+            iUpdating = true;
+            //create the int[] to store the number of used ratios
+            if(iUsedRatiosByType == null){
+                iUsedRatiosByType = new int[iRatioTypes.length];
+                for(int i = 0; i<iUsedRatiosByType.length; i ++){
+                    iUsedRatiosByType[i] = 0;
+                }
+            } else {
+                for(int i = 0; i<iUsedRatiosByType.length; i ++){
+                    iUsedRatiosByType[i] = 0;
+                }
             }
-        } else {
-            for(int i = 0; i<iUsedRatiosByType.length; i ++){
-                iUsedRatiosByType[i] = 0;
-            }
-        }
 
-        if(iQuantitativeValidationSingelton.isLog2()){
-            iLog2StatusDescriptiveStatistics = true;
-        }else{
-            iLog2StatusDescriptiveStatistics = false;
-        }
-        //create a descriptive statistics for every ratio type
-        this.iDescriptiveStats = new DescriptiveStatistics[iRatioTypes.length];
-        for(int t = 0; t<iRatioTypes.length; t ++){
-            DescriptiveStatistics stat = new DescriptiveStatistics();
-            for (int i = 0; i < iReferenceProteins.size(); i++) {
-                Vector<RatioGroup> lRatioGroups = iReferenceProteins.get(i).getRatioGroups();
-                for(int j = 0; j<lRatioGroups.size(); j ++){
-                    Ratio lRatio = lRatioGroups.get(j).getRatioByType(iRatioTypes[t]);
-                    if(lRatio != null){
-                        if(iQuantitativeValidationSingelton.isRatioValidInReferenceSet()){
-                            //check if the ratio is valid
-                            if(lRatio.getValid()){
+            if(iQuantitativeValidationSingelton.isLog2()){
+                iLog2StatusDescriptiveStatistics = true;
+            }else{
+                iLog2StatusDescriptiveStatistics = false;
+            }
+            //create a descriptive statistics for every ratio type
+            this.iDescriptiveStats = new DescriptiveStatistics[iRatioTypes.length];
+            for(int t = 0; t<iRatioTypes.length; t ++){
+                DescriptiveStatistics stat = new DescriptiveStatistics();
+                for (int i = 0; i < iReferenceProteins.size(); i++) {
+                    Vector<RatioGroup> lRatioGroups = iReferenceProteins.get(i).getRatioGroups();
+                    for(int j = 0; j<lRatioGroups.size(); j ++){
+                        Ratio lRatio = lRatioGroups.get(j).getRatioByType(iRatioTypes[t]);
+                        if(lRatio != null){
+                            if(iQuantitativeValidationSingelton.isRatioValidInReferenceSet()){
+                                //check if the ratio is valid
+                                if(lRatio.getValid()){
+                                    if(!Double.isNaN(lRatio.getRatio(true)) && !Double.isInfinite(lRatio.getRatio(true))){
+                                        stat.addValue(lRatio.getRatio(iQuantitativeValidationSingelton.isLog2()));
+                                        iUsedRatiosByType[t] = iUsedRatiosByType[t] + 1;
+                                    }
+                                }
+                            } else {
                                 if(!Double.isNaN(lRatio.getRatio(true)) && !Double.isInfinite(lRatio.getRatio(true))){
                                     stat.addValue(lRatio.getRatio(iQuantitativeValidationSingelton.isLog2()));
                                     iUsedRatiosByType[t] = iUsedRatiosByType[t] + 1;
                                 }
                             }
-                        } else {
-                            if(!Double.isNaN(lRatio.getRatio(true)) && !Double.isInfinite(lRatio.getRatio(true))){
-                                stat.addValue(lRatio.getRatio(iQuantitativeValidationSingelton.isLog2()));
-                                iUsedRatiosByType[t] = iUsedRatiosByType[t] + 1;
-                            }
                         }
-                    }
 
+                    }
                 }
+                iDescriptiveStats[t] = stat;
             }
-            iDescriptiveStats[t] = stat;
+            iUpdating = false;
         }
+
     }
 
     /**
@@ -498,8 +517,170 @@ public class ReferenceSet {
         return iUsedRatiosByType;
     }
 
+
+    /*public double getIndexCloseToRatio(Ratio lRatio, String lType){
+        Vector<Ratio> lRatios;
+        if(iQuantitativeValidationSingelton.isUseOriginalRatio()){
+            lRatios = (Vector<Ratio>) iOriginalRatiosByType.get(lType);
+        } else {
+            lRatios = (Vector<Ratio>) iRatiosByType.get(lType);
+        }
+
+        int low = 0;
+        int high = lRatios.size() - 1;
+        int mid;
+        int lIndex = -1;
+        if(lRatio.getRatio(true) <= lRatios.get(low).getRatio(true)){
+            lIndex = 0;
+        }
+        if(lRatio.getRatio(true) >= lRatios.get(high).getRatio(true)){
+            lIndex = high;
+        }
+
+        while( lIndex == -1 )
+        {
+            mid = ( low + high ) / 2;
+            if(low + 1 == high || low >= high){
+               lIndex = low;
+
+            } else if( lRatios.get(mid).getRatio(true) < lRatio.getRatio(true)){
+                low = mid + 1;
+            } else if( lRatios.get(mid).getRatio(true) > lRatio.getRatio(true) ) {
+                high = mid - 1;
+            } else{
+                lIndex = mid;
+            }
+        }
+        return (double) lIndex;
+
+    }
     
     public void calculateStatisticsByRandomSampling(){
+        RANDOM SAMPLING in a ratio dependant sorted list
+
+        Vector<QuantitativeProtein> lAllProteins = iQuantitativeValidationSingelton.getAllProteins();
+
+        //find which samples sizes must be calculated
+        int lMaxRatiosForProtein = 0;
+        for(int i = 0; i<lAllProteins.size(); i ++){
+            if(lMaxRatiosForProtein < lAllProteins.get(i).getNumberOfRatioGroups()){
+                lMaxRatiosForProtein = lAllProteins.get(i).getNumberOfRatioGroups();
+            }
+        }
+
+        //calculate the statistics for every ratio type
+        //we only want the unique peptide ratios
+        boolean lUnique = iQuantitativeValidationSingelton.isUseOnlyUniqueRatioForProteinMean();
+        boolean lValid = iQuantitativeValidationSingelton.isUseOnlyValidRatioForProteinMean();
+        iQuantitativeValidationSingelton.setUseOnlyUniqueRatioForProteinMean(true);
+        iQuantitativeValidationSingelton.setUseOnlyValidRatioForProteinMean(true);
+        for(int i = 0; i<iQuantitativeValidationSingelton.getRatioTypes().size(); i ++){
+            //gather all the unique and valid peptide ratios
+            Vector<Ratio> lAllRatios = new Vector<Ratio>();
+            Vector<Ratio> lAllOriginalRatios = new Vector<Ratio>();
+            Vector<Double> lAllIntensities = new Vector<Double>();
+            for(int j = 0; j<lAllProteins.size(); j ++){
+                for(int k = 0; k<lAllProteins.get(j).getPeptideGroups(false).size(); k ++){
+                    Vector<Ratio> lTempRatios =  lAllProteins.get(j).getPeptideGroups(false).get(k).getRatiosForType(iQuantitativeValidationSingelton.getRatioTypes().get(i),true, -1);
+                    iQuantitativeValidationSingelton.setUseOriginalRatio(true);
+                    Vector<Ratio> lTempOriginalRatios =  lAllProteins.get(j).getPeptideGroups(false).get(k).getRatiosForType(iQuantitativeValidationSingelton.getRatioTypes().get(i),true, -1);
+                    iQuantitativeValidationSingelton.setUseOriginalRatio(false);
+                    Vector<Double> lTempInts =  lAllProteins.get(j).getPeptideGroups(false).get(k).getIntensitiesForType(iQuantitativeValidationSingelton.getRatioTypes().get(i),true, -1);
+
+                    for(int l = 0; l<lTempRatios.size(); l ++){
+                        lAllRatios.add(lTempRatios.get(l));
+                        lAllOriginalRatios.add(lTempOriginalRatios.get(l));
+                    }
+                    for(int l = 0; l<lTempInts.size(); l ++){
+                        lAllIntensities.add(lTempInts.get(l));
+                    }
+                }
+            }
+
+            RatioSorterByRatio lSorter = new RatioSorterByRatio();
+            Collections.sort(lAllRatios, lSorter);
+            iRatiosByType.put(iQuantitativeValidationSingelton.getRatioTypes().get(i), lAllRatios);
+            for(int t = 0; t<lAllRatios.size(); t ++){
+                lAllRatios.get(t).setIndex((double)t);
+            }
+            Collections.sort(lAllOriginalRatios, lSorter);
+            iOriginalRatiosByType.put(iQuantitativeValidationSingelton.getRatioTypes().get(i), lAllOriginalRatios);
+            for(int t = 0; t<lAllRatios.size(); t ++){
+                lAllRatios.get(t).setOriginalIndex((double)t);    
+            }
+            //create the hashmap to store the different statistics in
+            HashMap lRatioMeansMap = new HashMap();
+            HashMap lRatioSDMap = new HashMap();
+            HashMap lOriginalRatioMeansMap = new HashMap();
+            HashMap lOriginalRatioSDMap = new HashMap();
+            HashMap lIntensityMeansMap = new HashMap();
+            HashMap lIntensityMedianMap = new HashMap();
+            HashMap lIntensitySumsMap = new HashMap();
+            HashMap lIntensitySDMap = new HashMap();
+            for(int j = 1; j<= lMaxRatiosForProtein; j ++){
+                //System.out.println("Random sampling " + (j) + "/" + lMaxRatiosForProtein);
+                DescriptiveStatistics lStatMean = new DescriptiveStatistics();
+                DescriptiveStatistics lStatSD = new DescriptiveStatistics();
+                DescriptiveStatistics lStatOriginalMean = new DescriptiveStatistics();
+                DescriptiveStatistics lStatOriginalSD = new DescriptiveStatistics();
+                DescriptiveStatistics lStatIntSD = new DescriptiveStatistics();
+                DescriptiveStatistics lStatIntSum = new DescriptiveStatistics();
+                DescriptiveStatistics lStatIntMean = new DescriptiveStatistics();
+                DescriptiveStatistics lStatIntMedian = new DescriptiveStatistics();
+                for(int k = 0; k<1000; k ++){
+                    DescriptiveStatistics lTempRatio = new DescriptiveStatistics();
+                    DescriptiveStatistics lTempOriginalRatio = new DescriptiveStatistics();
+                    DescriptiveStatistics lTempIntensity = new DescriptiveStatistics();
+                    for(int l = 0; l<j; l ++){
+                        //get random ratio and put it in temp
+                        double lRandom = (Math.random() * lAllRatios.size());
+                        int lRandom2 = (int) (Math.random() * lAllIntensities.size());
+                        double lRandom3 = (Math.random() * lAllOriginalRatios.size());
+                        lTempRatio.addValue(lRandom);
+                        lTempOriginalRatio.addValue(lRandom3);
+                        lTempIntensity.addValue(lAllIntensities.get(lRandom2));
+                    }
+                    double[] lvalues = lTempIntensity.getValues();
+                    double lMedianInt = BasicStats.median(lvalues, false);
+                    lStatMean.addValue(lTempRatio.getMean());
+                    lStatSD.addValue(lTempRatio.getStandardDeviation());
+                    lStatOriginalMean.addValue(lTempOriginalRatio.getMean());
+                    lStatOriginalSD.addValue(lTempOriginalRatio.getStandardDeviation());
+                    lStatIntSD.addValue(lTempIntensity.getStandardDeviation());
+                    lStatIntMean.addValue(lTempIntensity.getMean());
+                    lStatIntMedian.addValue(lMedianInt);
+                    lStatIntSum.addValue(lTempIntensity.getSum());
+                }
+
+                lRatioMeansMap.put(j,lStatMean);
+                lRatioSDMap.put(j,lStatSD);
+                lOriginalRatioMeansMap.put(j,lStatOriginalMean);
+                lOriginalRatioSDMap.put(j,lStatOriginalSD);
+                lIntensityMeansMap.put(j,lStatIntMean);
+                lIntensityMedianMap.put(j,lStatIntMedian);
+                lIntensitySDMap.put(j,lStatIntSD);
+                lIntensitySumsMap.put(j,lStatIntSum);
+
+            }
+
+            iRandomMeansMapVector.add(lRatioMeansMap);
+            iRandomSDMapVector.add(lRatioSDMap);
+            iRandomOriginalRatioMeansMapVector.add(lOriginalRatioMeansMap);
+            iRandomOriginalRatioSDMapVector.add(lOriginalRatioSDMap);
+            iRandomIntMeanMapVector.add(lIntensityMeansMap);
+            iRandomIntMedianMapVector.add(lIntensityMedianMap);
+            iRandomIntSDMapVector.add(lIntensitySDMap);
+            iRandomIntSumMapVector.add(lIntensitySumsMap);
+        }
+
+        iQuantitativeValidationSingelton.setUseOnlyUniqueRatioForProteinMean(lUnique);
+        iQuantitativeValidationSingelton.setUseOnlyValidRatioForProteinMean(lValid);
+
+
+
+
+        /*
+        RANDOM SAMPLING
         Vector<QuantitativeProtein> lAllProteins = iQuantitativeValidationSingelton.getAllProteins();
 
         //find which samples sizes must be calculated
@@ -523,9 +704,9 @@ public class ReferenceSet {
             Vector<Double> lAllIntensities = new Vector<Double>();
             for(int j = 0; j<lAllProteins.size(); j ++){
                 for(int k = 0; k<lAllProteins.get(j).getPeptideGroups(false).size(); k ++){
-                    Vector<Double> lTempRatios =  lAllProteins.get(j).getPeptideGroups(false).get(k).getRatiosForType(iQuantitativeValidationSingelton.getRatioTypes().get(i),true, -1);
+                    Vector<Double> lTempRatios =  lAllProteins.get(j).getPeptideGroups(false).get(k).getRatioValuesForType(iQuantitativeValidationSingelton.getRatioTypes().get(i),true, -1);
                     iQuantitativeValidationSingelton.setUseOriginalRatio(true);
-                    Vector<Double> lTempOriginalRatios =  lAllProteins.get(j).getPeptideGroups(false).get(k).getRatiosForType(iQuantitativeValidationSingelton.getRatioTypes().get(i),true, -1);
+                    Vector<Double> lTempOriginalRatios =  lAllProteins.get(j).getPeptideGroups(false).get(k).getRatioValuesForType(iQuantitativeValidationSingelton.getRatioTypes().get(i),true, -1);
                     iQuantitativeValidationSingelton.setUseOriginalRatio(false);
                     Vector<Double> lTempInts =  lAllProteins.get(j).getPeptideGroups(false).get(k).getIntensitiesForType(iQuantitativeValidationSingelton.getRatioTypes().get(i),true, -1);
 
@@ -549,7 +730,7 @@ public class ReferenceSet {
             HashMap lIntensitySumsMap = new HashMap();
             HashMap lIntensitySDMap = new HashMap();
             for(int j = 1; j<= lMaxRatiosForProtein; j ++){
-                System.out.println("Random sampling " + (j+1) + "/" + lMaxRatiosForProtein);
+                //System.out.println("Random sampling " + (j) + "/" + lMaxRatiosForProtein);
                 DescriptiveStatistics lStatMean = new DescriptiveStatistics();
                 DescriptiveStatistics lStatSD = new DescriptiveStatistics();
                 DescriptiveStatistics lStatOriginalMean = new DescriptiveStatistics();
@@ -606,7 +787,7 @@ public class ReferenceSet {
 
         iQuantitativeValidationSingelton.setUseOnlyUniqueRatioForProteinMean(lUnique);
         iQuantitativeValidationSingelton.setUseOnlyValidRatioForProteinMean(lValid);
-
+        *//*
     }
 
     public double getZscoreForRatioMean(double lMean, int lNumberOfRatios, String lType){
@@ -691,6 +872,6 @@ public class ReferenceSet {
             }
         }
         return lZScore;
-    }
+    } */
 
 }

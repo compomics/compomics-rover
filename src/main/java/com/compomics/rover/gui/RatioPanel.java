@@ -1,5 +1,7 @@
 package com.compomics.rover.gui;
 
+import org.apache.log4j.Logger;
+
 import com.compomics.rover.general.interfaces.Ratio;
 import com.compomics.rover.general.singelton.QuantitativeValidationSingelton;
 import com.compomics.rover.general.quantitation.source.distiller.DistillerRatio;
@@ -20,6 +22,8 @@ import java.util.HashMap;
  * To change this template use File | Settings | File Templates.
  */
 public class RatioPanel {
+	// Class specific log4j logger for RatioPanel instances.
+	 private static Logger logger = Logger.getLogger(RatioPanel.class);
     private JLabel lblRatioType;
     private JLabel lblRatio;
     private JLabel lblQualityText;
@@ -60,7 +64,11 @@ public class RatioPanel {
 
         //set the labels
 
-        lblRatioType.setText(aRatio.getType());
+        if (aRatio.getInverted()) {
+            lblRatioType.setText(aRatio.getType() + " *");
+        } else {
+            lblRatioType.setText(aRatio.getType());
+        }
         lblRatio.setText(String.valueOf(Math.round(aRatio.getRatio(iQuantitativeValidationSingelton.isLog2()) * 1000.0) / 1000.0));
         if (aRatio.getValid()) {
             lblRatioType.setForeground(Color.GREEN);

@@ -1,5 +1,7 @@
 package com.compomics.rover.general.quantitation.sorters;
 
+import org.apache.log4j.Logger;
+
 import com.compomics.rover.general.quantitation.QuantitativeProtein;
 
 import java.util.Comparator;
@@ -12,6 +14,8 @@ import java.util.Comparator;
  * To change this template use File | Settings | File Templates.
  */
 public class QuantitativeProteinSorterByDiffProteinMeans implements Comparator<QuantitativeProtein> {
+	// Class specific log4j logger for QuantitativeProteinSorterByDiffProteinMeans instances.
+	 private static Logger logger = Logger.getLogger(QuantitativeProteinSorterByDiffProteinMeans.class);
 
     /**
      * The ratio type

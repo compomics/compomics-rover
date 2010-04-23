@@ -1,5 +1,7 @@
 package com.compomics.rover.general.fileio.rover;
 
+import org.apache.log4j.Logger;
+
 import com.compomics.rover.general.quantitation.QuantitativePeptideGroup;
 import com.compomics.rover.general.quantitation.QuantitativeProtein;
 import com.compomics.rover.general.quantitation.RatioGroup;
@@ -23,6 +25,8 @@ import java.util.Vector;
  * This class reads and loads the .rover file
  */
 public class RoverFileReader {
+	// Class specific log4j logger for RoverFileReader instances.
+	 private static Logger logger = Logger.getLogger(RoverFileReader.class);
 
     /**
      * The .rover file location
@@ -134,10 +138,10 @@ public class RoverFileReader {
                 }
 
             }
-        } catch (FileNotFoundException e1) {
-            e1.printStackTrace();
-        } catch (IOException e1) {
-            e1.printStackTrace();
+        } catch (FileNotFoundException e) {
+            logger.error(e.getMessage(), e);
+        } catch (IOException e) {
+            logger.error(e.getMessage(), e);
         }
         //now load the data
         this.loadReadedData();

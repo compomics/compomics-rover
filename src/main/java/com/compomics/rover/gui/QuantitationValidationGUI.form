@@ -177,7 +177,7 @@
                           <gridbag top="5" left="5" bottom="5" right="5" weightx="0.0" weighty="0.0"/>
                         </constraints>
                         <properties>
-                          <text value="Type ?"/>
+                          <text value="Select type:"/>
                         </properties>
                       </component>
                     </children>
@@ -465,17 +465,6 @@
                               <toolTipText value="Reference set parameters"/>
                             </properties>
                           </component>
-                          <component id="b0a07" class="javax.swing.JRadioButton" binding="defaultRatioRadioButton" default-binding="true">
-                            <constraints>
-                              <grid row="0" column="5" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
-                              <gridbag top="5" left="5" bottom="5" right="5" weightx="0.0" weighty="0.0"/>
-                            </constraints>
-                            <properties>
-                              <background color="-1"/>
-                              <selected value="true"/>
-                              <text value="Default ratio"/>
-                            </properties>
-                          </component>
                           <component id="60417" class="javax.swing.JButton" binding="misc_infoButton">
                             <constraints>
                               <grid row="0" column="2" row-span="45" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
@@ -508,7 +497,7 @@
                           </component>
                           <component id="d7e6f" class="javax.swing.JCheckBox" binding="useOnlyValidRatiosCheckBox" default-binding="true">
                             <constraints>
-                              <grid row="43" column="6" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+                              <grid row="43" column="5" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
                               <gridbag top="5" left="5" bottom="5" right="5" weightx="0.0" weighty="0.0"/>
                             </constraints>
                             <properties>
@@ -518,7 +507,7 @@
                           </component>
                           <component id="b1afb" class="javax.swing.JCheckBox" binding="useOnlyUniquelyIdentifiedCheckBox" default-binding="true">
                             <constraints>
-                              <grid row="0" column="6" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+                              <grid row="0" column="5" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
                               <gridbag top="5" left="5" bottom="5" right="5" weightx="0.0" weighty="0.0"/>
                             </constraints>
                             <properties>
@@ -528,8 +517,8 @@
                           </component>
                           <component id="7799c" class="javax.swing.JCheckBox" binding="log2CheckBox" default-binding="true">
                             <constraints>
-                              <grid row="0" column="7" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
-                              <gridbag top="5" left="5" bottom="5" right="5" weightx="1.0" weighty="0.0"/>
+                              <grid row="0" column="6" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+                              <gridbag top="5" left="5" bottom="5" right="5" weightx="0.0" weighty="0.0"/>
                             </constraints>
                             <properties>
                               <background color="-1"/>
@@ -538,44 +527,17 @@
                           </component>
                           <component id="6f62e" class="javax.swing.JCheckBox" binding="useOriginalCheckBox">
                             <constraints>
-                              <grid row="22" column="7" row-span="22" col-span="1" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
-                              <gridbag top="5" left="5" bottom="5" right="5" weightx="1.0" weighty="0.0"/>
+                              <grid row="22" column="6" row-span="22" col-span="1" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+                              <gridbag top="5" left="5" bottom="5" right="5" weightx="0.1" weighty="0.0"/>
                             </constraints>
                             <properties>
                               <background color="-1"/>
                               <text value="Use original ratios"/>
                             </properties>
                           </component>
-                          <component id="dd662" class="javax.swing.JRadioButton" binding="normalizedRatioRadioButton" default-binding="true">
-                            <constraints>
-                              <grid row="43" column="5" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
-                              <gridbag top="5" left="5" bottom="5" right="5" weightx="0.0" weighty="0.0"/>
-                            </constraints>
-                            <properties>
-                              <background color="-1"/>
-                              <selected value="false"/>
-                              <text value="Normalized ratio"/>
-                            </properties>
-                          </component>
-                          <component id="57247" class="javax.swing.JButton" binding="restartButton">
-                            <constraints>
-                              <grid row="0" column="8" row-span="44" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
-                              <gridbag weightx="0.0" weighty="0.0"/>
-                            </constraints>
-                            <properties>
-                              <contentAreaFilled value="false"/>
-                              <focusPainted value="false"/>
-                              <focusTraversalPolicyProvider value="true"/>
-                              <icon value="restart.png"/>
-                              <label value=""/>
-                              <margin top="3" left="3" bottom="3" right="3"/>
-                              <text value=""/>
-                              <toolTipText value="Create new analysis for a new dataset"/>
-                            </properties>
-                          </component>
                           <component id="305be" class="javax.swing.JButton" binding="exportButton">
                             <constraints>
-                              <grid row="0" column="11" row-span="44" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
+                              <grid row="0" column="10" row-span="44" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
                               <gridbag weightx="0.0" weighty="0.0"/>
                             </constraints>
                             <properties>
@@ -591,7 +553,7 @@
                           </component>
                           <component id="9f406" class="javax.swing.JButton" binding="loadRoverFileButton" default-binding="true">
                             <constraints>
-                              <grid row="0" column="13" row-span="44" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
+                              <grid row="0" column="12" row-span="44" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
                               <gridbag weightx="0.0" weighty="0.0"/>
                             </constraints>
                             <properties>
@@ -606,7 +568,7 @@
                           </component>
                           <component id="9b302" class="javax.swing.JButton" binding="reconstructButton" default-binding="true">
                             <constraints>
-                              <grid row="0" column="12" row-span="44" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
+                              <grid row="0" column="11" row-span="44" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
                               <gridbag weightx="0.0" weighty="0.0"/>
                             </constraints>
                             <properties>
@@ -616,6 +578,13 @@
                               <text value=""/>
                               <toolTipText value="Reconstruct protein from different sources"/>
                             </properties>
+                          </component>
+                          <component id="8a90a" class="javax.swing.JProgressBar" binding="progressBar1" default-binding="true">
+                            <constraints>
+                              <grid row="0" column="7" row-span="44" col-span="1" vsize-policy="0" hsize-policy="6" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
+                              <gridbag top="5" left="5" bottom="5" right="5" weightx="1.0" weighty="0.0"/>
+                            </constraints>
+                            <properties/>
                           </component>
                         </children>
                       </grid>

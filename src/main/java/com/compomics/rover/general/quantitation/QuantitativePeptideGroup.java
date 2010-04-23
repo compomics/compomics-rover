@@ -1,5 +1,7 @@
 package com.compomics.rover.general.quantitation;
 
+import org.apache.log4j.Logger;
+
 import com.compomics.rover.general.singelton.QuantitativeValidationSingelton;
 import com.compomics.rover.general.interfaces.Ratio;
 import com.compomics.rover.general.enumeration.RoverSource;
@@ -21,6 +23,8 @@ import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
  * This class groups different ratio groups with the same peptide sequence
  */
 public class QuantitativePeptideGroup {
+	// Class specific log4j logger for QuantitativePeptideGroup instances.
+	 private static Logger logger = Logger.getLogger(QuantitativePeptideGroup.class);
 
     /**
      * The peptide sequence of this peptide group
@@ -58,7 +62,14 @@ public class QuantitativePeptideGroup {
      * The end position of the peptide in the protein
      */
     private int iEndPosition;
-
+    /**
+     * String that indicates the razor accession of the protein linked to this peptide group
+     */
+    private String iRazorAccession = null;
+    /**
+     * boolean that indicates if the peptides are linked to more than one protein
+     */
+    private Boolean iMultiLink = null;
 
 
     /**
@@ -215,8 +226,8 @@ public class QuantitativePeptideGroup {
      * @param aType String with the specific ratio type
      * @return Vector<Double> with all the ratios
      */
-    public Vector<Double> getRatiosForType(String aType){
-        return this.getRatiosForType(aType,iQuantitativeValidationSingelton.isLog2(), -1);
+    public Vector<Double> getRatioValuesForType(String aType){
+        return this.getRatioValuesForType(aType,iQuantitativeValidationSingelton.isLog2(), -1);
     }
 
     /**
@@ -226,8 +237,8 @@ public class QuantitativePeptideGroup {
      * @param aIndex Int that indicates the index of a specific source, if this int is -1 all the sources will be used
      * @return Vector<Double> with all the ratios
      */
-    public Vector<Double> getRatiosForType(String aType, int aIndex){
-        return this.getRatiosForType(aType,iQuantitativeValidationSingelton.isLog2(), aIndex);
+    public Vector<Double> getRatioValuesForType(String aType, int aIndex){
+        return this.getRatioValuesForType(aType,iQuantitativeValidationSingelton.isLog2(), aIndex);
     }
 
 
@@ -239,7 +250,7 @@ public class QuantitativePeptideGroup {
      * @param aIndex Int that indicates the index of a specific source, if this int is -1 all the sources will be used
      * @return Vector<Double> with all the ratios
      */
-    public Vector<Double> getRatiosForType(String aType, boolean isLog2, int aIndex){
+    public Vector<Double> getRatioValuesForType(String aType, boolean isLog2, int aIndex){
         Vector<Double> lResult = new Vector<Double>();
         for(int i = 0; i<iRatioGroups.size(); i ++){
             Ratio lRatio = iRatioGroups.get(i).getRatioByType(aType);
@@ -274,6 +285,57 @@ public class QuantitativePeptideGroup {
         return lResult;
     }
 
+    /**
+     * This method will give all the ratios for a specific type.
+     * The log2 status and the useOnlyValidRatio status from the iQuantitativeValidationSingelton will be used to do the calculations
+     * @param aType String with the specific ratio type
+     * @param isLog2 Boolean that indicates if we have to use log 2 values
+     * @param aIndex Int that indicates the index of a specific source, if this int is -1 all the sources will be used
+     * @return Vector<Double> with all the ratios
+     */
+    public Vector<Ratio> getRatiosForType(String aType, boolean isLog2, int aIndex){
+        Vector<Ratio> lResult = new Vector<Ratio>();
+        for(int i = 0; i<iRatioGroups.size(); i ++){
+            Ratio lRatio = iRatioGroups.get(i).getRatioByType(aType);
+            if(lRatio != null){
+                boolean lUse = true;
+                if(aIndex >= 0){
+                    //an index is specified
+                    if(lRatio.getParentRatioGroup().getParentCollection().getIndex() != aIndex){
+                        //the ratio is from an unwanted source
+                        lUse = false;
+                    }
+                }
+                if(lUse){
+                    if (iQuantitativeValidationSingelton.isUseOnlyValidRatioForProteinMean()) {
+                        if (lRatio.getValid()) {
+                            if(iQuantitativeValidationSingelton.isUseOnlyUniqueRatioForProteinMean() && iRatioGroups.get(i).getProteinAccessions().length != 1){
+                                //lResult.add(Double.NaN);
+                            } else {
+                                lResult.add(lRatio);
+                            }
+                        }
+                    } else {
+                        if(iQuantitativeValidationSingelton.isUseOnlyUniqueRatioForProteinMean() && iRatioGroups.get(i).getProteinAccessions().length != 1){
+                            //lResult.add(Double.NaN);
+                        } else {
+                            lResult.add(lRatio);
+                        }
+                    }
+                }
+            }
+        }
+        return lResult;
+    }
+
+    /**
+     * This method will give all the summed intensities for one ratio type
+     *
+     * @param aType String with the specific ratio type
+     * @param isLog2 Boolean that indicates if we have to use log 2 values
+     * @param aIndex Int that indicates the index of a specific source, if this int is -1 all the sources will be used
+     * @return Vector<Double> with all the intensities
+     */
     public Vector<Double> getIntensitiesForType(String aType, boolean isLog2, int aIndex){
         Vector<Double> lResult = new Vector<Double>();
         for(int i = 0; i<iRatioGroups.size(); i ++){
@@ -333,10 +395,56 @@ public class QuantitativePeptideGroup {
      * @return boolean
      */
     public boolean isLinkedToMoreProteins(){
-        if(iRatioGroups.get(0).getProteinAccessions().length == 1){
-            return false;
+        if(iMultiLink == null){
+            boolean lMultiLink = false;
+            for(int i = 0; i<iRatioGroups.size(); i ++){
+                if(iRatioGroups.get(i).getProteinAccessions().length > 1){
+                    lMultiLink = true;
+                }
+            }
+            iMultiLink = lMultiLink;
         }
-        return true;
+        return iMultiLink;
+    }
+
+    /**
+     * Get the razor protein accession linked to this peptide group
+     * @return String with the razor protein accession
+     */
+    public String getRazorAccession(){
+        if(iRazorAccession == null){
+            Vector<String> lAccessions = new Vector<String>();
+            Vector<Integer> lCounts = new Vector<Integer>();
+            for(int i = 0; i<iRatioGroups.size(); i ++){
+                String lRazor = iRatioGroups.get(i).getRazorProteinAccession().trim();
+                boolean lFound = false;
+                int lIndex = 0;
+                for(int j = 0; j<lAccessions.size(); j ++){
+                    if(lAccessions.get(j).equalsIgnoreCase(lRazor)){
+                        lFound =  true;
+                        lIndex = j;
+                    }
+                }
+
+                if(lFound){
+                    lCounts.set(lIndex, lCounts.get(lIndex) + 1);
+                } else {
+                    lAccessions.add(lRazor);
+                    lCounts.add(1);
+                }
+            }
+
+            int lIndex = 0;
+            int lMax = 0;
+            for(int i = 0; i<lCounts.size(); i ++){
+                if(lCounts.get(i) > lMax){
+                    lIndex = i;
+                    lMax = lCounts.get(i);
+                }
+            }
+            iRazorAccession = lAccessions.get(lIndex);
+        }
+        return iRazorAccession;
     }
 
     /**
@@ -344,9 +452,37 @@ public class QuantitativePeptideGroup {
      * @return String with the protein accessions
      */
     public String getProteinsLinkedToGroupAsString(){
-        return iRatioGroups.get(0).getProteinAccessionsAsString();
+        String lAccession = "";
+        Vector<String> lAccessions = new Vector<String>();
+        for(int i = 0; i<iRatioGroups.size(); i ++){
+            String[] lAccesssionsRatioGroup = iRatioGroups.get(i).getProteinAccessions();
+            for(int j = 0; j<lAccesssionsRatioGroup.length; j ++){
+
+                boolean lFound = false;
+                for(int k = 0; k<lAccessions.size(); k ++){
+                    if(lAccessions.get(k).equalsIgnoreCase(lAccesssionsRatioGroup[j])){
+                        lFound =  true;
+                    }
+                }
+
+                if(!lFound){
+                    lAccessions.add(lAccesssionsRatioGroup[j]);
+                    if(lAccession.length() > 0){
+                        lAccession = lAccession + ", " +  lAccesssionsRatioGroup[j];
+                    } else {
+                        lAccession = lAccesssionsRatioGroup[j];
+                    }
+                }
+            }
+        }
+        return lAccession;
     }
 
+    /**
+     * Calculates the number of valid ratios for a specific ratio type
+     * @param lType String with the ratio type
+     * @return int with the number of valid ratios for the type
+     */
     public int getNumberOfValidRatiosForType(String lType) {
         int lCounter = 0;
         for(int i = 0; i<iRatioGroups.size(); i ++){
@@ -407,6 +543,11 @@ public class QuantitativePeptideGroup {
         this.iPostSequence = aPostSequence;
     }
 
+    /**
+     * This method calculates the standard deviation for the ratios from this peptide group linked to a specific ratio
+     * @param aType String with the ratio type
+     * @return double with the calculated SD
+     */
     public double getSDForGroup(String aType) {
         DescriptiveStatistics lStat = new DescriptiveStatistics();
         for(int i = 0; i<iRatioGroups.size(); i ++){
@@ -427,4 +568,5 @@ public class QuantitativePeptideGroup {
         }
         return Math.round(lResult*10000.0)/10000.0;
     }
+
 }

@@ -1,5 +1,7 @@
 package com.compomics.rover.general.fileio.xml;
 
+import org.apache.log4j.Logger;
+
 import psidev.psi.tools.xxindex.index.IndexElement;
 import psidev.psi.tools.xxindex.StandardXpathAccess;
 
@@ -18,6 +20,8 @@ import java.io.IOException;
  * This class holds an IndexElement, the accessor for that IndexElement and the xml title tag linked to the accassor and the IndexElement
  */
 public class IndexElementExtension {
+	// Class specific log4j logger for IndexElementExtension instances.
+	 private static Logger logger = Logger.getLogger(IndexElementExtension.class);
 
     /**
      * The IndexElement

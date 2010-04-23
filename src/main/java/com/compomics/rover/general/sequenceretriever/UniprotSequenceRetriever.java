@@ -1,5 +1,7 @@
 package com.compomics.rover.general.sequenceretriever;
 
+import org.apache.log4j.Logger;
+
 import java.io.BufferedInputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
@@ -17,6 +19,8 @@ import java.net.URL;
  * This class can retrieve the protein sequence for an UniProt protien accession
  */
 public class UniprotSequenceRetriever {
+	// Class specific log4j logger for UniprotSequenceRetriever instances.
+	 private static Logger logger = Logger.getLogger(UniprotSequenceRetriever.class);
 
     /**
      * The protein sequence

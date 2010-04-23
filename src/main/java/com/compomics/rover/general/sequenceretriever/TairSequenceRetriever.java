@@ -1,5 +1,7 @@
 package com.compomics.rover.general.sequenceretriever;
 
+import org.apache.log4j.Logger;
+
 import java.io.BufferedInputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
@@ -14,6 +16,8 @@ import java.net.URL;
  * To change this template use File | Settings | File Templates.
  */
 public class TairSequenceRetriever {
+	// Class specific log4j logger for TairSequenceRetriever instances.
+	 private static Logger logger = Logger.getLogger(TairSequenceRetriever.class);
 /**
      * The protein sequence
      */

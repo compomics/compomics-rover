@@ -1,5 +1,7 @@
 package com.compomics.rover.general.quantitation.source.Census;
 
+import org.apache.log4j.Logger;
+
 import com.compomics.rover.general.quantitation.DefaultRatio;
 import com.compomics.rover.general.quantitation.RatioGroup;
 import com.compomics.rover.general.quantitation.RatioGroupCollection;
@@ -35,6 +37,8 @@ import org.jfree.ui.RectangleAnchor;
  * The censsus ratio group
  */
 public class CensusRatioGroup extends RatioGroup {
+	// Class specific log4j logger for CensusRatioGroup instances.
+	 private static Logger logger = Logger.getLogger(CensusRatioGroup.class);
 
     /**
      * The absolute intensities found in the DistillerRatioGroup in the distiller quantitation file.

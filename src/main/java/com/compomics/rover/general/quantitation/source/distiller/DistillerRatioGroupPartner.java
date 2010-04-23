@@ -1,5 +1,7 @@
 package com.compomics.rover.general.quantitation.source.distiller;
 
+import org.apache.log4j.Logger;
+
 import com.compomics.rover.general.fileio.xml.XmlElementExtension;
 
 import java.util.Vector;
@@ -15,6 +17,8 @@ import java.util.Vector;
  * This DistillerRatioGroupPartner holds additional information for every component (Light, Heavy, ...) of a DistillerRatioGroup
  */
 public class DistillerRatioGroupPartner {
+	// Class specific log4j logger for DistillerRatioGroupPartner instances.
+	 private static Logger logger = Logger.getLogger(DistillerRatioGroupPartner.class);
 
     /**
      * The component type (Light, Medium, ...)

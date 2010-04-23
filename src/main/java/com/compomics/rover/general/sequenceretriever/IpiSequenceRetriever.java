@@ -1,5 +1,7 @@
 package com.compomics.rover.general.sequenceretriever;
 
+import org.apache.log4j.Logger;
+
 import java.io.BufferedInputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
@@ -18,6 +20,8 @@ import java.net.URL;
  * This class can retrieve the protein sequence for an IPI protien accession
  */
 public class IpiSequenceRetriever {
+	// Class specific log4j logger for IpiSequenceRetriever instances.
+	 private static Logger logger = Logger.getLogger(IpiSequenceRetriever.class);
 
     /**
      * The protein sequence

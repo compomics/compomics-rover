@@ -1,5 +1,7 @@
 package com.compomics.rover.general.quantitation;
 
+import org.apache.log4j.Logger;
+
 import com.compomics.rover.general.interfaces.Ratio;
 import com.compomics.rover.general.singelton.QuantitativeValidationSingelton;
 import com.compomics.rover.general.quantitation.ReferenceSet;
@@ -31,6 +33,8 @@ import java.util.HashMap;
  * selected and validated status, ...)
  */
 public class QuantitativeProtein {
+	// Class specific log4j logger for QuantitativeProtein instances.
+	 private static Logger logger = Logger.getLogger(QuantitativeProtein.class);
 
     /**
      * The protein accession
@@ -72,6 +76,11 @@ public class QuantitativeProtein {
      * boolean that indicates if the peptide groups are ordened
      */
     private boolean iPeptideGroupsOrdened = false;
+    /**
+     * The protein sequence length
+     */
+    private int iSequenceLength = 0;
+    private Vector<RatioGroup> iRatioGroups;
 
 
     /**
@@ -155,6 +164,7 @@ public class QuantitativeProtein {
     /**
      * Getter for the PeptideGroups linked to this protein
      *
+     * @param lOrdered boolean that indicates if the peptides must be ordered (start position)
      * @return Vector with the PeptideGroups linked to this protein
      */
     public Vector<QuantitativePeptideGroup> getPeptideGroups(boolean lOrdered) {
@@ -264,7 +274,8 @@ public class QuantitativeProtein {
      *
      * @param aType Ratio type
      * @param aMultipleSourceIndex Int that indicates the index of a specific source, if this int is -1 all the sources will be used
-      * @return double The protein ratio mean
+     * @param isLog2 boolean that indicates if the log2 values of the ratios must be used
+     * @return double The protein ratio mean
      */
     public double getProteinRatio(String aType, int aMultipleSourceIndex, boolean isLog2) {
 
@@ -273,7 +284,7 @@ public class QuantitativeProtein {
 
         for (int i = 0; i < iPeptideGroups.size(); i++) {
             if(iPeptideGroups.get(i).isUsedInCalculations()){
-                Vector<Double> lRatios = iPeptideGroups.get(i).getRatiosForType(aType, isLog2, aMultipleSourceIndex);
+                Vector<Double> lRatios = iPeptideGroups.get(i).getRatioValuesForType(aType, isLog2, aMultipleSourceIndex);
                 for(int j = 0; j<lRatios.size(); j ++){
                     lProteinRatioMean = lProteinRatioMean + lRatios.get(j);
                     lNumberOfRatiosUsed = lNumberOfRatiosUsed + 1;
@@ -287,6 +298,13 @@ public class QuantitativeProtein {
 
     }
 
+    /**
+     * Getter for the sum of all the peptide intensities for the components linked to a specific ratio type
+     * @param aType Ratio type
+     * @param aMultipleSourceIndex Int that indicates the index of a specific source, if this int is -1 all the sources will be used
+     * @param isLog2 boolean that indicates if the log2 values of the ratios must be used
+     * @return double The summed intensity
+     */
     public double getSummedProteinIntensities(String aType, int aMultipleSourceIndex, boolean isLog2) {
 
         double lProteinIntensitySum = 0.0;
@@ -303,7 +321,14 @@ public class QuantitativeProtein {
         return Math.round(lResult*10000.0)/10000.0;
 
     }
-    
+
+    /**
+     * Getter for the SD of all the peptide intensities for the components linked to a specific ratio type
+     * @param aType Ratio type
+     * @param aMultipleSourceIndex Int that indicates the index of a specific source, if this int is -1 all the sources will be used
+     * @param isLog2 boolean that indicates if the log2 values of the ratios must be used
+     * @return double The SD of the intensities
+     */
     public double getStandardDeviationProteinIntensities(String aType, int aMultipleSourceIndex, boolean isLog2) {
         DescriptiveStatistics lIntensityHolder = new DescriptiveStatistics();
 
@@ -321,6 +346,13 @@ public class QuantitativeProtein {
 
     }
 
+    /**
+     * Getter for the mean of all the peptide intensities for the components linked to a specific ratio type
+     * @param aType Ratio type
+     * @param aMultipleSourceIndex Int that indicates the index of a specific source, if this int is -1 all the sources will be used
+     * @param isLog2 boolean that indicates if the log2 values of the ratios must be used
+     * @return double The mean of the intensities
+     */
     public double getMeanProteinIntensity(String aType, int aMultipleSourceIndex, boolean isLog2) {
 
         double lProteinIntensitySum = 0.0;
@@ -342,6 +374,13 @@ public class QuantitativeProtein {
 
     }
 
+    /**
+     * Getter for the median of all the peptide intensities for the components linked to a specific ratio type
+     * @param aType Ratio type
+     * @param aMultipleSourceIndex Int that indicates the index of a specific source, if this int is -1 all the sources will be used
+     * @param isLog2 boolean that indicates if the log2 values of the ratios must be used
+     * @return double The median of the intensities
+     */
     public double getMedianProteinIntensity(String aType, int aMultipleSourceIndex, boolean isLog2) {
 
         Vector<Double> lPeptideIntensities = new Vector<Double>();
@@ -369,16 +408,26 @@ public class QuantitativeProtein {
     }
 
 
-
+    /**
+     * This method calculates the number of ratios that are used for the calculation of a specific ratio type
+     * @param aType String that indicates the ratio type
+     * @return int with the number of ratios used
+     */
     public int getNumberOfRatiosUsedForProteinMean(String aType) {
         return this.getNumberOfRatiosUsedForProteinMean(aType, -1);
     }
 
+    /**
+     * This method calculates the number of ratios that are used for the calculation of a specific ratio type
+     * @param aType String that indicates the ratio type
+     * @param aMultipleSourceIndex Int that indicates the index of a specific source, if this int is -1 all the sources will be used
+     * @return int with the number of ratios used
+     */
     public int getNumberOfRatiosUsedForProteinMean(String aType, int aMultipleSourceIndex) {
         int lNumberOfRatiosUsed = 0;
         for (int i = 0; i < iPeptideGroups.size(); i++) {
             if(iPeptideGroups.get(i).isUsedInCalculations()){
-                Vector<Double> lRatios = iPeptideGroups.get(i).getRatiosForType(aType, aMultipleSourceIndex);
+                Vector<Double> lRatios = iPeptideGroups.get(i).getRatioValuesForType(aType, aMultipleSourceIndex);
                 for(int j = 0; j<lRatios.size(); j ++){
                     lNumberOfRatiosUsed = lNumberOfRatiosUsed + 1;
 
@@ -388,19 +437,22 @@ public class QuantitativeProtein {
         return lNumberOfRatiosUsed;
     }
 
-
+    /**
+     * Method that calculates the protein coverage
+     * @return double with the protein coverage
+     */
     public double getProteinCoverage(){
         double lLenghtPeptides = 0.0;
-        if(iSequence != null){
+        if(iSequenceLength != 0){
             for (int i = 0; i < iPeptideGroups.size(); i++) {
                 lLenghtPeptides = lLenghtPeptides + iPeptideGroups.get(i).getSequence().length();
             }
-            return lLenghtPeptides / (double) iSequence.length();
+            return lLenghtPeptides / (double) iSequenceLength;
         }
         return  lLenghtPeptides; 
     }
 
-
+/*
     public double getProteinPvalue(String aType, int aMultipleSourceIndex){
         double lZScore = Math.abs(getProteinZScore(aType, aMultipleSourceIndex));
         return iQuantitativeValidationSingelton.calculateTwoSidedPvalueForZvalue(lZScore);
@@ -413,7 +465,7 @@ public class QuantitativeProtein {
 
         for (int i = 0; i < iPeptideGroups.size(); i++) {
             if(iPeptideGroups.get(i).isUsedInCalculations()){
-                Vector<Double> lRatios = iPeptideGroups.get(i).getRatiosForType(aType,true, aMultipleSourceIndex);
+                Vector<Double> lRatios = iPeptideGroups.get(i).getRatioValuesForType(aType,true, aMultipleSourceIndex);
                 for(int j = 0; j<lRatios.size(); j ++){
                     lProteinRatioMean = lProteinRatioMean + lRatios.get(j);
                     lNumberOfRatiosUsed = lNumberOfRatiosUsed + 1;
@@ -430,11 +482,18 @@ public class QuantitativeProtein {
 
         //lResult = ((lZscore*(lRefSD / Math.sqrt(lNumberOfRatiosUsed)))-(lMean - lRefMean)) / (lRefSD/Math.sqrt(lNumberOfRatiosUsed));
         lResult = ((lZscore*(lRefSD / Math.sqrt(lNumberOfRatiosUsed)))-Math.abs(lMean - lRefMean)) / (lRefSD/Math.sqrt(lNumberOfRatiosUsed));
-        double lPvalueResult = 1.0 - iQuantitativeValidationSingelton.calculateOneSidedPvalueForZvalue(lResult);
+        double lPvalueResult = 1.0 - iQuantitativeValidationSingelton.calculateTwoSidedPvalueForZvalue(lResult);
         //System.out.println(lNumberOfRatiosUsed+","+lRefSD + "," + (lMean- lRefMean) +  "," + 1.96 + "," + lResult + "," + lPvalueResult);
         return lPvalueResult;
-    }
+    }  */
 
+    /**
+     * This method calculates the Z-score for this protein based on the SD and mean of the reference set, the protein ratio and the
+     * number of peptide ratios used in the calculation of the protein ratio
+     * @param aType String that indicates the ratio type
+     * @param aMultipleSourceIndex Int that indicates the index of a specific source, if this int is -1 all the sources will be used
+     * @return double with the protein Z-score
+     */
     public double getProteinZScore(String aType, int aMultipleSourceIndex){
         double lResult;
         double lProteinRatioMean = 0.0;
@@ -442,7 +501,7 @@ public class QuantitativeProtein {
 
         for (int i = 0; i < iPeptideGroups.size(); i++) {
             if(iPeptideGroups.get(i).isUsedInCalculations()){
-                Vector<Double> lRatios = iPeptideGroups.get(i).getRatiosForType(aType,true, aMultipleSourceIndex);
+                Vector<Double> lRatios = iPeptideGroups.get(i).getRatioValuesForType(aType,true, aMultipleSourceIndex);
                 for(int j = 0; j<lRatios.size(); j ++){
                     lProteinRatioMean = lProteinRatioMean + lRatios.get(j);
                     lNumberOfRatiosUsed = lNumberOfRatiosUsed + 1;
@@ -464,7 +523,7 @@ public class QuantitativeProtein {
     }
 
     /**
-     * Getter for the protein ratio mean for a specific ratio type
+     * Getter for the SD of the peptide ratios linked to this protein for a specific ratio type
      *
      * @param aType Ratio type
      * @return double The protein ratio mean
@@ -474,7 +533,7 @@ public class QuantitativeProtein {
 
         for (int i = 0; i < iPeptideGroups.size(); i++) {
             if(iPeptideGroups.get(i).isUsedInCalculations()){
-                Vector<Double> lRatios = iPeptideGroups.get(i).getRatiosForType(aType, true, -1);
+                Vector<Double> lRatios = iPeptideGroups.get(i).getRatioValuesForType(aType, true, -1);
                 for(int j = 0; j<lRatios.size(); j ++){
                     lRatioHolder.addValue(lRatios.get(j));
                 }
@@ -487,7 +546,140 @@ public class QuantitativeProtein {
     }
 
     /**
-     * Getter for the protein ratio mean for a specific ratio type
+     * Getter for the MAD of the peptide ratios linked to this protein for a specific ratio type
+     *
+     * @param aType Ratio type
+     * @return double The protein ratio mean
+     */
+    public double getProteinRatioMADForType(String aType) {
+        Vector<Ratio> lRatioHolder = new Vector<Ratio>();
+
+        for (int i = 0; i < iPeptideGroups.size(); i++) {
+            if(iPeptideGroups.get(i).isUsedInCalculations()){
+                Vector<Ratio> lRatios = iPeptideGroups.get(i).getRatiosForType(aType, true, -1);
+                for(int j = 0; j<lRatios.size(); j ++){
+                    lRatioHolder.add(lRatios.get(j));
+                }
+            }
+        }
+
+        double lResultSD = calculateMAD(lRatioHolder);
+        return Math.round(lResultSD*10000.0)/10000.0;
+
+    }
+
+
+    /**
+     * Method to calculate the MAD for ratios
+     * @param lRatios Vector with ratios
+     * @return double with the resulting MAD
+     */
+     public double calculateMAD(Vector<Ratio> lRatios) {
+        double[] lRatioDoubles = new double[lRatios.size()];
+        for (int i = 0; i < lRatios.size(); i++) {
+            lRatioDoubles[i] = lRatios.get(i).getRatio(true);
+        }
+        if(lRatioDoubles.length == 0){
+            return 0.0;
+        }
+        return BasicStats.mad(lRatioDoubles, false);
+    }
+
+
+     /**
+     * Getter for the SD of the original MAD linked to the ratios of this protein for a specific ratio type
+     *
+     * @param aType Ratio type
+     * @return double The protein ratio mean
+     */
+    public double getOriginalMadSD(String aType) {
+        DescriptiveStatistics lMadHolder = new DescriptiveStatistics();
+
+        for (int i = 0; i < iPeptideGroups.size(); i++) {
+            if(iPeptideGroups.get(i).isUsedInCalculations()){
+                Vector<Ratio> lRatios = iPeptideGroups.get(i).getRatiosForType(aType, true, -1);
+                for(int j = 0; j<lRatios.size(); j ++){
+                    lMadHolder.addValue(lRatios.get(j).getPreNormalizedMAD());
+                }
+            }
+        }
+
+        double lResultSD = lMadHolder.getStandardDeviation();
+        return Math.round(lResultSD*10000.0)/10000.0;
+
+    }
+
+    /**
+     * Getter for the SD of the MAD linked to the ratios of this protein for a specific ratio type
+     *
+     * @param aType Ratio type
+     * @return double The protein ratio mean
+     */
+    public double getNormalizedMadSD(String aType) {
+        DescriptiveStatistics lMadHolder = new DescriptiveStatistics();
+
+        for (int i = 0; i < iPeptideGroups.size(); i++) {
+            if(iPeptideGroups.get(i).isUsedInCalculations()){
+                Vector<Ratio> lRatios = iPeptideGroups.get(i).getRatiosForType(aType, true, -1);
+                for(int j = 0; j<lRatios.size(); j ++){
+                    lMadHolder.addValue(lRatios.get(j).getNormalizedMAD());
+                }
+            }                                                  
+        }
+
+        double lResultSD = lMadHolder.getStandardDeviation();
+        return Math.round(lResultSD*10000.0)/10000.0;
+
+    }
+
+    /**
+     * Getter for the mean of the original MAD linked to the ratios of this protein for a specific ratio type
+     *
+     * @param aType Ratio type
+     * @return double The protein ratio mean
+     */
+    public double getOriginalMadMean(String aType) {
+        DescriptiveStatistics lMadHolder = new DescriptiveStatistics();
+
+        for (int i = 0; i < iPeptideGroups.size(); i++) {
+            if(iPeptideGroups.get(i).isUsedInCalculations()){
+                Vector<Ratio> lRatios = iPeptideGroups.get(i).getRatiosForType(aType, true, -1);
+                for(int j = 0; j<lRatios.size(); j ++){
+                    lMadHolder.addValue(lRatios.get(j).getPreNormalizedMAD());
+                }
+            }
+        }
+
+        double lResultSD = lMadHolder.getMean();
+        return Math.round(lResultSD*10000.0)/10000.0;
+
+    }
+
+    /**
+     * Getter for the mean of the MAD linked to the ratios of this protein for a specific ratio type
+     *
+     * @param aType Ratio type
+     * @return double The protein ratio mean
+     */
+    public double getNormalizedMadMean(String aType) {
+        DescriptiveStatistics lMadHolder = new DescriptiveStatistics();
+
+        for (int i = 0; i < iPeptideGroups.size(); i++) {
+            if(iPeptideGroups.get(i).isUsedInCalculations()){
+                Vector<Ratio> lRatios = iPeptideGroups.get(i).getRatiosForType(aType, true, -1);
+                for(int j = 0; j<lRatios.size(); j ++){
+                    lMadHolder.addValue(lRatios.get(j).getNormalizedMAD());
+                }
+            }
+        }
+
+        double lResultSD = lMadHolder.getMean();
+        return Math.round(lResultSD*10000.0)/10000.0;
+
+    }
+
+    /**
+     * Getter for the protein ratio calculated with peptides linked to only this protein
      *
      * @param aType Ratio type
      * @return double The protein ratio mean
@@ -499,8 +691,8 @@ public class QuantitativeProtein {
 
         for (int i = 0; i < iPeptideGroups.size(); i++) {
             if(iPeptideGroups.get(i).isUsedInCalculations()){
-                Vector<Double> lRatios = iPeptideGroups.get(i).getRatiosForType(aType);
-                if(iPeptideGroups.get(i).getRatioGroups().get(0).getProteinAccessions().length == 1){
+                Vector<Double> lRatios = iPeptideGroups.get(i).getRatioValuesForType(aType);
+                if(!iPeptideGroups.get(i).isLinkedToMoreProteins()){
                     for(int j = 0; j<lRatios.size(); j ++){
                         lProteinRatioMean = lProteinRatioMean + lRatios.get(j);
                         lNumberOfRatiosUsed = lNumberOfRatiosUsed + 1;
@@ -717,6 +909,13 @@ public class QuantitativeProtein {
         this.iSequence = aSequence;
     }
 
+    public int getSequenceLength() {
+        return iSequenceLength;
+    }
+
+    public void setSequenceLength(int iSequenceLength) {
+        this.iSequenceLength = iSequenceLength;
+    }
 
     public String getProteinComment() {
         if(iProteinComment == null){
@@ -800,14 +999,18 @@ public class QuantitativeProtein {
      * @return Vector with the ratiogroups
      */
     public Vector<RatioGroup> getRatioGroups() {
-        Vector<RatioGroup> lRatioGroups = new Vector<RatioGroup>();
-        for(int i = 0; i<iPeptideGroups.size(); i++){
-            for(int j = 0; j<iPeptideGroups.get(i).getRatioGroups().size(); j++){
-                lRatioGroups.add(iPeptideGroups.get(i).getRatioGroups().get(j));
+        if(iRatioGroups != null){
+            return iRatioGroups;
+        } else {
+            iRatioGroups = new Vector<RatioGroup>();
+            for(int i = 0; i<iPeptideGroups.size(); i++){
+                for(int j = 0; j<iPeptideGroups.get(i).getRatioGroups().size(); j++){
+                    iRatioGroups.add(iPeptideGroups.get(i).getRatioGroups().get(j));
+                }
             }
         }
 
-        return lRatioGroups;
+        return iRatioGroups;
     }
 
 
@@ -819,7 +1022,7 @@ public class QuantitativeProtein {
     public int getNumberOfUniquePeptidesGroups(){
         int lCounter = 0;
         for(int i = 0; i<iPeptideGroups.size(); i++){
-            if(iPeptideGroups.get(i).getRatioGroups().get(0).getProteinAccessions().length == 1){
+            if(!iPeptideGroups.get(i).isLinkedToMoreProteins()){
                 lCounter = lCounter + 1;
             }
         }
@@ -833,18 +1036,80 @@ public class QuantitativeProtein {
     public int getNumberOfUniquePeptides(){
         int lCounter = 0;
         for(int i = 0; i<iPeptideGroups.size(); i++){
-            if(iPeptideGroups.get(i).getRatioGroups().get(0).getProteinAccessions().length == 1){
+            if(!iPeptideGroups.get(i).isLinkedToMoreProteins()){
                 lCounter = lCounter + iPeptideGroups.get(i).getRatioGroups().size();
             }
         }
         return lCounter;
     }
 
+    /*
+    public double getRatioIndexMeanForType(String lType){
+        DescriptiveStatistics lIndexHolder = new DescriptiveStatistics();
+
+        for (int i = 0; i < iPeptideGroups.size(); i++) {
+            if(iPeptideGroups.get(i).isUsedInCalculations()){
+                Vector<Ratio> lRatios = iPeptideGroups.get(i).getRatiosForType(lType, true, -1);
+                for(int j = 0; j<lRatios.size(); j ++){
+                    double lIndex = -1.0;
+                    if(iQuantitativeValidationSingelton.isUseOriginalRatio()){
+                        lIndex = lRatios.get(j).getOriginalIndex();
+                    } else {
+                        lIndex = lRatios.get(j).getIndex();
+                    }
+                    if(lIndex == -1.0){
+                        lIndex = iQuantitativeValidationSingelton.getReferenceSet().getIndexCloseToRatio(lRatios.get(j), lType);
+                        if(iQuantitativeValidationSingelton.isUseOriginalRatio()){
+                            lRatios.get(j).setOriginalIndex(lIndex);
+                        } else {
+                            lRatios.get(j).setIndex(lIndex);
+                        }
+                        System.out.println(lIndex);
+                    }
+                    lIndexHolder.addValue(lIndex);
+                }
+            }
+        }
+
+        double lResult = lIndexHolder.getMean();
+        return Math.round(lResult*10000.0)/10000.0;
+    }
+
+    public double getRatioIndexSDForType(String lType){
+        DescriptiveStatistics lIndexHolder = new DescriptiveStatistics();
+
+        for (int i = 0; i < iPeptideGroups.size(); i++) {
+            if(iPeptideGroups.get(i).isUsedInCalculations()){
+                Vector<Ratio> lRatios = iPeptideGroups.get(i).getRatiosForType(lType, true, -1);
+                for(int j = 0; j<lRatios.size(); j ++){
+                    double lIndex = -1.0;
+                    if(iQuantitativeValidationSingelton.isUseOriginalRatio()){
+                        lIndex = lRatios.get(j).getOriginalIndex();
+                    } else {
+                        lIndex = lRatios.get(j).getIndex();
+                    }
+                    if(lIndex == -1.0){
+                        lIndex = iQuantitativeValidationSingelton.getReferenceSet().getIndexCloseToRatio(lRatios.get(j), lType);
+                        if(iQuantitativeValidationSingelton.isUseOriginalRatio()){
+                            lRatios.get(j).setOriginalIndex(lIndex);
+                        } else {
+                            lRatios.get(j).setIndex(lIndex);
+                        }
+                    }
+                    lIndexHolder.addValue(lIndex);
+                }
+            }
+        }
+
+        double lResult = lIndexHolder.getStandardDeviation();
+        return Math.round(lResult*10000.0)/10000.0;
+    }  */
+
     /**
      * This method will calculate in a multiple source environment the maximum difference between the combined protein ratio
      * and the source specific protein ratio
      * @param iType
-     * @return
+     * @return double with the difference
      */
     public double getDiffProteinRatios(String iType) {
         double lProteinRatio = this.getProteinRatio(iType);

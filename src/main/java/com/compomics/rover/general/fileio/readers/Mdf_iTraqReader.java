@@ -1,5 +1,7 @@
 package com.compomics.rover.general.fileio.readers;
 
+import org.apache.log4j.Logger;
+
 import com.compomics.mascotdatfile.util.mascot.*;
 import com.compomics.mascotdatfile.util.mascot.enumeration.Mass;
 import com.compomics.mascotdatfile.util.mascot.quantitation.Ratio;
@@ -33,6 +35,8 @@ import java.sql.SQLException;
  * This class will read a mascotdatfile and will create a RatioGroupCollection with iTRAQ ratios found in this mascot datfile.
  */
 public class Mdf_iTraqReader {
+	// Class specific log4j logger for Mdf_iTraqReader instances.
+	 private static Logger logger = Logger.getLogger(Mdf_iTraqReader.class);
     /**
      * Boolean that indicates if the spectra must be found in the mgf merge file.
      */
@@ -177,6 +181,7 @@ public class Mdf_iTraqReader {
             lQuant = iDatFile.getMascotDatFile().getQuantitation();
         } catch (NullPointerException e){
             iFlamable.passHotPotato(new Throwable("No quantitative information was found in the datfile '" + iDatFile.getMascotDatFile().getFileName() + "'."));
+            logger.error(e.getMessage(), e);
             return null;
         }
         Ratio[] lRatios = lQuant.getRatios();
@@ -193,6 +198,7 @@ public class Mdf_iTraqReader {
             lQuant = iDatFile.getMascotDatFile().getQuantitation();
         } catch (NullPointerException e){
             iFlamable.passHotPotato(new Throwable("No quantitative information was found in the datfile '" + iDatFile.getMascotDatFile().getFileName() + "'."));
+            logger.error(e.getMessage(), e);
             return null;
         }
         Component[] lComp = lQuant.getComponents();
@@ -212,7 +218,7 @@ public class Mdf_iTraqReader {
             try {
                 lIdentifications = IdentificationExtension.getIdentificationExtensions(iConn, " i.l_datfileid = " + iDatabaseDatfileid);
             } catch (SQLException e) {
-                e.printStackTrace();
+                logger.error(e.getMessage(), e);
             }
         } else {
             lIdentifications =  iDatFile.extractDatfilePeptideIdentification(iThreshold);
@@ -233,8 +239,8 @@ public class Mdf_iTraqReader {
         iQuantitationType = lParam.getQuantiation();
 
         //check if the quantitation type is itraq
-        if(iQuantitationType.indexOf("iTRAQ") == -1){
-            iFlamable.passHotPotato(new Throwable("No itraq information could be extracted from the datfile '" + iRatioGroupCollection.getMetaData(QuantitationMetaType.FILENAME) + "'! The quantitation type was: " + iQuantitationType + "."));
+        if(iQuantitationType.indexOf("iTRAQ") == -1 && iQuantitationType.indexOf("TMT") == -1){
+            iFlamable.passHotPotato(new Throwable("No correct quantification information could be extracted from the datfile '" + iRatioGroupCollection.getMetaData(QuantitationMetaType.FILENAME) + "'! The quantitation type was: " + iQuantitationType + "."));
             return;
         }
 
@@ -277,13 +283,17 @@ public class Mdf_iTraqReader {
                     for(int j = 0; j<iRatioTypes.length; j ++){
                         Ratio lMDFRatio = iRatioTypes[j];
                         double lRatioDouble = lMDFRatio.calculate(lQuery.getPeakList(), lMassTolerance , lMass);
-                        ITraqRatio lRatio = new ITraqRatio(lRatioDouble, lMDFRatio.getName(), true, lRatioGroup);
-                        lRatioGroup.addRatio(lRatio);
+                        if(lRatioDouble >= 0.0){
+                            ITraqRatio lRatio = new ITraqRatio(lRatioDouble, lMDFRatio.getName(), true, lRatioGroup);
+                            lRatioGroup.addRatio(lRatio);
+                        }
                     }
                     //set the peptide sequence
                     lRatioGroup.setPeptideSequence(iPeptideIdentifications.get(i).getSequence());
                     //add the ratiogroup to the ratiogroup collection
-                    iRatioGroupCollection.add(lRatioGroup);
+                    if(lRatioGroup.getNumberOfRatios() > 0){
+                        iRatioGroupCollection.add(lRatioGroup);
+                    }
                 }
             }
         }
@@ -450,8 +460,10 @@ public class Mdf_iTraqReader {
             }
         } catch (FileNotFoundException e) {
             iFlamable.passHotPotato(new Throwable("Problem reading '" + iMgf.getAbsolutePath() + "' !"));
+            logger.error(e.getMessage(), e);
         } catch (IOException e) {
             iFlamable.passHotPotato(new Throwable("Problem reading '" + iMgf.getAbsolutePath() + "' !"));
+            logger.error(e.getMessage(), e);
         }
     }
 

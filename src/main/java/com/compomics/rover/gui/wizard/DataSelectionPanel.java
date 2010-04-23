@@ -1,5 +1,9 @@
 package com.compomics.rover.gui.wizard;
 
+import com.compomics.util.enumeration.CompomicsTools;
+import com.compomics.util.io.PropertiesManager;
+import org.apache.log4j.Logger;
+
 import com.compomics.mslims.db.accessors.Project;
 import com.compomics.mslims.db.accessors.Protocol;
 import com.compomics.util.gui.dialogs.ConnectionDialog;
@@ -12,6 +16,8 @@ import javax.swing.*;
 import javax.swing.border.TitledBorder;
 import javax.swing.filechooser.FileFilter;
 import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.text.SimpleDateFormat;
 import java.awt.event.ItemListener;
@@ -20,6 +26,7 @@ import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
 import java.awt.*;
 import java.io.File;
+import java.util.Properties;
 import java.util.Vector;
 
 
@@ -35,6 +42,8 @@ import java.util.Vector;
  */
 
 public class DataSelectionPanel implements Connectable, WizardPanel {
+	// Class specific log4j logger for DataSelectionPanel instances.
+	 private static Logger logger = Logger.getLogger(DataSelectionPanel.class);
 
     //gui stuff
     private JPanel jpanContent;
@@ -124,6 +133,8 @@ public class DataSelectionPanel implements Connectable, WizardPanel {
         FileFilter lFilter = null;
         if (RoverSource.ITRAQ_DAT == iRoverSource) {
             lFilter = new DatFileFilter();
+        } else if (RoverSource.TMT_DAT == iRoverSource) {
+            lFilter = new DatFileFilter();
         } else if (RoverSource.ITRAQ_ROV == iRoverSource) {
             lFilter = new MgfRovFileFilter();
         } else if (RoverSource.DISTILLER_QUANT_TOOLBOX_ROV == iRoverSource) {
@@ -157,8 +168,9 @@ public class DataSelectionPanel implements Connectable, WizardPanel {
     private void loadProjects() {
         try {
             iProjects = Project.getAllProjects(iConn);
-        } catch (SQLException sqle) {
-            iParent.passHotPotato(sqle, "Unable to load projects from DB!");
+        } catch (SQLException e) {
+            iParent.passHotPotato(e, "Unable to load projects from DB!");
+            logger.error(e.getMessage(), e);
         }
     }
 
@@ -168,8 +180,9 @@ public class DataSelectionPanel implements Connectable, WizardPanel {
     private void loadProtocol() {
         try {
             iProtocols = Protocol.getAllProtocols(iConn);
-        } catch (SQLException sqle) {
-            iParent.passHotPotato(sqle, "Unable to load protocol types from DB!");
+        } catch (SQLException e) {
+            iParent.passHotPotato(e, "Unable to load protocol types from DB!");
+            logger.error(e.getMessage(), e);
         }
     }
 
@@ -206,6 +219,7 @@ public class DataSelectionPanel implements Connectable, WizardPanel {
 
         iFeasableToProceed = true;
         iNotFeasableReason = null;
+        iQuantitationSingelton.removeLastRoverDataType();
     }
 
     /**
@@ -285,6 +299,8 @@ public class DataSelectionPanel implements Connectable, WizardPanel {
                     iNotFeasableReason = "No correct (.txt) files were selected.";
                 } else if (RoverSource.CENSUS == iRoverSource) {
                     iNotFeasableReason = "No correct .txt and .xml file were selected.";
+                } else if (RoverSource.ITRAQ_DAT == iRoverSource || RoverSource.TMT_DAT == iRoverSource) {
+                    iNotFeasableReason = "No correct .dat files were selected.";
                 } else {
                     iNotFeasableReason = "No correct (.rov) files were selected.";
                 }
@@ -377,8 +393,27 @@ public class DataSelectionPanel implements Connectable, WizardPanel {
             //check if we have a connection
             iConn = iParent.getMs_limsConnection();
             if (iConn == null) {
-                ConnectionDialog cd = new ConnectionDialog(iParent, this, "Establish DB connection for ms_lims", "connection.properties");
+                Properties lConnectionProperties = PropertiesManager.getInstance().getProperties(CompomicsTools.MSLIMS, "ms-lims.properties");
+                ConnectionDialog cd = new ConnectionDialog(iParent, this, "Establish DB connection for ms_lims", lConnectionProperties);
                 cd.setVisible(true);
+            }
+            if(iConn == null){
+                iParent.getPreviousButton().doClick();
+                iQuantitationSingelton.removeLastRoverDataType();
+                return;
+            } else {
+                //check if we are working with a 7.1 ms_lims version or earlier
+                try{
+                    String query = "select * from quantitation_group where quantitation_groupid = 1";
+
+                    PreparedStatement ps = iConn.prepareStatement(query);
+                    ResultSet rs = ps.executeQuery();
+                    rs.close();
+                    ps.close();
+                    iQuantitationSingelton.setMsLimsPre7_2(false);
+                } catch (SQLException e) {
+                    iQuantitationSingelton.setMsLimsPre7_2(true);
+                }
             }
             this.loadProjects();
             this.loadProtocol();
@@ -427,7 +462,6 @@ public class DataSelectionPanel implements Connectable, WizardPanel {
             //we will not use ms_lims
             ms_limsPanel.setVisible(false);
             filePanel.setVisible(true);
-
         }
 
 

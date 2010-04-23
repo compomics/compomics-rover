@@ -1,5 +1,7 @@
 package com.compomics.rover.gui;
 
+import org.apache.log4j.Logger;
+
 import com.compomics.rover.general.singelton.QuantitativeValidationSingelton;
 import com.compomics.rover.general.quantitation.ReferenceSet;
 
@@ -13,6 +15,8 @@ import java.awt.*;
  * Time: 10:34:38
  */
 public class ReferenceSetInfoFrame extends JFrame {
+	// Class specific log4j logger for ReferenceSetInfoFrame instances.
+	 private static Logger logger = Logger.getLogger(ReferenceSetInfoFrame.class);
 
     /**
      * This distiller validation singelton holds information for the calculation of the ratio

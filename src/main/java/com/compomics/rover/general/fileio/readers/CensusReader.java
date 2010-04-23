@@ -1,5 +1,7 @@
 package com.compomics.rover.general.fileio.readers;
 
+import org.apache.log4j.Logger;
+
 import com.compomics.rover.general.fileio.files.CensusOut;
 import com.compomics.rover.general.fileio.files.CensusChro;
 import com.compomics.rover.general.PeptideIdentification.DefaultPeptideIdentification;
@@ -25,6 +27,8 @@ import java.util.ArrayList;
  * This class will reads census files and will create a ratiogroupcollection
  */
 public class CensusReader {
+	// Class specific log4j logger for CensusReader instances.
+	 private static Logger logger = Logger.getLogger(CensusReader.class);
     /**
      * The census out file
      */
@@ -113,7 +117,7 @@ public class CensusReader {
             }
         } catch (Exception e){
             iFlamable.passHotPotato(new Throwable("Problem reading the census chro file"));
-            e.printStackTrace();
+            logger.error(e.getMessage(), e);
         }
     }
 

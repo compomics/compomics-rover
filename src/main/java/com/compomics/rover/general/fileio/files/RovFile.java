@@ -1,5 +1,7 @@
 package com.compomics.rover.general.fileio.files;
 
+import org.apache.log4j.Logger;
+
 import com.compomics.util.interfaces.Flamable;
 import com.compomics.mascotdatfile.util.mascot.*;
 import com.compomics.rover.general.quantitation.RatioGroupCollection;
@@ -26,6 +28,8 @@ import java.util.*;
  * This class holds the different elements of the unzipped rov.file (Mascot dat file, the quantitation xml file, ...)
  */
 public class RovFile {
+	// Class specific log4j logger for RovFile instances.
+	 private static Logger logger = Logger.getLogger(RovFile.class);
 
     /**
      * The original rov file
@@ -113,7 +117,6 @@ public class RovFile {
                   ZipInputStream in = new ZipInputStream( new BufferedInputStream(new FileInputStream(iOriginalRovFile)));
                   ZipEntry entry;
                   while((entry = in.getNextEntry()) != null){
-                        //System.out.println("Extracting: " + entry);
                         int count;
                         byte data[] = new byte[1000];
 
@@ -156,9 +159,8 @@ public class RovFile {
                   lNeededFilesFound = true;
               }
           } catch (IOException e) {
-            iFlamable.passHotPotato(new Throwable("Error in parsing the .rov file"));
-              System.err.println("Failing!");
-              e.printStackTrace();
+              iFlamable.passHotPotato(new Throwable("Error in parsing the .rov file"));
+              logger.error(e.getMessage(), e);
           }
 
         return lNeededFilesFound;
@@ -175,6 +177,10 @@ public class RovFile {
 
     public File getQuantitationXmlFile(){
         return iQuantitationXmlFile;    
+    }
+
+    public void setThreshold(double iThreshold) {
+        this.iThreshold = iThreshold;
     }
 
     /**

@@ -1,5 +1,7 @@
 package com.compomics.rover.gui;
 
+import org.apache.log4j.Logger;
+
 import com.compomics.rover.general.singelton.QuantitativeValidationSingelton;
 import com.compomics.rover.general.enumeration.RoverSource;
 import com.compomics.rover.general.enumeration.ProteinDatabaseType;
@@ -34,6 +36,8 @@ import java.sql.Connection;
  * To change this template use File | Settings | File Templates.
  */
 public class RecreateProteinsForMulti extends JFrame {
+	// Class specific log4j logger for RecreateProteinsForMulti instances.
+	 private static Logger logger = Logger.getLogger(RecreateProteinsForMulti.class);
     private JPanel jpanSources;
     private JProgressBar progressBar1;
     private JButton startReconstructionButton;

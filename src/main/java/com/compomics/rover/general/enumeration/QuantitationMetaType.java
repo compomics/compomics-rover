@@ -1,5 +1,7 @@
 package com.compomics.rover.general.enumeration;
 
+import org.apache.log4j.Logger;
+
 /**
  * Created by IntelliJ IDEA.
  * User: Kenny Date: 24-nov-2008 Time: 15:19:27

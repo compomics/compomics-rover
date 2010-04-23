@@ -1,5 +1,7 @@
 package com.compomics.rover.general.quantitation;
 
+import org.apache.log4j.Logger;
+
 import java.util.HashMap;
 
 /**
@@ -10,6 +12,8 @@ import java.util.HashMap;
  * To change this template use File | Settings | File Templates.
  */
 public class MergedComponentType {
+	// Class specific log4j logger for MergedComponentType instances.
+	 private static Logger logger = Logger.getLogger(MergedComponentType.class);
 
     private String iName;
     private HashMap<Integer, String> iIndexLinks = new HashMap<Integer, String>();

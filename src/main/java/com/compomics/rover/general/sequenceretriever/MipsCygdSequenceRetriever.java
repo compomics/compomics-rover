@@ -1,5 +1,7 @@
 package com.compomics.rover.general.sequenceretriever;
 
+import org.apache.log4j.Logger;
+
 import java.net.URL;
 import java.net.HttpURLConnection;
 import java.io.BufferedInputStream;
@@ -14,6 +16,8 @@ import java.io.InputStreamReader;
  * To change this template use File | Settings | File Templates.
  */
 public class MipsCygdSequenceRetriever {
+	// Class specific log4j logger for MipsCygdSequenceRetriever instances.
+	 private static Logger logger = Logger.getLogger(MipsCygdSequenceRetriever.class);
     /**
      * The protein sequence
      */

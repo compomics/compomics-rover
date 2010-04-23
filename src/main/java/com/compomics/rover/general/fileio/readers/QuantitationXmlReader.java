@@ -1,5 +1,7 @@
 package com.compomics.rover.general.fileio.readers;
 
+import org.apache.log4j.Logger;
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -32,6 +34,8 @@ import com.compomics.util.interfaces.Flamable;
  * This class reads and parses the Mascot Distiller quantitation xml file (rov file)
  */
 public class QuantitationXmlReader {
+	// Class specific log4j logger for QuantitationXmlReader instances.
+	 private static Logger logger = Logger.getLogger(QuantitationXmlReader.class);
 
     /**
      * The RatioGroupCollection where all the ratios, hits, ... will be stored in
@@ -192,7 +196,6 @@ public class QuantitationXmlReader {
             //5.Get the ratio types from the xml file
             Vector<XmlElementExtension> lRatioElements = getXmlElements(index, access, "/quantitationResults/mqm:quantitation/mqm:method/mqm:report_ratio");
             Vector lRatioList = new Vector();
-            Vector<RatioType> lRatioTypes = new Vector<RatioType>();
             for(int i = 0; i<lRatioElements.size(); i ++){
                 String lRatioType = lRatioElements.get(i).getAttribute("name");
                 lRatioList.add(lRatioType);
@@ -203,7 +206,6 @@ public class QuantitationXmlReader {
                 }
                 String[] lComponentsArray = new String[lComponents.size()];
                 lComponents.toArray(lComponentsArray);
-                lRatioTypes.add(new RatioType(lRatioType, lComponentsArray));
             }
             iRatioGroupCollection.setRatioTypes(lRatioList);
 
@@ -244,6 +246,7 @@ public class QuantitationXmlReader {
 
         } catch (IOException e) {
             iFlamable.passHotPotato(new Throwable("Problem in reading distiller .rov file information for  '" + lPath + "' !"));
+            logger.error(e.getMessage(), e);
         }
     }
 

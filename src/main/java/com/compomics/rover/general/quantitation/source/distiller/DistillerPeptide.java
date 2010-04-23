@@ -1,5 +1,7 @@
 package com.compomics.rover.general.quantitation.source.distiller;
 
+import org.apache.log4j.Logger;
+
 /**
  * Created by IntelliJ IDEA.
  * User: Niklaas Colaert
@@ -12,6 +14,8 @@ package com.compomics.rover.general.quantitation.source.distiller;
  * It complements the DistillerRatioGroups within a DistillerHit instance.
  */
 public class DistillerPeptide {
+	// Class specific log4j logger for DistillerPeptide instances.
+	 private static Logger logger = Logger.getLogger(DistillerPeptide.class);
 
     /**
      * The QueryNumber in the Mascot results file.

@@ -1,5 +1,12 @@
 package com.compomics.rover.gui.wizard;
 
+import com.compomics.util.enumeration.CompomicsTools;
+import com.compomics.util.io.PropertiesManager;
+import com.jgoodies.looks.plastic.PlasticLookAndFeel;
+import com.jgoodies.looks.plastic.PlasticXPLookAndFeel;
+import com.jgoodies.looks.plastic.theme.SkyKrupp;
+import org.apache.log4j.Logger;
+
 import com.compomics.rover.general.interfaces.WizardPanel;
 import com.compomics.rover.general.enumeration.RoverSource;
 import com.compomics.rover.general.enumeration.ProteinDatabaseType;
@@ -31,6 +38,8 @@ import java.util.Vector;
  * This Class creates a frame with for the wizard
  */
 public class WizardFrameHolder extends JFrame implements Flamable {
+	// Class specific log4j logger for WizardFrameHolder instances.
+	private static Logger logger = Logger.getLogger(WizardFrameHolder.class);
 
     //gui stuff
     private JButton exitButton;
@@ -38,6 +47,7 @@ public class WizardFrameHolder extends JFrame implements Flamable {
     private JButton previousButton;
     private JPanel jpanContent;
     private JPanel wizardPanel;
+    private JButton btnOpenMulti;
 
     /**
      * The index of the wizard
@@ -100,7 +110,7 @@ public class WizardFrameHolder extends JFrame implements Flamable {
             }
 
         } catch (IOException e) {
-            e.printStackTrace();
+            logger.error(e.getMessage(), e);
         }
 
         //create the panel array
@@ -113,12 +123,19 @@ public class WizardFrameHolder extends JFrame implements Flamable {
             }
         });
         //action listener for the exit button
-        //action listener for the previous button
         exitButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 close();
             }
         });
+        //action listener for the mutli button
+        btnOpenMulti.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                com.compomics.rover.gui.multiwizard.WizardFrameHolder launch = new com.compomics.rover.gui.multiwizard.WizardFrameHolder(true, null);
+                closeFrame();
+            }
+        });
+
         //action listener for the next button
         nextButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
@@ -225,7 +242,7 @@ public class WizardFrameHolder extends JFrame implements Flamable {
         //create JFrame parameters
         this.setTitle("Rover wizard");
         this.setContentPane(jpanContent);
-        this.setSize(800, 400);
+        this.setSize(850, 450);
         this.setLocation(150, 150);
         this.setVisible(true);
         this.setIconImage(new ImageIcon(getClass().getResource("/rover.png")).getImage());
@@ -246,6 +263,10 @@ public class WizardFrameHolder extends JFrame implements Flamable {
         this.dispose();
     }
 
+    public JButton getPreviousButton(){
+        return previousButton;
+    }
+
     /**
      * This method will be done when the close button is clicked
      */
@@ -254,10 +275,10 @@ public class WizardFrameHolder extends JFrame implements Flamable {
             if (iConn != null) {
                 //close db connection
                 try {
-                    System.out.println("Closing db connection");
+                    logger.info("Closing db connection");
                     iConn.close();
                 } catch (SQLException e) {
-                    System.out.println("Unable to close database connection!");
+                    logger.info("Unable to close database connection!");
                 }
             }
             //exit the program
@@ -368,6 +389,7 @@ public class WizardFrameHolder extends JFrame implements Flamable {
      */
     public void passHotPotato(Throwable aThrowable) {
         this.passHotPotato(aThrowable, aThrowable.getMessage());
+        logger.warn(aThrowable.getMessage(), aThrowable);
     }
 
     /**
@@ -434,6 +456,14 @@ public class WizardFrameHolder extends JFrame implements Flamable {
     }
 
     public static void main(String[] args) {
+        PropertiesManager.getInstance().updateLog4jConfiguration(logger, CompomicsTools.ROVER);
+        logger.info("Rover started");
+        try {
+            PlasticLookAndFeel.setPlasticTheme(new SkyKrupp());
+            UIManager.setLookAndFeel(new PlasticXPLookAndFeel());
+        } catch (UnsupportedLookAndFeelException e) {
+            // ignore exception
+        } 
         WizardFrameHolder launch = new WizardFrameHolder(true, null);
     }
 
@@ -458,6 +488,14 @@ public class WizardFrameHolder extends JFrame implements Flamable {
 
         // The directory is now empty so delete it
         return dir.delete();
+    }
+
+    public void setFastaDatabase(String text) {
+        iQuantitativeValidationSingelton.setFastaDatabaseLocation(text);
+    }
+
+    public void setRatioNormalization(boolean selected) {
+        iQuantitativeValidationSingelton.setNormalization(selected);
     }
 
 
@@ -490,8 +528,43 @@ public class WizardFrameHolder extends JFrame implements Flamable {
         label1.setText(" Welcome to the Rover wizard ");
         gbc = new GridBagConstraints();
         gbc.gridx = 0;
-        gbc.gridy = 0;
+        gbc.gridy = 1;
+        gbc.gridwidth = 2;
         wizardPanel.add(label1, gbc);
+        final JLabel label2 = new JLabel();
+        label2.setText("Start the analysis or combine quantitative data from different sources");
+        gbc = new GridBagConstraints();
+        gbc.gridx = 0;
+        gbc.gridy = 3;
+        gbc.anchor = GridBagConstraints.WEST;
+        gbc.insets = new Insets(5, 5, 5, 5);
+        wizardPanel.add(label2, gbc);
+        final JPanel spacer1 = new JPanel();
+        gbc = new GridBagConstraints();
+        gbc.gridx = 0;
+        gbc.gridy = 2;
+        gbc.weighty = 1.0;
+        gbc.fill = GridBagConstraints.VERTICAL;
+        wizardPanel.add(spacer1, gbc);
+        final JPanel spacer2 = new JPanel();
+        gbc = new GridBagConstraints();
+        gbc.gridx = 0;
+        gbc.gridy = 0;
+        gbc.weighty = 1.0;
+        gbc.fill = GridBagConstraints.VERTICAL;
+        wizardPanel.add(spacer2, gbc);
+        btnOpenMulti = new JButton();
+        btnOpenMulti.setBorderPainted(true);
+        btnOpenMulti.setContentAreaFilled(false);
+        btnOpenMulti.setFocusPainted(false);
+        btnOpenMulti.setIcon(new ImageIcon(getClass().getResource("/mutliRover.png")));
+        btnOpenMulti.setText("");
+        btnOpenMulti.setToolTipText("next");
+        gbc = new GridBagConstraints();
+        gbc.gridx = 1;
+        gbc.gridy = 3;
+        gbc.insets = new Insets(5, 5, 5, 5);
+        wizardPanel.add(btnOpenMulti, gbc);
         exitButton = new JButton();
         exitButton.setContentAreaFilled(false);
         exitButton.setFocusPainted(false);
@@ -529,13 +602,13 @@ public class WizardFrameHolder extends JFrame implements Flamable {
         gbc.fill = GridBagConstraints.HORIZONTAL;
         gbc.insets = new Insets(5, 5, 5, 5);
         jpanContent.add(previousButton, gbc);
-        final JPanel spacer1 = new JPanel();
+        final JPanel spacer3 = new JPanel();
         gbc = new GridBagConstraints();
         gbc.gridx = 1;
         gbc.gridy = 2;
         gbc.weightx = 1.0;
         gbc.fill = GridBagConstraints.HORIZONTAL;
-        jpanContent.add(spacer1, gbc);
+        jpanContent.add(spacer3, gbc);
         final JSeparator separator1 = new JSeparator();
         gbc = new GridBagConstraints();
         gbc.gridx = 0;

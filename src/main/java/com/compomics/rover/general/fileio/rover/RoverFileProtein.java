@@ -1,5 +1,7 @@
 package com.compomics.rover.general.fileio.rover;
 
+import org.apache.log4j.Logger;
+
 /**
  * Created by IntelliJ IDEA.
  * User: niklaas
@@ -12,6 +14,8 @@ package com.compomics.rover.general.fileio.rover;
  * This class has a protein accession and two booleans who indicate if this protein was selected and validated in the .rover file
  */
 public class RoverFileProtein {
+	// Class specific log4j logger for RoverFileProtein instances.
+	 private static Logger logger = Logger.getLogger(RoverFileProtein.class);
 
     /**
      * The protein accession

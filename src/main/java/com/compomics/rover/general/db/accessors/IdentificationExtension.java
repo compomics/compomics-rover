@@ -1,5 +1,8 @@
 package com.compomics.rover.general.db.accessors;
 
+import com.compomics.rover.general.singelton.QuantitativeValidationSingelton;
+import org.apache.log4j.Logger;
+
 import com.compomics.mslims.db.accessors.Identification;
 import com.compomics.mslims.db.accessors.Identification_to_quantitation;
 import com.compomics.rover.general.interfaces.PeptideIdentification;
@@ -24,6 +27,8 @@ import java.sql.PreparedStatement;
  * This class extends the ms_lims identification class and implements the PeptideIdentification interface.
  */
 public class IdentificationExtension extends Identification implements PeptideIdentification {
+	// Class specific log4j logger for IdentificationExtension instances.
+	 private static Logger logger = Logger.getLogger(IdentificationExtension.class);
 
     /**
      * An ArrayList with Identification_to_quantitations linked to this identification
@@ -95,7 +100,14 @@ public class IdentificationExtension extends Identification implements PeptideId
      * @throws SQLException when the retrieving of the identifications went wrong.
      */
     public static IdentificationExtension[] getIdentificationExtensionsforProject(Connection aConn, long aProjectID, String aWhereAddition) throws SQLException {
-        String sql = "select i.*, s.filename from identification as i, spectrumfile as s where i.l_spectrumfileid = s.spectrumfileid and s.l_projectid=?";
+        String sql;
+        QuantitativeValidationSingelton iQuantitationSingelton = QuantitativeValidationSingelton.getInstance();
+         if(iQuantitationSingelton.getMsLimsPre7_2()){
+             sql = "select i.*, s.filename from identification as i, spectrumfile as s where i.l_spectrumfileid = s.spectrumfileid and s.l_projectid=?";
+         } else {
+             sql = "select i.*, s.filename from identification as i, spectrum as s where i.l_spectrumid = s.spectrumid and s.l_projectid=?";
+         }
+        
         if (aWhereAddition != null) {
             sql += " AND " + aWhereAddition;
         }
@@ -126,10 +138,21 @@ public class IdentificationExtension extends Identification implements PeptideId
      * @throws SQLException when the retrieving of the identifications went wrong.
      */
     public static Vector<PeptideIdentification> getIdentificationExtensions(Connection aConn, String aWhereAddition) throws SQLException {
-        String sql = "select i.*, s.filename from identification as i, spectrumfile as s ";
-        if (aWhereAddition != null) {
-            sql += " where i.l_spectrumfileid = s.spectrumfileid and " + aWhereAddition;
-        }
+
+        String sql;
+        QuantitativeValidationSingelton iQuantitationSingelton = QuantitativeValidationSingelton.getInstance();
+         if(iQuantitationSingelton.getMsLimsPre7_2()){
+             sql = "select i.*, s.filename from identification as i, spectrumfile as s ";
+             if (aWhereAddition != null) {
+                 sql += " where i.l_spectrumfileid = s.spectrumfileid and " + aWhereAddition;
+             }
+         } else {
+             sql = "select i.*, s.filename from identification as i, spectrum as s ";
+             if (aWhereAddition != null) {
+                 sql += " where i.l_spectrumid = s.spectrumid and " + aWhereAddition;
+             }
+         }
+
         PreparedStatement prep = aConn.prepareStatement(sql);
         ResultSet rs = prep.executeQuery();
         Vector v = new Vector();

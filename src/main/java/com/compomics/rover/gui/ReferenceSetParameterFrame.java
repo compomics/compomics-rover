@@ -1,5 +1,7 @@
 package com.compomics.rover.gui;
 
+import org.apache.log4j.Logger;
+
 import com.compomics.rover.general.singelton.QuantitativeValidationSingelton;
 import com.compomics.rover.general.quantitation.ReferenceSet;
 import com.compomics.rover.general.quantitation.QuantitativeProtein;
@@ -17,6 +19,8 @@ import java.util.ArrayList;
  * Time: 13:09:58
  */
 public class ReferenceSetParameterFrame extends JFrame {
+	// Class specific log4j logger for ReferenceSetParameterFrame instances.
+	 private static Logger logger = Logger.getLogger(ReferenceSetParameterFrame.class);
     private JPanel jpanContent;
     private JRadioButton useAllProteinsRadioButton;
     private JRadioButton useMostAbundantProteinsRadioButton;

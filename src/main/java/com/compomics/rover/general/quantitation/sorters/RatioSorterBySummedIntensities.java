@@ -1,5 +1,7 @@
 package com.compomics.rover.general.quantitation.sorters;
 
+import org.apache.log4j.Logger;
+
 import com.compomics.rover.general.quantitation.RatioGroup;
 import com.compomics.rover.general.quantitation.QuantitativeProtein;
 import com.compomics.rover.general.quantitation.source.distiller.DistillerRatioGroup;
@@ -16,7 +18,9 @@ import java.util.Comparator;
  * Time: 11:43:01
  * To change this template use File | Settings | File Templates.
  */
-public class RatioSorterByIntensities implements Comparator<Ratio> {
+public class RatioSorterBySummedIntensities implements Comparator<Ratio> {
+	// Class specific log4j logger for RatioSorterBySummedIntensities instances.
+	 private static Logger logger = Logger.getLogger(RatioSorterBySummedIntensities.class);
 
     /**
      * The ratio type
@@ -28,7 +32,7 @@ public class RatioSorterByIntensities implements Comparator<Ratio> {
      * @param aType Ratio type
      */
 
-    public RatioSorterByIntensities(String aType) {
+    public RatioSorterBySummedIntensities(String aType) {
         this.iType = aType;
     }
 

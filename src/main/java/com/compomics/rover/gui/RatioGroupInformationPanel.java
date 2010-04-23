@@ -1,5 +1,7 @@
 package com.compomics.rover.gui;
 
+import org.apache.log4j.Logger;
+
 import com.compomics.rover.general.singelton.QuantitativeValidationSingelton;
 import com.compomics.rover.general.quantitation.RatioGroup;
 import com.compomics.rover.general.quantitation.source.distiller.DistillerRatioGroup;
@@ -38,6 +40,8 @@ import java.util.Vector;
  * - a graph with the XIC and absolute intensity values is created
  */
 public class RatioGroupInformationPanel extends JFrame {
+	// Class specific log4j logger for RatioGroupInformationPanel instances.
+	 private static Logger logger = Logger.getLogger(RatioGroupInformationPanel.class);
     //gui stuff
     private JPanel jpanContent;
     private JPanel jpanGraphs;
@@ -125,7 +129,11 @@ public class RatioGroupInformationPanel extends JFrame {
                 JPanel jpanRatio = new JPanel();
                 jpanRatio.setLayout(new BoxLayout(jpanRatio, BoxLayout.Y_AXIS));
                 jpanRatio.setBackground(Color.white);
-                jpanRatio.setBorder(BorderFactory.createTitledBorder(lRatio.getType()));
+                if(lRatio.getInverted()){
+                    jpanRatio.setBorder(BorderFactory.createTitledBorder(lRatio.getType()+ " *"));
+                } else {
+                    jpanRatio.setBorder(BorderFactory.createTitledBorder(lRatio.getType()));
+                }
 
                 if (lRatio.getValid()) {
                     //the ratio is valid => it can be set invalid
@@ -151,8 +159,9 @@ public class RatioGroupInformationPanel extends JFrame {
                                         lRatio.setComment((String) lCmbComments.getSelectedItem());
                                         try {
                                             lQuant.updateLowPriority(iConnMsLims);
-                                        } catch (SQLException e1) {
-                                            JOptionPane.showMessageDialog(new JFrame(), new String[]{"An error occurred will changing the valid status: ", e1.getMessage()}, "ERROR!", JOptionPane.ERROR_MESSAGE);
+                                        } catch (SQLException e) {
+                                            JOptionPane.showMessageDialog(new JFrame(), new String[]{"An error occurred will changing the valid status: ", e.getMessage()}, "ERROR!", JOptionPane.ERROR_MESSAGE);
+                                            logger.error(e.getMessage(), e);
                                         }
                                         return true;
                                     }
@@ -187,8 +196,9 @@ public class RatioGroupInformationPanel extends JFrame {
                                         lRatio.setComment((String) lCmbComments.getSelectedItem());
                                         try {
                                             lQuant.updateLowPriority(iConnMsLims);
-                                        } catch (SQLException e1) {
-                                            JOptionPane.showMessageDialog(new JFrame(), new String[]{"An error occurred will changing the valid status: ", e1.getMessage()}, "ERROR!", JOptionPane.ERROR_MESSAGE);
+                                        } catch (SQLException e) {
+                                            JOptionPane.showMessageDialog(new JFrame(), new String[]{"An error occurred will changing the valid status: ", e.getMessage()}, "ERROR!", JOptionPane.ERROR_MESSAGE);
+                                            logger.error(e.getMessage(), e);
                                         }
                                         return true;
                                     }
@@ -256,8 +266,9 @@ public class RatioGroupInformationPanel extends JFrame {
                                         lRatio.setComment((String) lCmbComments.getSelectedItem());
                                         try {
                                             lQuant.updateLowPriority(iConnMsLims);
-                                        } catch (SQLException e1) {
-                                            JOptionPane.showMessageDialog(new JFrame(), new String[]{"An error occurred will changing the valid status: ", e1.getMessage()}, "ERROR!", JOptionPane.ERROR_MESSAGE);
+                                        } catch (SQLException e) {
+                                            JOptionPane.showMessageDialog(new JFrame(), new String[]{"An error occurred will changing the valid status: ", e.getMessage()}, "ERROR!", JOptionPane.ERROR_MESSAGE);
+                                            logger.error(e.getMessage(), e);
                                         }
                                         return true;
                                     }
@@ -289,8 +300,9 @@ public class RatioGroupInformationPanel extends JFrame {
                                         lRatio.setComment((String) lCmbComments.getSelectedItem());
                                         try {
                                             lQuant.updateLowPriority(iConnMsLims);
-                                        } catch (SQLException e1) {
-                                            JOptionPane.showMessageDialog(new JFrame(), new String[]{"An error occurred will changing the valid status: ", e1.getMessage()}, "ERROR!", JOptionPane.ERROR_MESSAGE);
+                                        } catch (SQLException e) {
+                                            JOptionPane.showMessageDialog(new JFrame(), new String[]{"An error occurred will changing the valid status: ", e.getMessage()}, "ERROR!", JOptionPane.ERROR_MESSAGE);
+                                            logger.error(e.getMessage(), e);
                                         }
                                         return true;
                                     }
@@ -562,7 +574,7 @@ public class RatioGroupInformationPanel extends JFrame {
             jpanContent.setBackground(Color.white);
 
         } catch (IOException e) {
-            System.out.println(e);
+            logger.error(e.getMessage(), e);
         }
     }
 

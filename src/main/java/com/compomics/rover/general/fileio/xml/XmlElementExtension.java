@@ -1,5 +1,7 @@
 package com.compomics.rover.general.fileio.xml;
 
+import org.apache.log4j.Logger;
+
 import java.util.HashMap;
 import java.util.StringTokenizer;
 import java.util.Vector;
@@ -16,6 +18,8 @@ import java.util.Vector;
  * This class parses the xml element and can hold XmlElement attribute information, title, value and children of the XmlElements
  */
 public class XmlElementExtension {
+	// Class specific log4j logger for XmlElementExtension instances.
+	 private static Logger logger = Logger.getLogger(XmlElementExtension.class);
 
     /**
      * Value of this XmlElementExtension

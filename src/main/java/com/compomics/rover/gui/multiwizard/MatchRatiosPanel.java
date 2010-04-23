@@ -1,5 +1,7 @@
 package com.compomics.rover.gui.multiwizard;
 
+import org.apache.log4j.Logger;
+
 import com.compomics.rover.general.interfaces.WizardPanel;
 import com.compomics.rover.general.quantitation.MergedRatioType;
 import com.compomics.rover.gui.multiwizard.WizardFrameHolder;
@@ -18,6 +20,8 @@ import java.awt.*;
  * To change this template use File | Settings | File Templates.
  */
 public class MatchRatiosPanel implements WizardPanel {
+	// Class specific log4j logger for MatchRatiosPanel instances.
+	 private static Logger logger = Logger.getLogger(MatchRatiosPanel.class);
 
 
     private WizardFrameHolder iParent;
@@ -44,6 +48,7 @@ public class MatchRatiosPanel implements WizardPanel {
             iRatioTypeCounter = iRatioTypeCounter + 1;
             lblRatioLabelCount.setText("Ratio type " + (iRatioTypeCounter + 1) + "/" + iCollectionsRatios.get(iIndexCounter).length);
             lblLabel.setText(iCollectionsRatios.get(iIndexCounter)[iRatioTypeCounter]);
+            invertRatioCheckBox.setSelected(false);
 
         } else {
             //we must select the next index
@@ -58,6 +63,7 @@ public class MatchRatiosPanel implements WizardPanel {
                 lblSet.setText("All set");
                 lblLabel.setText("Click next");
                 lblRatioLabelCount.setText("");
+                iParent.clickNextButton();
 
             } else {
 
@@ -65,7 +71,7 @@ public class MatchRatiosPanel implements WizardPanel {
                 linkToSelectedMergedButton.setEnabled(true);
                 //we will show the next data set
                 iRatioTypeCounter = 0;
-                lblSet.setText("Set " + (iIndexCounter + 1) + "/" + iCollectionsRatios.size());
+                lblSet.setText(iParent.getTitle(iIndexCounter) + " : set " + (iIndexCounter + 1) + "/" + iCollectionsRatios.size());
                 lblRatioLabelCount.setText("Ratio type " + (iRatioTypeCounter + 1) + "/" + iCollectionsRatios.get(iIndexCounter).length);
                 lblLabel.setText(iCollectionsRatios.get(iIndexCounter)[iRatioTypeCounter]);
             }
@@ -80,19 +86,34 @@ public class MatchRatiosPanel implements WizardPanel {
                 String lName = newlyCreatedRatioTypeTextField.getText();
                 if (lName.equalsIgnoreCase("Newly created ratio type name")) {
                     //the given name was the default name
-                    JOptionPane.showMessageDialog(iParent, "Set a valid name for the newly created ratio type!", "ERROR", JOptionPane.ERROR_MESSAGE);
+                    JOptionPane.showMessageDialog(iParent, "Set a valid name for the newly created ratio type!", "ERROR", JOptionPane.WARNING_MESSAGE);
                     newlyCreatedRatioTypeTextField.setText("");
                     newlyCreatedRatioTypeTextField.requestFocus();
                 } else {
-                    MergedRatioType lMerged = new MergedRatioType(lName);
-                    if (invertRatioCheckBox.isSelected()) {
-                        lMerged.addRatioType(iIndexCounter, iCollectionsRatios.get(iIndexCounter)[iRatioTypeCounter], true);
-                    } else {
-                        lMerged.addRatioType(iIndexCounter, lblLabel.getText(), false);
+                    //check if the name does not exists
+                    boolean lAlreadyUsed = false;
+                    for (int i = 0; i < iRatioTypes.size(); i++) {
+                        if (iRatioTypes.get(i).toString().equalsIgnoreCase(lName)) {
+                            lAlreadyUsed = true;
+                        }
                     }
-                    iRatioTypes.add(lMerged);
-                    list1.updateUI();
-                    nextRatio();
+                    if (lAlreadyUsed) {
+                        JOptionPane.showMessageDialog(iParent, "Set a valid name for the newly created ratio type!\n" + lName + " was already used.", "ERROR", JOptionPane.WARNING_MESSAGE);
+                        newlyCreatedRatioTypeTextField.setText("");
+                        newlyCreatedRatioTypeTextField.requestFocus();
+                    } else {
+                        MergedRatioType lMerged = new MergedRatioType(lName);
+                        if (invertRatioCheckBox.isSelected()) {
+                            lMerged.addRatioType(iIndexCounter, iCollectionsRatios.get(iIndexCounter)[iRatioTypeCounter], true);
+                        } else {
+                            lMerged.addRatioType(iIndexCounter, lblLabel.getText(), false);
+                        }
+                        iRatioTypes.add(lMerged);
+                        list1.updateUI();
+                        nextRatio();
+                        newlyCreatedRatioTypeTextField.setText("");
+                        newlyCreatedRatioTypeTextField.requestFocus();
+                    }
                 }
             }
         });
@@ -107,7 +128,7 @@ public class MatchRatiosPanel implements WizardPanel {
                     }
                     nextRatio();
                 } else {
-                    JOptionPane.showMessageDialog(iParent, "No ratio type was selected!", "ERROR", JOptionPane.ERROR_MESSAGE);
+                    JOptionPane.showMessageDialog(iParent, "No ratio type was selected!", "ERROR", JOptionPane.WARNING_MESSAGE);
                 }
             }
         });
@@ -148,7 +169,7 @@ public class MatchRatiosPanel implements WizardPanel {
         iCollectionsComponents = iParent.getCollectionsComponents();
         iCollectionsRatios = iParent.getCollectionsRatios();
         lblLabel.setText(iCollectionsRatios.get(0)[0]);
-        lblSet.setText("Set 1/" + iCollectionsRatios.size());
+        lblSet.setText(iParent.getTitle(iIndexCounter) + " : set " + (iIndexCounter + 1) + "/" + iCollectionsRatios.size());
         lblRatioLabelCount.setText("Ratio type 1/" + iCollectionsRatios.get(0).length);
         linkToSelectedMergedButton.setEnabled(false);
         iParent.setNextButtonEnabled(false);

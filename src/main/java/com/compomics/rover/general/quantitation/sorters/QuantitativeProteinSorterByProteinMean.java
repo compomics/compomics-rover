@@ -1,5 +1,7 @@
 package com.compomics.rover.general.quantitation.sorters;
 
+import org.apache.log4j.Logger;
+
 import com.compomics.rover.general.quantitation.QuantitativeProtein;
 
 import java.util.Comparator;
@@ -16,6 +18,8 @@ import java.util.Comparator;
  * This implementation of the Comparator class sorts DistillerProteins by protein mean for a specific ratio type
  */
 public class QuantitativeProteinSorterByProteinMean implements Comparator<QuantitativeProtein> {
+	// Class specific log4j logger for QuantitativeProteinSorterByProteinMean instances.
+	 private static Logger logger = Logger.getLogger(QuantitativeProteinSorterByProteinMean.class);
 
     /**
      * The ratio type

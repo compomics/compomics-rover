@@ -1,5 +1,7 @@
 package com.compomics.rover.general.enumeration;
 
+import org.apache.log4j.Logger;
+
 /**
  * Created by IntelliJ IDEA.
  * User: niklaas
@@ -11,5 +13,5 @@ package com.compomics.rover.general.enumeration;
  * This enumeration holds the different source types for Rover
  */
 public enum RoverSource {
-    ITRAQ_DAT, ITRAQ_MS_LIMS, ITRAQ_ROV, DISTILLER_QUANT_TOOLBOX_ROV, DISTILLER_QUANT_TOOLBOX_MS_LIMS, MS_QUANT, MAX_QUANT, MAX_QUANT_NO_SIGN, CENSUS
+    ITRAQ_DAT, ITRAQ_MS_LIMS, ITRAQ_ROV, TMT_DAT, DISTILLER_QUANT_TOOLBOX_ROV, DISTILLER_QUANT_TOOLBOX_MS_LIMS, MS_QUANT, MAX_QUANT, MAX_QUANT_NO_SIGN, CENSUS
 }

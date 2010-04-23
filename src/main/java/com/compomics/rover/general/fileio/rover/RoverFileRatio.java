@@ -1,5 +1,7 @@
 package com.compomics.rover.general.fileio.rover;
 
+import org.apache.log4j.Logger;
+
 /**
  * Created by IntelliJ IDEA.
  * User: niklaas
@@ -12,6 +14,8 @@ package com.compomics.rover.general.fileio.rover;
  * This class stores the parameters of a ratio that was stored in the .rover file
  */
 public class RoverFileRatio {
+	// Class specific log4j logger for RoverFileRatio instances.
+	 private static Logger logger = Logger.getLogger(RoverFileRatio.class);
 
     /**
      * The ratio type (L/H, M/H, ...)

@@ -1,5 +1,7 @@
 package com.compomics.rover.general.quantitation;
 
+import org.apache.log4j.Logger;
+
 import java.util.HashMap;
 
 /**
@@ -10,6 +12,8 @@ import java.util.HashMap;
  * To change this template use File | Settings | File Templates.
  */
 public class MergedRatioType {
+	// Class specific log4j logger for MergedRatioType instances.
+	 private static Logger logger = Logger.getLogger(MergedRatioType.class);
 
 
     private String iName;

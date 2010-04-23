@@ -1,0 +1,36 @@
+\BOOKMARK [0][-]{chapter.1}{General Information}{}
+\BOOKMARK [1][-]{section.1.1}{Downloading and running Rover}{chapter.1}
+\BOOKMARK [1][-]{section.1.2}{Java}{chapter.1}
+\BOOKMARK [0][-]{chapter.2}{Starting Rover with the Rover wizard}{}
+\BOOKMARK [1][-]{section.2.1}{Different types of analyses}{chapter.2}
+\BOOKMARK [1][-]{section.2.2}{Starting the Rover wizard}{chapter.2}
+\BOOKMARK [1][-]{section.2.3}{Different steps in the Rover wizard}{chapter.2}
+\BOOKMARK [2][-]{subsection.2.3.1}{Step 1 - Selection of the information source}{section.2.3}
+\BOOKMARK [2][-]{subsection.2.3.2}{Step 2 - Selection of the data}{section.2.3}
+\BOOKMARK [3][-]{subsubsection.2.3.2.1}{From files}{subsection.2.3.2}
+\BOOKMARK [3][-]{subsubsection.2.3.2.2}{From ms\137lims}{subsection.2.3.2}
+\BOOKMARK [2][-]{subsection.2.3.3}{Step 3 - Input parameters}{section.2.3}
+\BOOKMARK [3][-]{subsubsection.2.3.3.1}{Peptide identification confidence level}{subsection.2.3.3}
+\BOOKMARK [3][-]{subsubsection.2.3.3.2}{Reference set}{subsection.2.3.3}
+\BOOKMARK [3][-]{subsubsection.2.3.3.3}{Database type}{subsection.2.3.3}
+\BOOKMARK [3][-]{subsubsection.2.3.3.4}{Instrument standard deviation}{subsection.2.3.3}
+\BOOKMARK [2][-]{subsection.2.3.4}{Step 4}{section.2.3}
+\BOOKMARK [2][-]{subsection.2.3.5}{Step 5 - Data retrieval \(only multiple sources approach\)}{section.2.3}
+\BOOKMARK [2][-]{subsection.2.3.6}{Step 6 - Grouping ratios \(only multiple sources approach\)}{section.2.3}
+\BOOKMARK [2][-]{subsection.2.3.7}{Step 7 - Grouping components \(only multiple sources approach\)}{section.2.3}
+\BOOKMARK [2][-]{subsection.2.3.8}{Step 8 - Data merging}{section.2.3}
+\BOOKMARK [0][-]{chapter.3}{Data viewing with Rover}{}
+\BOOKMARK [1][-]{section.3.1}{Overview}{chapter.3}
+\BOOKMARK [1][-]{section.3.2}{Protein list panel}{chapter.3}
+\BOOKMARK [1][-]{section.3.3}{Protein bar}{chapter.3}
+\BOOKMARK [1][-]{section.3.4}{Filter}{chapter.3}
+\BOOKMARK [1][-]{section.3.5}{Ratio distribution graph}{chapter.3}
+\BOOKMARK [1][-]{section.3.6}{Protein panel}{chapter.3}
+\BOOKMARK [1][-]{section.3.7}{More info panel}{chapter.3}
+\BOOKMARK [1][-]{section.3.8}{Button panels}{chapter.3}
+\BOOKMARK [2][-]{subsection.3.8.1}{Top button panel}{section.3.8}
+\BOOKMARK [2][-]{subsection.3.8.2}{Lower button panel}{section.3.8}
+\BOOKMARK [1][-]{section.3.9}{Export panel}{chapter.3}
+\BOOKMARK [0][-]{chapter.4}{Statistics}{}
+\BOOKMARK [0][-]{chapter.5}{Working with Rover, an example}{}
+\BOOKMARK [0][-]{chapter.6}{Problems and questions}{}

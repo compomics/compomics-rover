@@ -6,6 +6,8 @@
  */
 package com.compomics.rover.general.singelton;
 
+import org.apache.log4j.Logger;
+
 import java.util.Observable;
 
 
@@ -13,6 +15,8 @@ import java.util.Observable;
  * The log
  */
 public class Log extends Observable {
+	// Class specific log4j logger for Log instances.
+	 private static Logger logger = Logger.getLogger(Log.class);
 
     /**
      * The log that will be appended

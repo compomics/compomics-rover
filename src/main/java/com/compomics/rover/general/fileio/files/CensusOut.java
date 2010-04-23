@@ -1,5 +1,7 @@
 package com.compomics.rover.general.fileio.files;
 
+import org.apache.log4j.Logger;
+
 import com.compomics.util.interfaces.Flamable;
 
 import java.io.*;
@@ -17,6 +19,8 @@ import java.util.Vector;
  * This class reads the census out file
  */
 public class CensusOut {
+	// Class specific log4j logger for CensusOut instances.
+	 private static Logger logger = Logger.getLogger(CensusOut.class);
     /**
      * The census out file
      */
@@ -110,15 +114,16 @@ public class CensusOut {
                     iPeptideInfos.add(lPeptide);
                 }
             }
-        } catch (FileNotFoundException e1) {
+        } catch (FileNotFoundException e) {
             iFlamable.passHotPotato(new Throwable("Problem reading the census out file"));
-            e1.printStackTrace();
-        } catch (IOException e1) {
+            logger.error(e.getMessage(), e);
+            e.printStackTrace();
+        } catch (IOException e) {
             iFlamable.passHotPotato(new Throwable("Problem reading the census out file"));
-            e1.printStackTrace();
+            logger.error(e.getMessage(), e);
         } catch (Exception e){
             iFlamable.passHotPotato(new Throwable("Problem reading the census out file"));
-            e.printStackTrace();
+            logger.error(e.getMessage(), e);
         }
     }
 
