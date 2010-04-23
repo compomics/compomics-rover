@@ -1,5 +1,7 @@
 package com.compomics.rover.gui.multiwizard;
 
+import org.apache.log4j.Logger;
+
 import com.compomics.rover.general.interfaces.WizardPanel;
 
 import javax.swing.*;
@@ -15,6 +17,8 @@ import java.awt.*;
  * To change this template use File | Settings | File Templates.
  */
 public class OverviewPanel implements WizardPanel {
+	// Class specific log4j logger for OverviewPanel instances.
+	 private static Logger logger = Logger.getLogger(OverviewPanel.class);
     private JButton addAnOtherSourceButton;
     private JPanel jpanContent;
     private WizardFrameHolder iParent;

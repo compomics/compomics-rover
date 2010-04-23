@@ -1,8 +1,9 @@
 package com.compomics.rover.gui;
 
+import org.apache.log4j.Logger;
+
 import com.compomics.rover.general.enumeration.QuantitationMetaType;
 import com.compomics.rover.general.enumeration.ProteinDatabaseType;
-import com.compomics.rover.general.enumeration.MaxQuantScoreType;
 import com.compomics.rover.general.interfaces.Ratio;
 import com.compomics.rover.general.quantitation.QuantitativeProtein;
 import com.compomics.rover.general.quantitation.RatioGroup;
@@ -13,7 +14,6 @@ import com.compomics.rover.general.quantitation.source.distiller.DistillerRatioG
 import com.compomics.rover.general.singelton.Log;
 import com.compomics.rover.general.singelton.QuantitativeValidationSingelton;
 import com.compomics.rover.general.fileio.rover.RoverFileReader;
-import com.compomics.rover.gui.wizard.WizardFrameHolder;
 import com.compomics.util.sun.SwingWorker;
 import org.jfree.chart.ChartPanel;
 import org.jfree.chart.JFreeChart;
@@ -45,6 +45,8 @@ import java.util.Collections;
  * This is the main frame of Rover
  */
 public class QuantitationValidationGUI extends JFrame {
+	// Class specific log4j logger for QuantitationValidationGUI instances.
+	 private static Logger logger = Logger.getLogger(QuantitationValidationGUI.class);
 
     //gui components
     private JTabbedPane tabbedPane;
@@ -90,8 +92,6 @@ public class QuantitationValidationGUI extends JFrame {
     private JCheckBox showHuberEstimatedDistributionCheckBox;
     private JTree treeRovFiles;
     private JButton miscButton;
-    private JRadioButton normalizedRatioRadioButton;
-    private JRadioButton defaultRatioRadioButton;
     private JButton misc_infoButton;
     private JButton logButton;
     private JCheckBox useOnlyUniquelyIdentifiedCheckBox;
@@ -101,6 +101,7 @@ public class QuantitationValidationGUI extends JFrame {
     private JComboBox cmbRatioTypes;
     private JLabel lblRatioType;
     private JCheckBox useOriginalCheckBox;
+    private JProgressBar progressBar1;
 
     /**
      * All the proteins (with isoforms) with quantitative information
@@ -163,6 +164,8 @@ public class QuantitationValidationGUI extends JFrame {
      */
     private Log iLog = Log.getInstance();
 
+    private boolean iUpdating = false;
+
 
     /**
      * The constructor
@@ -175,7 +178,11 @@ public class QuantitationValidationGUI extends JFrame {
         //set title
         super("Rover");
         //set icon
-        this.setIconImage(new ImageIcon(getClass().getResource("/rover.png")).getImage());
+        if (iQuantitativeValidationSingelton.isMultipleSources()) {
+            this.setIconImage(new ImageIcon(getClass().getResource("/mutliRover.png")).getImage());
+        } else {
+            this.setIconImage(new ImageIcon(getClass().getResource("/rover.png")).getImage());
+        }
         //set the proteins
         this.iProteins = new QuantitativeProtein[aProteins.size()];
         aProteins.toArray(iProteins);
@@ -200,10 +207,10 @@ public class QuantitationValidationGUI extends JFrame {
                     if (iStandAlone) {
                         if (iQuantitativeValidationSingelton.isDatabaseMode()) {
                             try {
-                                System.out.println("Closing the db connection");
+                                logger.info("Closing the db connection");
                                 iConnMsLims.close();
                             } catch (SQLException e) {
-                                System.out.println("Unable to close database connection!");
+                                logger.info("Unable to close database connection!");
                             }
                         }
                         System.exit(0);
@@ -219,6 +226,7 @@ public class QuantitationValidationGUI extends JFrame {
         });
 
         //set these checkboxes selected (depending on the status in the validation singelton)
+        iQuantitativeValidationSingelton.setLog2(true);
         log2CheckBox.setSelected(iQuantitativeValidationSingelton.isLog2());
         useOnlyValidRatiosCheckBox.setSelected(iQuantitativeValidationSingelton.isUseOnlyValidRatioForProteinMean());
         useOnlyUniquelyIdentifiedCheckBox.setSelected(iQuantitativeValidationSingelton.isUseOnlyUniqueRatioForProteinMean());
@@ -234,6 +242,7 @@ public class QuantitationValidationGUI extends JFrame {
         goToBrowserButton.setVisible(false);
         setValidatedButton.setVisible(false);
         showPossibleIsoformsButton.setVisible(false);
+        progressBar1.setVisible(false);
         //create labels
         jLabelTotaleNumber.setText("# proteins : " + iProteins.length);
         jLabelSelected.setText("# selected proteins : " + iQuantitativeValidationSingelton.getSelectedProteins().size());
@@ -241,41 +250,34 @@ public class QuantitationValidationGUI extends JFrame {
         //buttons adjustment
         addToSelectionButton.setText("");
 
+        //only show the rov button if it is a Distiller project
         if (!iQuantitativeValidationSingelton.isDistillerQuantitation()) {
             showRovButton.setVisible(false);
             tabRov.setVisible(false);
             tabbedPane.remove(1);
         }
 
-        if (!iQuantitativeValidationSingelton.isMaxQuantQuantitation()) {
-            defaultRatioRadioButton.setVisible(false);
-            normalizedRatioRadioButton.setVisible(false);
-        } else {
-            iQuantitativeValidationSingelton.setMaxQuantScoreType(MaxQuantScoreType.RATIO);
-            normalizedRatioRadioButton.setSelected(true);
-            if (iQuantitativeValidationSingelton.isMaxQuantQuantitationWithoutSign()) {
-            }
-        }
-        if (iQuantitativeValidationSingelton.getRoverSources().size() > 1) {
+        //show the reconstruct checkbox if needed, and the showRovButton
+        if (!iQuantitativeValidationSingelton.isMultipleSources()) {
             //we've got a multi project
-            //some features wont be here
+            //some features will not be here
             showRovButton.setVisible(false);
             tabRov.setVisible(false);
             if (tabbedPane.getComponents().length > 1) {
                 tabbedPane.remove(1);
             }
-            normalizedRatioRadioButton.setVisible(false);
         }
+        reconstructButton.setVisible(false);
 
-        if (!iQuantitativeValidationSingelton.isMultipleSources()) {
-            reconstructButton.setVisible(false);
+        //show the normalization checkbox if needed
+        if (iQuantitativeValidationSingelton.isNormalization()) {
+            useOriginalCheckBox.setVisible(true);
         } else {
             useOriginalCheckBox.setVisible(false);
         }
-        //exclude the normalization
-        useOriginalCheckBox.setVisible(false);
 
-        if (iQuantitativeValidationSingelton.isMultipleSources() && iQuantitativeValidationSingelton.getRatioTypes().size() > 0) {
+        //show the ratio type selection combobox if needed
+        if (iQuantitativeValidationSingelton.getRatioTypes().size() > 0) {
             lblRatioType.setVisible(true);
             cmbRatioTypes.setVisible(true);
         } else {
@@ -283,72 +285,17 @@ public class QuantitationValidationGUI extends JFrame {
             cmbRatioTypes.setVisible(false);
         }
 
-        cmbOrder.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                String lOrderType = (String) cmbOrder.getSelectedItem();
-                if (lOrderType.equalsIgnoreCase("alphabetical")) {
-                    //sort by the protein accession
-                    Collections.sort(iFilteredProteins, new QuantitativeProteinSorterByAccession());
-                    proteinList.updateUI();
-                }
-                if (lOrderType.equalsIgnoreCase("# peptide ratios")) {
-                    //sort by number of ratio groups
-                    Collections.sort(iFilteredProteins, new QuantitativeProteinSorterByRatioGroupNumbers());
-                    proteinList.updateUI();
-                }
-                if (lOrderType.equalsIgnoreCase("protein ratio")) {
-                    //sort by the protein ratio
-                    Collections.sort(iFilteredProteins, new QuantitativeProteinSorterByProteinMean((String) cmbRatioTypes.getSelectedItem()));
-                    proteinList.updateUI();
+        //do not show the go to browser button if a local fasta db was used
+        if (iQuantitativeValidationSingelton.getDatabaseType() == ProteinDatabaseType.LOCAL || iQuantitativeValidationSingelton.getDatabaseType() == ProteinDatabaseType.UNKNOWN) {
+            goToBrowserButton.setVisible(false);
+        }
 
-                }
-                if (lOrderType.equalsIgnoreCase("ratio diff between sources")) {
-                    //sort by the protein ratio
-                    Collections.sort(iFilteredProteins, new QuantitativeProteinSorterByDiffProteinMeans((String) cmbRatioTypes.getSelectedItem()));
-                    proteinList.updateUI();
 
-                }
-
-                if (lOrderType.equalsIgnoreCase("protein P value")) {
-                    //sort by the protein ratio
-                    Collections.sort(iFilteredProteins, new QuantitativeProteinSorterByProteinPValue((String) cmbRatioTypes.getSelectedItem()));
-                    proteinList.updateUI();
-                }
-
-            }
-        });
-        cmbRatioTypes.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                //check if protein ratio is selected in the cmbOrder
-                String lOrderType = (String) cmbOrder.getSelectedItem();
-                if (lOrderType.equalsIgnoreCase("protein ratio")) {
-                    //sort by the protein ratio
-                    Collections.sort(iFilteredProteins, new QuantitativeProteinSorterByProteinMean((String) cmbRatioTypes.getSelectedItem()));
-                    proteinList.updateUI();
-
-                }
-                if (lOrderType.equalsIgnoreCase("ratio diff between sources")) {
-                    //sort by the protein ratio
-                    Collections.sort(iFilteredProteins, new QuantitativeProteinSorterByDiffProteinMeans((String) cmbRatioTypes.getSelectedItem()));
-                    proteinList.updateUI();
-
-                }
-
-                if (lOrderType.equalsIgnoreCase("protein P value")) {
-                    //sort by the protein ratio
-                    Collections.sort(iFilteredProteins, new QuantitativeProteinSorterByProteinPValue((String) cmbRatioTypes.getSelectedItem()));
-                    proteinList.updateUI();
-                }
-            }
-        });
-        useOriginalCheckBox.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                iQuantitativeValidationSingelton.setUseOriginalRatio(useOriginalCheckBox.isSelected());
-                iQuantitativeValidationSingelton.getReferenceSet().clearCalculateReferenceSet();
-            }
-        });
     }
 
+    /**
+     * This method will close the frame and the program
+     */
     public void closeFrame() {
         this.setVisible(false);
         this.dispose();
@@ -372,12 +319,6 @@ public class QuantitationValidationGUI extends JFrame {
             }
         });
 
-
-        restartButton.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                WizardFrameHolder lHolder = new WizardFrameHolder(false, iConnMsLims);
-            }
-        });
         logButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 LogGui lLogGui = new LogGui();
@@ -718,24 +659,111 @@ public class QuantitationValidationGUI extends JFrame {
 
         });
 
-        ActionListener maxQuantRatioTypeRbtnGroupListener = new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                if (defaultRatioRadioButton.isSelected()) {
-                    iQuantitativeValidationSingelton.setMaxQuantScoreType(MaxQuantScoreType.RATIO);
-                } else if (normalizedRatioRadioButton.isSelected()) {
-                    iQuantitativeValidationSingelton.setMaxQuantScoreType(MaxQuantScoreType.NORMALIZED);
-                }
-                iQuantitativeValidationSingelton.getReferenceSet().clearCalculateReferenceSet();
-                loadProtein(false);
-            }
-        };
-        defaultRatioRadioButton.addActionListener(maxQuantRatioTypeRbtnGroupListener);
-        normalizedRatioRadioButton.addActionListener(maxQuantRatioTypeRbtnGroupListener);
-
 
         misc_infoButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 ReferenceSetInfoFrame lReferenceFrame = new ReferenceSetInfoFrame();
+            }
+        });
+
+        cmbOrder.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                progressBar1.setIndeterminate(true);
+                progressBar1.setVisible(true);
+                SwingWorker lStarter = new SwingWorker() {
+                    public Boolean construct() {
+                        String lOrderType = (String) cmbOrder.getSelectedItem();
+                        if (lOrderType.equalsIgnoreCase("alphabetical")) {
+                            //sort by the protein accession
+                            Collections.sort(iFilteredProteins, new QuantitativeProteinSorterByAccession());
+                            proteinList.updateUI();
+                        }
+                        if (lOrderType.equalsIgnoreCase("# peptide ratios")) {
+                            //sort by number of ratio groups
+                            Collections.sort(iFilteredProteins, new QuantitativeProteinSorterByRatioGroupNumbers());
+                            proteinList.updateUI();
+                        }
+                        if (lOrderType.equalsIgnoreCase("protein ratio")) {
+                            //sort by the protein ratio
+                            Collections.sort(iFilteredProteins, new QuantitativeProteinSorterByProteinMean((String) cmbRatioTypes.getSelectedItem()));
+                            proteinList.updateUI();
+
+                        }
+                        if (lOrderType.equalsIgnoreCase("ratio diff between sources")) {
+                            //sort by the protein ratio
+                            Collections.sort(iFilteredProteins, new QuantitativeProteinSorterByDiffProteinMeans((String) cmbRatioTypes.getSelectedItem()));
+                            proteinList.updateUI();
+
+                        }
+
+                        if (lOrderType.equalsIgnoreCase("protein Z-score")) {
+                            //sort by the protein ratio
+                            Collections.sort(iFilteredProteins, new QuantitativeProteinSorterByProteinZscore((String) cmbRatioTypes.getSelectedItem()));
+                            proteinList.updateUI();
+                        }
+
+                        return true;
+                    }
+
+                    public void finished() {
+                        //
+                        progressBar1.setIndeterminate(true);
+                        progressBar1.setVisible(false);
+                    }
+
+                };
+
+                lStarter.start();
+
+
+            }
+        });
+        cmbRatioTypes.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                progressBar1.setIndeterminate(true);
+                progressBar1.setVisible(true);
+                SwingWorker lStarter = new SwingWorker() {
+                    public Boolean construct() {
+                        //check if protein ratio is selected in the cmbOrder
+                        String lOrderType = (String) cmbOrder.getSelectedItem();
+                        if (lOrderType.equalsIgnoreCase("protein ratio")) {
+                            //sort by the protein ratio
+                            Collections.sort(iFilteredProteins, new QuantitativeProteinSorterByProteinMean((String) cmbRatioTypes.getSelectedItem()));
+                            proteinList.updateUI();
+
+                        }
+                        if (lOrderType.equalsIgnoreCase("ratio diff between sources")) {
+                            //sort by the protein ratio
+                            Collections.sort(iFilteredProteins, new QuantitativeProteinSorterByDiffProteinMeans((String) cmbRatioTypes.getSelectedItem()));
+                            proteinList.updateUI();
+
+                        }
+
+                        if (lOrderType.equalsIgnoreCase("protein Z-score")) {
+                            //sort by the protein ratio
+                            Collections.sort(iFilteredProteins, new QuantitativeProteinSorterByProteinZscore((String) cmbRatioTypes.getSelectedItem()));
+                            proteinList.updateUI();
+                        }
+
+                        return true;
+                    }
+
+                    public void finished() {
+                        //
+                        progressBar1.setIndeterminate(true);
+                        progressBar1.setVisible(false);
+                    }
+
+                };
+
+                lStarter.start();
+            }
+        });
+        useOriginalCheckBox.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                iQuantitativeValidationSingelton.setUseOriginalRatio(useOriginalCheckBox.isSelected());
+                iQuantitativeValidationSingelton.getReferenceSet().clearCalculateReferenceSet();
+                loadProtein(false);
             }
         });
 
@@ -745,270 +773,307 @@ public class QuantitationValidationGUI extends JFrame {
     /**
      * This methods loads the ratio information panel, protein bar and the graphs
      *
-     * @param aForceUpdate An update will be done if the panels are not empty or if this forced update boolean is true.
+     * @param lForceUpdate An update will be done if the panels are not empty or if this forced update boolean is true.
      */
-    public void loadProtein(boolean aForceUpdate) {
-        if ((iChartPanels != null || aForceUpdate)) {
-            //get the protein from the list
-            iProtein = (QuantitativeProtein) proteinList.getSelectedValue();
-            //check if this protein is in the user selection
-            boolean lProteinInSelection = false;
-            for (int i = 0; i < iQuantitativeValidationSingelton.getSelectedProteins().size(); i++) {
-                if (iQuantitativeValidationSingelton.getSelectedProteins().get(i).getAccession().equalsIgnoreCase(iProtein.getAccession())) {
-                    lProteinInSelection = true;
-                }
-            }
-            ImageIcon addIcon = new ImageIcon(getClass().getResource("/addSelection.gif"));
-            ImageIcon deleteIcon = new ImageIcon(getClass().getResource("/deleteSelection.gif"));
-            if (lProteinInSelection) {
-                //it's in the selection, it can be deleted from that selection
-                addToSelectionButton.setIcon(deleteIcon);
-                addToSelectionButton.setToolTipText("Delete this protein from the selection");
-
-            } else {
-                //it's not in the selection, it can be added
-                addToSelectionButton.setIcon(addIcon);
-                addToSelectionButton.setToolTipText("Add this protein to the selection");
-            }
-            if (iProtein.getValidated()) {
-                setValidatedButton.setToolTipText("Set not validated");
-                setValidatedButton.setIcon(new ImageIcon(getClass().getResource("/setNotValidated.gif")));
-            } else {
-                setValidatedButton.setToolTipText("Set validated");
-                setValidatedButton.setIcon(new ImageIcon(getClass().getResource("/setValidated.gif")));
-            }
-            addToSelectionButton.setVisible(true);
-            goToBrowserButton.setVisible(true);
-            showPossibleIsoformsButton.setVisible(true);
-            setValidatedButton.setVisible(true);
-
-            //set the protein accession as "title"
-            lblProteinInfo.setText(iProtein.toString());
-            //get the different ratio types for this protein
-            String[] lTypes = iProtein.getTypes();
-            //create a chartpanel array
-            iChartPanels = new JFreeChart[lTypes.length];
-            //remove everyting from the chart panel
-            jpanProteinGraph.removeAll();
-            jpanProteinGraph.setBackground(Color.white);
-            //now add the new charts to the empty panel
-            for (int i = 0; i < lTypes.length; i++) {
-                //get the chart from the protein
-                iChartPanels[i] = iProtein.getChart(iQuantitativeValidationSingelton.getReferenceSet(), lTypes[i], showHuberEstimatedDistributionCheckBox.isSelected(), showRealDistributionCheckBox.isSelected());
-                jpanProteinGraph.add(Box.createVerticalStrut(5));
-                jpanProteinGraph.add(new ChartPanel(iChartPanels[i]));
-                jpanProteinGraph.add(Box.createVerticalStrut(5));
-            }
-
-            //remove everything from the ratio group information panel
-            jpanProteinRatioGroups.removeAll();
-            jpanProteinRatioGroups.add(Box.createVerticalStrut(5));
-            jpanProteinRatioGroups.setBackground(Color.white);
-            //now add the new info to the empty panel
-
-            //general protein information
-
-            JPanel lProteinInfoPanel = new JPanel();
-            lProteinInfoPanel.setLayout(new BoxLayout(lProteinInfoPanel, BoxLayout.Y_AXIS));
-            lProteinInfoPanel.setBackground(Color.WHITE);
-
-            //1.create the header
-            //1.1 create label
-            JLabel lProteinInfoLabel = new JLabel("Protein info: ");
-            lProteinInfoLabel.setFont(new Font("sansserif", Font.BOLD, 18));
-            lProteinInfoPanel.add(lProteinInfoLabel);
-            lProteinInfoPanel.add(new JLabel("   Protein accession : " + iProtein.getAccession()));
-            lProteinInfoPanel.add(Box.createVerticalStrut(5));
-            for (int i = 0; i < lTypes.length; i++) {
-                lProteinInfoPanel.add(Box.createVerticalStrut(5));
-                lProteinInfoPanel.add(new JLabel("   Protein mean for " + lTypes[i] + " : " + Math.round(iProtein.getProteinRatio(lTypes[i]) * 1000.0) / 1000.0));
-                lProteinInfoPanel.add(Box.createVerticalStrut(5));
-                lProteinInfoPanel.add(new JLabel("   Peptide grouped protein mean for " + lTypes[i] + " : " + Math.round(iProtein.getGroupedProteinRatio(lTypes[i]) * 1000.0) / 1000.0));
-                lProteinInfoPanel.add(Box.createVerticalStrut(5));
-            }
-            //add the label to a temp panel with X axis layout
-            JPanel lTemp = new JPanel();
-            lTemp.setBackground(Color.WHITE);
-            lTemp.setLayout(new BoxLayout(lTemp, BoxLayout.X_AXIS));
-            lTemp.setBackground(Color.WHITE);
-            lTemp.add(Box.createHorizontalStrut(5));
-            lTemp.add(lProteinInfoPanel);
-            lTemp.add(Box.createHorizontalGlue());
-            jpanProteinRatioGroups.add(lTemp);
-            jpanProteinRatioGroups.add(Box.createVerticalStrut(2));
-
-            //1.2 create a panel with the set comment button
-            JButton setCommentButton = new JButton("");
-            setCommentButton.setIcon(new ImageIcon(getClass().getResource("/pencil.png")));
-            setCommentButton.setToolTipText("Set protein comment");
-            setCommentButton.setContentAreaFilled(false);
-            final JTextField txtComment = new JTextField();
-            txtComment.setText(iProtein.getProteinComment());
-            setCommentButton.addActionListener(new ActionListener() {
-                public void actionPerformed(ActionEvent e) {
-                    iProtein.setProteinComment(txtComment.getText());
-                    iQuantitativeValidationSingelton.addCommentedProtein(iProtein);
-                    loadProtein(false);
-                }
-            });
-
-            final JButton hideButton = new JButton("");
-            hideButton.setFocusPainted(false);
-
-            if (iProtein.isAllPeptideCollapsedStatus()) {
-                hideButton.setIcon(new ImageIcon(getClass().getResource("/show.png")));
-                hideButton.setToolTipText("Show all the peptide ratios");
-            } else {
-                hideButton.setIcon(new ImageIcon(getClass().getResource("/hide.png")));
-                hideButton.setToolTipText("Hide all the peptide ratios");
-            }
-            hideButton.setContentAreaFilled(false);
-            hideButton.addActionListener(new ActionListener() {
-                public void actionPerformed(ActionEvent e) {
-                    if (iProtein.isAllPeptideCollapsedStatus()) {
-                        iProtein.setAllPeptideGroupsCollapsed(false);
-                    } else {
-                        iProtein.setAllPeptideGroupsCollapsed(true);
-                    }
-                    loadProtein(false);
-                }
-            });
-
-            JPanel lCommentPanel = new JPanel();
-            lCommentPanel.setBackground(Color.WHITE);
-            lCommentPanel.setLayout(new BoxLayout(lCommentPanel, BoxLayout.X_AXIS));
-            lCommentPanel.add(Box.createHorizontalStrut(5));
-            lCommentPanel.add(hideButton);
-            lCommentPanel.add(Box.createHorizontalStrut(5));
-            lCommentPanel.add(setCommentButton);
-            lCommentPanel.add(Box.createHorizontalStrut(5));
-            lCommentPanel.add(txtComment);
-            lCommentPanel.add(Box.createHorizontalGlue());
-            lCommentPanel.setMaximumSize(new Dimension(900, 20));
-            jpanProteinRatioGroups.add(lCommentPanel);
-            jpanProteinRatioGroups.add(Box.createVerticalStrut(2));
+    public void loadProtein(boolean lForceUpdate) {
 
 
-            //2.add a JSeparator
-            jpanProteinRatioGroups.add(new JSeparator());
-            jpanProteinRatioGroups.add(Box.createVerticalStrut(2));
+        final boolean aForceUpdate = lForceUpdate;
+        if (!iUpdating) {
+            iUpdating = true;
 
+            progressBar1.setVisible(true);
+            progressBar1.setIndeterminate(true);
 
-            //3. information for every peptide sequence grouped ratio
-            //get the peptide groups linked to this protien
-            final Vector<QuantitativePeptideGroup> lPeptideGroups = iProtein.getPeptideGroups(true);
-            for (int i = 0; i < lPeptideGroups.size(); i++) {
-
-                jpanProteinRatioGroups.add(Box.createVerticalStrut(5));
-                //create the title button
-                JButton lGroupTitleButton = new JButton((i + 1) + ". " + lPeptideGroups.get(i).getFullSequence());
-                lGroupTitleButton.setBorderPainted(false);
-                lGroupTitleButton.setContentAreaFilled(false);
-                lGroupTitleButton.setFocusPainted(false);
-                lGroupTitleButton.setFont(new Font("sansserif", Font.BOLD, 18));
-                if (!lPeptideGroups.get(i).isLinkedToMoreProteins()) {
-                    lGroupTitleButton.setForeground(Color.BLUE);
-                } else if (iProtein.getAccession().trim().equalsIgnoreCase(lPeptideGroups.get(i).getRatioGroups().get(0).getRazorProteinAccession().trim())) {
-                    lGroupTitleButton.setForeground(Color.RED);
-                    lGroupTitleButton.setToolTipText(lPeptideGroups.get(i).getProteinsLinkedToGroupAsString());
-                } else {
-                    lGroupTitleButton.setForeground(Color.ORANGE);
-                    lGroupTitleButton.setToolTipText(lPeptideGroups.get(i).getProteinsLinkedToGroupAsString());
-                }
-                //Create a checkbox. This checkbox will show if the ratios linked to this sequence will be used in the calculation of the protein mean
-                final JCheckBox lUsePeptides = new JCheckBox();
-                lUsePeptides.setBackground(Color.WHITE);
-                lUsePeptides.setSelected(lPeptideGroups.get(i).isUsedInCalculations());
-                if (iQuantitativeValidationSingelton.isUseOnlyUniqueRatioForProteinMean()) {
-                    if (lPeptideGroups.get(i).getRatioGroups().get(0).getProteinAccessions().length != 1) {
-                        lUsePeptides.setEnabled(false);
-                    }
-                }
-
-                final int i1 = i;
-                lUsePeptides.addActionListener(new ActionListener() {
-                    public void actionPerformed(ActionEvent e) {
-                        if (lUsePeptides.isSelected()) {
-                            lPeptideGroups.get(i1).setUsedInCalculation(true);
-                            iQuantitativeValidationSingelton.deleteNotUsedPeptide(iProtein.getAccession(), lPeptideGroups.get(i1).getSequence());
-                            loadProtein(false);
-                        } else {
-                            lPeptideGroups.get(i1).setUsedInCalculation(false);
-                            iQuantitativeValidationSingelton.addNotUsedPeptide(iProtein.getAccession(), lPeptideGroups.get(i1).getSequence());
-                            loadProtein(false);
-                        }
-                    }
-                });
-
-                //add the label to a temp panel with X axis layout
-                JPanel lTempRatioGroupInfo = new JPanel();
-                lTempRatioGroupInfo.setLayout(new BoxLayout(lTempRatioGroupInfo, BoxLayout.X_AXIS));
-                lTempRatioGroupInfo.setBackground(Color.WHITE);
-                lTempRatioGroupInfo.add(Box.createHorizontalStrut(5));
-                lTempRatioGroupInfo.add(lGroupTitleButton);
-                lTempRatioGroupInfo.add(Box.createHorizontalGlue());
-                lTempRatioGroupInfo.add(lUsePeptides);
-                lTempRatioGroupInfo.add(Box.createHorizontalStrut(5));
-
-                jpanProteinRatioGroups.add(lTempRatioGroupInfo);
-
-                for (int j = 0; j < lTypes.length; j++) {
-                    Double lMean = lPeptideGroups.get(i).getMeanRatioForGroup(lTypes[j]);
-                    if (lMean == null) {
-                        jpanProteinRatioGroups.add(new JLabel("     Peptide group ratio mean (" + lTypes[j] + "): /"));
-                        jpanProteinRatioGroups.add(Box.createVerticalStrut(5));
-                    } else {
-                        jpanProteinRatioGroups.add(new JLabel("     Peptide group ratio mean (" + lTypes[j] + "): " + (Math.round(lMean * 1000.0)) / 1000.0));
-                        jpanProteinRatioGroups.add(Box.createVerticalStrut(5));
-
-                    }
-                }
-
-                //create panel to show the ratiogroups on
-                final JPanel jpanRatioGroup = new JPanel();
-                jpanRatioGroup.setLayout(new BoxLayout(jpanRatioGroup, BoxLayout.Y_AXIS));
-                jpanRatioGroup.setBackground(Color.WHITE);
-                //add the different ratio groups to the panel
-                for (int j = 0; j < lPeptideGroups.get(i).getRatioGroups().size(); j++) {
-                    jpanRatioGroup.add(Box.createVerticalStrut(5));
-                    //create the ratio group panel
-                    RatioGroupPanel lPanel = new RatioGroupPanel(lPeptideGroups.get(i).getRatioGroups().get(j), iConnMsLims, this);
-                    //add the created panel to the vector
-                    jpanRatioGroup.add(lPanel.getContentPane());
-                }
-                //check if these ratiogroups must be shown
-                if (lPeptideGroups.get(i).isCollapsed()) {
-                    jpanRatioGroup.setVisible(false);
-                }
-                jpanProteinRatioGroups.add(jpanRatioGroup);
-
-                final int i2 = i;
-                lGroupTitleButton.addActionListener(new ActionListener() {
-                    public void actionPerformed(ActionEvent e) {
-                        jpanRatioGroup.setVisible(!jpanRatioGroup.isVisible());
-                        lPeptideGroups.get(i2).setCollapsed(!lPeptideGroups.get(i2).isCollapsed());
-                    }
-                });
-            }
-
-            final QuantitativeProtein lProteinForWorker = iProtein;
-            //create the protein bar in a new thread because the sequence retrieving can take some time
-            SwingWorker lProteinBarThread = new SwingWorker() {
+            SwingWorker lStarter = new SwingWorker() {
                 public Boolean construct() {
-                    iProteinBar = new ProteinBarPanel(lProteinForWorker);
-                    jpanExtraProteinInfo.removeAll();
-                    jpanExtraProteinInfo.add(iProteinBar);
+
+                    if ((iChartPanels != null || aForceUpdate)) {
+                        //get the protein from the list
+                        iProtein = (QuantitativeProtein) proteinList.getSelectedValue();
+                        //check if this protein is in the user selection
+                        boolean lProteinInSelection = false;
+                        for (int i = 0; i < iQuantitativeValidationSingelton.getSelectedProteins().size(); i++) {
+                            if (iQuantitativeValidationSingelton.getSelectedProteins().get(i).getAccession().equalsIgnoreCase(iProtein.getAccession())) {
+                                lProteinInSelection = true;
+                            }
+                        }
+                        ImageIcon addIcon = new ImageIcon(getClass().getResource("/addSelection.gif"));
+                        ImageIcon deleteIcon = new ImageIcon(getClass().getResource("/deleteSelection.gif"));
+                        if (lProteinInSelection) {
+                            //it's in the selection, it can be deleted from that selection
+                            addToSelectionButton.setIcon(deleteIcon);
+                            addToSelectionButton.setToolTipText("Delete this protein from the selection");
+
+                        } else {
+                            //it's not in the selection, it can be added
+                            addToSelectionButton.setIcon(addIcon);
+                            addToSelectionButton.setToolTipText("Add this protein to the selection");
+                        }
+                        if (iProtein.getValidated()) {
+                            setValidatedButton.setToolTipText("Set not validated");
+                            setValidatedButton.setIcon(new ImageIcon(getClass().getResource("/setNotValidated.gif")));
+                        } else {
+                            setValidatedButton.setToolTipText("Set validated");
+                            setValidatedButton.setIcon(new ImageIcon(getClass().getResource("/setValidated.gif")));
+                        }
+                        addToSelectionButton.setVisible(true);
+                        if (iQuantitativeValidationSingelton.getDatabaseType() != ProteinDatabaseType.LOCAL && iQuantitativeValidationSingelton.getDatabaseType() != ProteinDatabaseType.UNKNOWN) {
+                            goToBrowserButton.setVisible(true);
+                        }
+                        showPossibleIsoformsButton.setVisible(true);
+                        setValidatedButton.setVisible(true);
+
+                        //set the protein accession as "title"
+                        lblProteinInfo.setText(iProtein.toString());
+                        //get the different ratio types for this protein
+                        String[] lTypes = iProtein.getTypes();
+                        //create a chartpanel array
+                        iChartPanels = new JFreeChart[lTypes.length];
+                        //remove everyting from the chart panel
+                        jpanProteinGraph.removeAll();
+                        jpanProteinGraph.setBackground(Color.white);
+                        //now add the new charts to the empty panel
+                        for (int i = 0; i < lTypes.length; i++) {
+                            //get the chart from the protein
+                            iChartPanels[i] = iProtein.getChart(iQuantitativeValidationSingelton.getReferenceSet(), lTypes[i], showHuberEstimatedDistributionCheckBox.isSelected(), showRealDistributionCheckBox.isSelected());
+                            jpanProteinGraph.add(Box.createVerticalStrut(5));
+                            jpanProteinGraph.add(new ChartPanel(iChartPanels[i]));
+                            jpanProteinGraph.add(Box.createVerticalStrut(5));
+                        }
+
+                        //remove everything from the ratio group information panel
+                        jpanProteinRatioGroups.removeAll();
+                        jpanProteinRatioGroups.add(Box.createVerticalStrut(5));
+                        jpanProteinRatioGroups.setBackground(Color.white);
+                        //now add the new info to the empty panel
+
+                        //general protein information
+
+                        JPanel lProteinInfoPanel = new JPanel();
+                        lProteinInfoPanel.setLayout(new BoxLayout(lProteinInfoPanel, BoxLayout.Y_AXIS));
+                        lProteinInfoPanel.setBackground(Color.WHITE);
+
+                        //1.create the header
+                        //1.1 create label
+                        JLabel lProteinInfoLabel = new JLabel("Protein info: ");
+                        lProteinInfoLabel.setFont(new Font("sansserif", Font.BOLD, 18));
+                        lProteinInfoPanel.add(lProteinInfoLabel);
+                        lProteinInfoPanel.add(new JLabel("   Protein accession : " + iProtein.getAccession()));
+                        lProteinInfoPanel.add(Box.createVerticalStrut(5));
+                        for (int i = 0; i < lTypes.length; i++) {
+                            lProteinInfoPanel.add(Box.createVerticalStrut(5));
+                            lProteinInfoPanel.add(new JLabel("   Protein mean for " + lTypes[i] + " : " + Math.round(iProtein.getProteinRatio(lTypes[i]) * 1000.0) / 1000.0));
+                            lProteinInfoPanel.add(Box.createVerticalStrut(5));
+                            lProteinInfoPanel.add(new JLabel("   Peptide grouped protein mean for " + lTypes[i] + " : " + Math.round(iProtein.getGroupedProteinRatio(lTypes[i]) * 1000.0) / 1000.0));
+                            lProteinInfoPanel.add(Box.createVerticalStrut(5));
+                            lProteinInfoPanel.add(new JLabel("   Peptide SD " + lTypes[i] + " : " + Math.round(iProtein.getProteinRatioStandardDeviationForType(lTypes[i]) * 1000.0) / 1000.0));
+                            lProteinInfoPanel.add(Box.createVerticalStrut(5));
+                            lProteinInfoPanel.add(new JLabel("   Protein Z-score " + lTypes[i] + " : " + (Math.round(iProtein.getProteinZScore(lTypes[i], -1) * 1000.0) / 1000.0)));
+                            lProteinInfoPanel.add(Box.createVerticalStrut(5));
+                        }
+                        //add the label to a temp panel with X axis layout
+                        JPanel lTemp = new JPanel();
+                        lTemp.setBackground(Color.WHITE);
+                        lTemp.setLayout(new BoxLayout(lTemp, BoxLayout.X_AXIS));
+                        lTemp.setBackground(Color.WHITE);
+                        lTemp.add(Box.createHorizontalStrut(5));
+                        lTemp.add(lProteinInfoPanel);
+                        lTemp.add(Box.createHorizontalGlue());
+                        jpanProteinRatioGroups.add(lTemp);
+                        jpanProteinRatioGroups.add(Box.createVerticalStrut(2));
+
+                        //1.2 create a panel with the set comment button
+                        JButton setCommentButton = new JButton("");
+                        setCommentButton.setIcon(new ImageIcon(getClass().getResource("/pencil.png")));
+                        setCommentButton.setToolTipText("Set protein comment");
+                        setCommentButton.setContentAreaFilled(false);
+                        final JTextField txtComment = new JTextField();
+                        txtComment.setText(iProtein.getProteinComment());
+                        setCommentButton.addActionListener(new ActionListener() {
+                            public void actionPerformed(ActionEvent e) {
+                                iProtein.setProteinComment(txtComment.getText());
+                                iQuantitativeValidationSingelton.addCommentedProtein(iProtein);
+                                loadProtein(false);
+                            }
+                        });
+
+                        final JButton hideButton = new JButton("");
+                        hideButton.setFocusPainted(false);
+
+                        if (iProtein.isAllPeptideCollapsedStatus()) {
+                            hideButton.setIcon(new ImageIcon(getClass().getResource("/show.png")));
+                            hideButton.setToolTipText("Show all the peptide ratios");
+                        } else {
+                            hideButton.setIcon(new ImageIcon(getClass().getResource("/hide.png")));
+                            hideButton.setToolTipText("Hide all the peptide ratios");
+                        }
+                        hideButton.setContentAreaFilled(false);
+                        hideButton.addActionListener(new ActionListener() {
+                            public void actionPerformed(ActionEvent e) {
+                                if (iProtein.isAllPeptideCollapsedStatus()) {
+                                    iProtein.setAllPeptideGroupsCollapsed(false);
+                                } else {
+                                    iProtein.setAllPeptideGroupsCollapsed(true);
+                                }
+                                loadProtein(false);
+                            }
+                        });
+
+                        JPanel lCommentPanel = new JPanel();
+                        lCommentPanel.setBackground(Color.WHITE);
+                        lCommentPanel.setLayout(new BoxLayout(lCommentPanel, BoxLayout.X_AXIS));
+                        lCommentPanel.add(Box.createHorizontalStrut(5));
+                        lCommentPanel.add(hideButton);
+                        lCommentPanel.add(Box.createHorizontalStrut(5));
+                        lCommentPanel.add(setCommentButton);
+                        lCommentPanel.add(Box.createHorizontalStrut(5));
+                        lCommentPanel.add(txtComment);
+                        lCommentPanel.add(Box.createHorizontalGlue());
+                        lCommentPanel.setMaximumSize(new Dimension(900, 20));
+                        jpanProteinRatioGroups.add(lCommentPanel);
+                        jpanProteinRatioGroups.add(Box.createVerticalStrut(2));
+
+
+                        //2.add a JSeparator
+                        jpanProteinRatioGroups.add(new JSeparator());
+                        jpanProteinRatioGroups.add(Box.createVerticalStrut(2));
+
+
+                        //3. information for every peptide sequence grouped ratio
+                        //get the peptide groups linked to this protien
+                        final Vector<QuantitativePeptideGroup> lPeptideGroups = iProtein.getPeptideGroups(true);
+
+                        progressBar1.setIndeterminate(false);
+                        progressBar1.setMaximum(lPeptideGroups.size());
+                        progressBar1.setValue(0);
+
+                        for (int i = 0; i < lPeptideGroups.size(); i++) {
+                            progressBar1.setValue(i + 1);
+                            jpanProteinRatioGroups.add(Box.createVerticalStrut(5));
+                            //create the title button
+                            JButton lGroupTitleButton = new JButton((i + 1) + ". " + lPeptideGroups.get(i).getFullSequence());
+                            lGroupTitleButton.setBorderPainted(false);
+                            lGroupTitleButton.setContentAreaFilled(false);
+                            lGroupTitleButton.setFocusPainted(false);
+                            lGroupTitleButton.setFont(new Font("sansserif", Font.BOLD, 18));
+                            if (!lPeptideGroups.get(i).isLinkedToMoreProteins()) {
+                                lGroupTitleButton.setForeground(Color.BLUE);
+                            } else if (iProtein.getAccession().trim().equalsIgnoreCase(lPeptideGroups.get(i).getRazorAccession().trim())) {
+                                lGroupTitleButton.setForeground(Color.RED);
+                                lGroupTitleButton.setToolTipText(lPeptideGroups.get(i).getProteinsLinkedToGroupAsString());
+                            } else {
+                                lGroupTitleButton.setForeground(Color.ORANGE);
+                                lGroupTitleButton.setToolTipText(lPeptideGroups.get(i).getProteinsLinkedToGroupAsString());
+                            }
+                            //Create a checkbox. This checkbox will show if the ratios linked to this sequence will be used in the calculation of the protein mean
+                            final JCheckBox lUsePeptides = new JCheckBox();
+                            lUsePeptides.setBackground(Color.WHITE);
+                            lUsePeptides.setSelected(lPeptideGroups.get(i).isUsedInCalculations());
+                            if (iQuantitativeValidationSingelton.isUseOnlyUniqueRatioForProteinMean()) {
+                                if (lPeptideGroups.get(i).isLinkedToMoreProteins()) {
+                                    lUsePeptides.setEnabled(false);
+                                }
+                            }
+
+                            final int i1 = i;
+                            lUsePeptides.addActionListener(new ActionListener() {
+                                public void actionPerformed(ActionEvent e) {
+                                    if (lUsePeptides.isSelected()) {
+                                        lPeptideGroups.get(i1).setUsedInCalculation(true);
+                                        iQuantitativeValidationSingelton.deleteNotUsedPeptide(iProtein.getAccession(), lPeptideGroups.get(i1).getSequence());
+                                        loadProtein(false);
+                                    } else {
+                                        lPeptideGroups.get(i1).setUsedInCalculation(false);
+                                        iQuantitativeValidationSingelton.addNotUsedPeptide(iProtein.getAccession(), lPeptideGroups.get(i1).getSequence());
+                                        loadProtein(false);
+                                    }
+                                }
+                            });
+
+                            //add the label to a temp panel with X axis layout
+                            JPanel lTempRatioGroupInfo = new JPanel();
+                            lTempRatioGroupInfo.setLayout(new BoxLayout(lTempRatioGroupInfo, BoxLayout.X_AXIS));
+                            lTempRatioGroupInfo.setBackground(Color.WHITE);
+                            lTempRatioGroupInfo.add(Box.createHorizontalStrut(5));
+                            lTempRatioGroupInfo.add(lGroupTitleButton);
+                            lTempRatioGroupInfo.add(Box.createHorizontalGlue());
+                            lTempRatioGroupInfo.add(lUsePeptides);
+                            lTempRatioGroupInfo.add(Box.createHorizontalStrut(5));
+
+                            jpanProteinRatioGroups.add(lTempRatioGroupInfo);
+
+                            for (int j = 0; j < lTypes.length; j++) {
+                                Double lMean = lPeptideGroups.get(i).getMeanRatioForGroup(lTypes[j]);
+                                if (lMean == null) {
+                                    jpanProteinRatioGroups.add(new JLabel("     Peptide group ratio mean (" + lTypes[j] + "): /"));
+                                    jpanProteinRatioGroups.add(Box.createVerticalStrut(5));
+                                } else {
+                                    jpanProteinRatioGroups.add(new JLabel("     Peptide group ratio mean (" + lTypes[j] + "): " + (Math.round(lMean * 1000.0)) / 1000.0));
+                                    jpanProteinRatioGroups.add(Box.createVerticalStrut(5));
+
+                                }
+                            }
+
+                            //create panel to show the ratiogroups on
+                            final JPanel jpanRatioGroup = new JPanel();
+                            jpanRatioGroup.setLayout(new BoxLayout(jpanRatioGroup, BoxLayout.Y_AXIS));
+                            jpanRatioGroup.setBackground(Color.WHITE);
+                            //add the different ratio groups to the panel
+                            for (int j = 0; j < lPeptideGroups.get(i).getRatioGroups().size(); j++) {
+                                jpanRatioGroup.add(Box.createVerticalStrut(5));
+                                //create the ratio group panel
+                                RatioGroupPanel lPanel = new RatioGroupPanel(lPeptideGroups.get(i).getRatioGroups().get(j), iConnMsLims, getFrame());
+                                //add the created panel to the vector
+                                jpanRatioGroup.add(lPanel.getContentPane());
+                            }
+                            //check if these ratiogroups must be shown
+                            if (lPeptideGroups.get(i).isCollapsed()) {
+                                jpanRatioGroup.setVisible(false);
+                            }
+                            jpanProteinRatioGroups.add(jpanRatioGroup);
+
+                            final int i2 = i;
+                            lGroupTitleButton.addActionListener(new ActionListener() {
+                                public void actionPerformed(ActionEvent e) {
+                                    jpanRatioGroup.setVisible(!jpanRatioGroup.isVisible());
+                                    lPeptideGroups.get(i2).setCollapsed(!lPeptideGroups.get(i2).isCollapsed());
+                                }
+                            });
+                        }
+
+                        final QuantitativeProtein lProteinForWorker = iProtein;
+                        //create the protein bar in a new thread because the sequence retrieving can take some time
+                        SwingWorker lProteinBarThread = new SwingWorker() {
+                            public Boolean construct() {
+                                iProteinBar = new ProteinBarPanel(lProteinForWorker);
+                                jpanExtraProteinInfo.removeAll();
+                                jpanExtraProteinInfo.add(iProteinBar);
+                                return true;
+                            }
+
+                            public void finished() {
+                                iProteinBar.updateUI();
+                            }
+                        };
+                        lProteinBarThread.start();
+                        jpanProteinRatioGroups.updateUI();
+                        jpanExtraProteinInfo.updateUI();
+                        jpanProteinGraph.updateUI();
+                    }
                     return true;
                 }
 
                 public void finished() {
-                    iProteinBar.updateUI();
+                    //
+                    progressBar1.setIndeterminate(true);
+                    progressBar1.setVisible(false);
+                    iUpdating = false;
                 }
+
             };
-            lProteinBarThread.start();
-            jpanProteinRatioGroups.updateUI();
-            jpanExtraProteinInfo.updateUI();
-            jpanProteinGraph.updateUI();
+
+            lStarter.start();
         }
     }
 
@@ -1186,9 +1251,10 @@ public class QuantitationValidationGUI extends JFrame {
         //create the order cmb
         String[] lOrderOptions;
         if (iQuantitativeValidationSingelton.isMultipleSources()) {
-            lOrderOptions = new String[]{"alphabetical", "# peptide ratios", "protein ratio", "protein P value", "ratio diff between sources"};
+            lOrderOptions = new String[]{"alphabetical", "# peptide ratios", "protein ratio", "protein Z-score", "ratio diff between sources"};
         } else {
-            lOrderOptions = new String[]{"alphabetical", "# peptide ratios", "protein P value", "protein ratio"};
+            //lOrderOptions = new String[]{"alphabetical", "# peptide ratios", "protein P value", "protein ratio"};
+            lOrderOptions = new String[]{"alphabetical", "# peptide ratios", "protein ratio", "protein Z-score"};
         }
         cmbOrder = new JComboBox(lOrderOptions);
         //create type cmb
@@ -1451,7 +1517,7 @@ public class QuantitationValidationGUI extends JFrame {
         gbc.insets = new Insets(5, 5, 5, 5);
         leftPanel.add(cmbRatioTypes, gbc);
         lblRatioType = new JLabel();
-        lblRatioType.setText("Type ?");
+        lblRatioType.setText("Select type:");
         gbc = new GridBagConstraints();
         gbc.gridx = 0;
         gbc.gridy = 4;
@@ -1674,16 +1740,6 @@ public class QuantitationValidationGUI extends JFrame {
         gbc.fill = GridBagConstraints.HORIZONTAL;
         gbc.insets = new Insets(5, 5, 5, 5);
         jpanProteinMeanOptions.add(miscButton, gbc);
-        defaultRatioRadioButton = new JRadioButton();
-        defaultRatioRadioButton.setBackground(new Color(-1));
-        defaultRatioRadioButton.setSelected(true);
-        defaultRatioRadioButton.setText("Default ratio");
-        gbc = new GridBagConstraints();
-        gbc.gridx = 5;
-        gbc.gridy = 0;
-        gbc.anchor = GridBagConstraints.WEST;
-        gbc.insets = new Insets(5, 5, 5, 5);
-        jpanProteinMeanOptions.add(defaultRatioRadioButton, gbc);
         misc_infoButton = new JButton();
         misc_infoButton.setContentAreaFilled(false);
         misc_infoButton.setFocusPainted(false);
@@ -1718,7 +1774,7 @@ public class QuantitationValidationGUI extends JFrame {
         useOnlyValidRatiosCheckBox.setBackground(new Color(-1));
         useOnlyValidRatiosCheckBox.setText("Use only valid ratios");
         gbc = new GridBagConstraints();
-        gbc.gridx = 6;
+        gbc.gridx = 5;
         gbc.gridy = 43;
         gbc.anchor = GridBagConstraints.WEST;
         gbc.insets = new Insets(5, 5, 5, 5);
@@ -1727,7 +1783,7 @@ public class QuantitationValidationGUI extends JFrame {
         useOnlyUniquelyIdentifiedCheckBox.setBackground(new Color(-1));
         useOnlyUniquelyIdentifiedCheckBox.setText("Use only uniquely identified (blue) peptides");
         gbc = new GridBagConstraints();
-        gbc.gridx = 6;
+        gbc.gridx = 5;
         gbc.gridy = 0;
         gbc.anchor = GridBagConstraints.WEST;
         gbc.insets = new Insets(5, 5, 5, 5);
@@ -1736,9 +1792,8 @@ public class QuantitationValidationGUI extends JFrame {
         log2CheckBox.setBackground(new Color(-1));
         log2CheckBox.setText("log 2");
         gbc = new GridBagConstraints();
-        gbc.gridx = 7;
+        gbc.gridx = 6;
         gbc.gridy = 0;
-        gbc.weightx = 1.0;
         gbc.anchor = GridBagConstraints.WEST;
         gbc.insets = new Insets(5, 5, 5, 5);
         jpanProteinMeanOptions.add(log2CheckBox, gbc);
@@ -1746,38 +1801,13 @@ public class QuantitationValidationGUI extends JFrame {
         useOriginalCheckBox.setBackground(new Color(-1));
         useOriginalCheckBox.setText("Use original ratios");
         gbc = new GridBagConstraints();
-        gbc.gridx = 7;
+        gbc.gridx = 6;
         gbc.gridy = 22;
         gbc.gridheight = 22;
-        gbc.weightx = 1.0;
+        gbc.weightx = 0.1;
         gbc.anchor = GridBagConstraints.WEST;
         gbc.insets = new Insets(5, 5, 5, 5);
         jpanProteinMeanOptions.add(useOriginalCheckBox, gbc);
-        normalizedRatioRadioButton = new JRadioButton();
-        normalizedRatioRadioButton.setBackground(new Color(-1));
-        normalizedRatioRadioButton.setSelected(false);
-        normalizedRatioRadioButton.setText("Normalized ratio");
-        gbc = new GridBagConstraints();
-        gbc.gridx = 5;
-        gbc.gridy = 43;
-        gbc.anchor = GridBagConstraints.WEST;
-        gbc.insets = new Insets(5, 5, 5, 5);
-        jpanProteinMeanOptions.add(normalizedRatioRadioButton, gbc);
-        restartButton = new JButton();
-        restartButton.setContentAreaFilled(false);
-        restartButton.setFocusPainted(false);
-        restartButton.setFocusTraversalPolicyProvider(true);
-        restartButton.setIcon(new ImageIcon(getClass().getResource("/restart.png")));
-        restartButton.setLabel("");
-        restartButton.setMargin(new Insets(3, 3, 3, 3));
-        restartButton.setText("");
-        restartButton.setToolTipText("Create new analysis for a new dataset");
-        gbc = new GridBagConstraints();
-        gbc.gridx = 8;
-        gbc.gridy = 0;
-        gbc.gridheight = 44;
-        gbc.fill = GridBagConstraints.HORIZONTAL;
-        jpanProteinMeanOptions.add(restartButton, gbc);
         exportButton = new JButton();
         exportButton.setContentAreaFilled(false);
         exportButton.setFocusPainted(false);
@@ -1788,7 +1818,7 @@ public class QuantitationValidationGUI extends JFrame {
         exportButton.setText("");
         exportButton.setToolTipText("Export proteins");
         gbc = new GridBagConstraints();
-        gbc.gridx = 11;
+        gbc.gridx = 10;
         gbc.gridy = 0;
         gbc.gridheight = 44;
         gbc.fill = GridBagConstraints.HORIZONTAL;
@@ -1802,7 +1832,7 @@ public class QuantitationValidationGUI extends JFrame {
         loadRoverFileButton.setText("");
         loadRoverFileButton.setToolTipText("Import a .rover file");
         gbc = new GridBagConstraints();
-        gbc.gridx = 13;
+        gbc.gridx = 12;
         gbc.gridy = 0;
         gbc.gridheight = 44;
         gbc.fill = GridBagConstraints.HORIZONTAL;
@@ -1814,11 +1844,20 @@ public class QuantitationValidationGUI extends JFrame {
         reconstructButton.setText("");
         reconstructButton.setToolTipText("Reconstruct protein from different sources");
         gbc = new GridBagConstraints();
-        gbc.gridx = 12;
+        gbc.gridx = 11;
         gbc.gridy = 0;
         gbc.gridheight = 44;
         gbc.fill = GridBagConstraints.HORIZONTAL;
         jpanProteinMeanOptions.add(reconstructButton, gbc);
+        progressBar1 = new JProgressBar();
+        gbc = new GridBagConstraints();
+        gbc.gridx = 7;
+        gbc.gridy = 0;
+        gbc.gridheight = 44;
+        gbc.weightx = 1.0;
+        gbc.fill = GridBagConstraints.HORIZONTAL;
+        gbc.insets = new Insets(5, 5, 5, 5);
+        jpanProteinMeanOptions.add(progressBar1, gbc);
         showPossibleIsoformsButton = new JButton();
         showPossibleIsoformsButton.setContentAreaFilled(false);
         showPossibleIsoformsButton.setFocusPainted(false);
@@ -1876,10 +1915,6 @@ public class QuantitationValidationGUI extends JFrame {
         gbc.gridy = 1;
         gbc.anchor = GridBagConstraints.WEST;
         panel2.add(chbShowOnlyNonValid, gbc);
-        ButtonGroup buttonGroup;
-        buttonGroup = new ButtonGroup();
-        buttonGroup.add(defaultRatioRadioButton);
-        buttonGroup.add(normalizedRatioRadioButton);
     }
 
     /**
@@ -1975,8 +2010,8 @@ public class QuantitationValidationGUI extends JFrame {
 
             }
         } catch (IOException e) {
-            e.printStackTrace();
             JOptionPane.showMessageDialog(new JFrame(), "\n\n The system failed to invoke your default web browser while attempting to access: \n\n " + url + "\n\n", "Browser Error", JOptionPane.WARNING_MESSAGE);
+            logger.error(e.getMessage(), e);
             return false;
         }
         return true;

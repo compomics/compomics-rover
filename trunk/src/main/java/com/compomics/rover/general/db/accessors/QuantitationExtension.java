@@ -1,5 +1,8 @@
 package com.compomics.rover.general.db.accessors;
 
+import com.compomics.rover.general.singelton.QuantitativeValidationSingelton;
+import org.apache.log4j.Logger;
+
 import com.compomics.mslims.db.accessors.Quantitation;
 
 import java.sql.ResultSet;
@@ -20,6 +23,8 @@ import java.util.Vector;
  * This class extends the ms_lims Quantitation class
  */
 public class QuantitationExtension extends Quantitation{
+	// Class specific log4j logger for QuantitationExtension instances.
+	 private static Logger logger = Logger.getLogger(QuantitationExtension.class);
 
     /**
      * The file name of the quantitation file where this Quantitation could be found in.
@@ -47,18 +52,35 @@ public class QuantitationExtension extends Quantitation{
      * @exception   java.sql.SQLException    when reading the ResultSet failed.
      */
     public QuantitationExtension(ResultSet aRS, String aQuantitationFileName, String aFile_ref) throws SQLException {
-        iQuantitationid = aRS.getLong(1);
-        iL_quantitation_groupid = aRS.getLong(2);
-        iRatio = aRS.getDouble(3);
-        iStandard_error = aRS.getDouble(4);
-        iType = aRS.getString(5);
-        iValid = aRS.getBoolean(6);
-        iComment = aRS.getString(7);
-        iUsername = aRS.getString(8);
-        iCreationdate = (java.sql.Timestamp)aRS.getObject(9);
-        iModificationdate = (java.sql.Timestamp)aRS.getObject(10);
-        this.iQuantitationFileName = aQuantitationFileName;
-        this.iFile_ref = aFile_ref;
+        QuantitativeValidationSingelton iQuantitationSingelton = QuantitativeValidationSingelton.getInstance();
+         if(iQuantitationSingelton.getMsLimsPre7_2()){
+             iQuantitationid = aRS.getLong(1);
+            iL_quantitation_groupid = aRS.getLong(4);
+            iRatio = aRS.getDouble(5);
+            iStandard_error = aRS.getDouble(6);
+            iType = aRS.getString(7);
+            iValid = aRS.getBoolean(8);
+            iComment = aRS.getString(9);
+            iUsername = aRS.getString(10);
+            iCreationdate = (java.sql.Timestamp)aRS.getObject(11);
+            iModificationdate = (java.sql.Timestamp)aRS.getObject(12);
+            this.iQuantitationFileName = aQuantitationFileName;
+            this.iFile_ref = aFile_ref;
+         } else {
+             iQuantitationid = aRS.getLong(1);
+             iL_quantitation_groupid = aRS.getLong(2);
+             iRatio = aRS.getDouble(3);
+             iStandard_error = aRS.getDouble(4);
+             iType = aRS.getString(5);
+             iValid = aRS.getBoolean(6);
+             iComment = aRS.getString(7);
+             iUsername = aRS.getString(8);
+             iCreationdate = (java.sql.Timestamp)aRS.getObject(9);
+             iModificationdate = (java.sql.Timestamp)aRS.getObject(10);
+             this.iQuantitationFileName = aQuantitationFileName;
+             this.iFile_ref = aFile_ref;
+         }
+
     }
 
     /**
@@ -112,7 +134,13 @@ public class QuantitationExtension extends Quantitation{
      */
     public static Vector getQuantitationForIdentifications(String aIds, Connection aConn) throws SQLException {
         Vector temp = new Vector();
-        String query = "select q.*, e.filename, g.file_ref from identification_to_quantitation as t, quantitation as q, quantitation_file as e, quantitation_group as g where t.l_identificationid in (" + aIds + ") and t.l_quantitation_groupid = q.l_quantitation_groupid and q.l_quantitation_groupid = g.quantitation_groupid and e.quantitation_fileid = g.l_quantitation_fileid group by q.quantitationid";
+        String query;
+        QuantitativeValidationSingelton iQuantitationSingelton = QuantitativeValidationSingelton.getInstance();
+         if(iQuantitationSingelton.getMsLimsPre7_2()){
+             query = "select q.*, e.filename from identification_to_quantitation as t, quantitation as q, quantitation_file as e where t.l_identificationid in (" + aIds + ") and t.quantitation_link = q.quantitation_link and e.quantitation_fileid = q.l_quantitation_fileid group by q.quantitationid";
+         } else {
+             query = "select q.*, e.filename, g.file_ref from identification_to_quantitation as t, quantitation as q, quantitation_file as e, quantitation_group as g where t.l_identificationid in (" + aIds + ") and t.l_quantitation_groupid = q.l_quantitation_groupid and q.l_quantitation_groupid = g.quantitation_groupid and e.quantitation_fileid = g.l_quantitation_fileid group by q.quantitationid";
+         }
 
         PreparedStatement ps = aConn.prepareStatement(query);
         ResultSet rs = ps.executeQuery();

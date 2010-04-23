@@ -1,5 +1,7 @@
 package com.compomics.rover.general.quantitation.source.distiller;
 
+import org.apache.log4j.Logger;
+
 
 
 import com.compomics.rover.general.db.accessors.IdentificationExtension;
@@ -19,6 +21,8 @@ import java.util.Vector;
  * A DistillerHit basically exists of DistillerPeptides and DistillerRatioGroups.
  */
 public class DistillerHit {
+	// Class specific log4j logger for DistillerHit instances.
+	 private static Logger logger = Logger.getLogger(DistillerHit.class);
     /**
      * The hitnumber serves as an 'identifier' within Mascot Distiller.
      */

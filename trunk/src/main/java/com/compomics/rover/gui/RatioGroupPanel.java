@@ -1,5 +1,7 @@
 package com.compomics.rover.gui;
 
+import org.apache.log4j.Logger;
+
 import com.compomics.rover.general.quantitation.RatioGroup;
 import com.compomics.rover.general.singelton.QuantitativeValidationSingelton;
 
@@ -17,6 +19,8 @@ import java.sql.Connection;
  * To change this template use File | Settings | File Templates.
  */
 public class RatioGroupPanel {
+	// Class specific log4j logger for RatioGroupPanel instances.
+	 private static Logger logger = Logger.getLogger(RatioGroupPanel.class);
     private JPanel jpanRatios;
     private JButton moreInfoButton;
     private JPanel jpanContent;
@@ -36,9 +40,9 @@ public class RatioGroupPanel {
 
         $$$setupUI$$$();
 
-        if (iQuantitativeValidationSingelton.getRoverSources().size() > 1) {
+        if (iQuantitativeValidationSingelton.isMultipleSources()) {
             //we're in mutli mode
-            lblMulti.setText(String.valueOf(1 + aRatioGroup.getParentCollection().getIndex()));
+            lblMulti.setText(iQuantitativeValidationSingelton.getTitles().get(aRatioGroup.getParentCollection().getIndex()));
 
         } else {
             multiSeparator.setVisible(false);

@@ -1,5 +1,7 @@
 package com.compomics.rover.gui;
 
+import org.apache.log4j.Logger;
+
 
 import com.compomics.rover.general.quantitation.QuantitativeProtein;
 import com.compomics.rover.general.quantitation.RatioGroup;
@@ -26,6 +28,8 @@ import java.util.Vector;
  * This class will create a panel wiht a protein bar on it
  */
 public class ProteinBarPanel extends JPanel {
+	// Class specific log4j logger for ProteinBarPanel instances.
+	 private static Logger logger = Logger.getLogger(ProteinBarPanel.class);
 
     /**
      * The protein
@@ -51,6 +55,10 @@ public class ProteinBarPanel extends JPanel {
      * This distiller validation singelton holds information for the calculation of the ratio
      */
     private QuantitativeValidationSingelton iQuantitativeValidationSingelton = QuantitativeValidationSingelton.getInstance();
+    /**
+     * The protein sequence length
+     */
+    private int iSequenceLength = 0;
 
     /**
      * The constructor
@@ -68,15 +76,19 @@ public class ProteinBarPanel extends JPanel {
             if (iProtein.getSequence() == null) {
                 if (iQuantitativeValidationSingelton.getDatabaseType().equals(ProteinDatabaseType.UNIPROT)) {
                     this.iSequence = (new UniprotSequenceRetriever(iProtein.getAccession())).getSequence();
+                    this.iSequenceLength = iSequence.length();
                     iProtein.setSequence(iSequence);
                 } else if (iQuantitativeValidationSingelton.getDatabaseType().equals(ProteinDatabaseType.IPI)) {
                     this.iSequence = (new IpiSequenceRetriever(iProtein.getAccession())).getSequence();
+                    this.iSequenceLength = iSequence.length();
                     iProtein.setSequence(iSequence);
                 } else if (iQuantitativeValidationSingelton.getDatabaseType().equals(ProteinDatabaseType.NCBI)) {
                     this.iSequence = (new NcbiSequenceRetriever(iProtein.getAccession())).getSequence();
+                    this.iSequenceLength = iSequence.length();
                     iProtein.setSequence(iSequence);
                 }
             } else {
+                this.iSequenceLength = iProtein.getSequenceLength();
                 iSequence = iProtein.getSequence();
             }
         } catch (Exception e) {
@@ -185,8 +197,8 @@ public class ProteinBarPanel extends JPanel {
 
                         if (lPeptideStart > -1) {
                             //only show it if it is found
-                            int lXratioBoxStart = (int) Math.round((double) lBoxWidth * ((double) lPeptideStart / (double) iSequence.length()));
-                            int lXratioBoxEnd = (int) Math.round((double) lBoxWidth * ((double) lPeptideEnd / (double) iSequence.length()));
+                            int lXratioBoxStart = (int) Math.round((double) lBoxWidth * ((double) lPeptideStart / (double) iSequenceLength));
+                            int lXratioBoxEnd = (int) Math.round((double) lBoxWidth * ((double) lPeptideEnd / (double) iSequenceLength));
                             Color lColor;
                             if (iQuantitativeValidationSingelton.isLog2()) {
                                 lColor = calculateColor(lPeptideGroups.get(j).getMeanRatioForGroup(iProtein.getTypes()[i]), 0.0 , (double) iQuantitativeValidationSingelton.getRightGraphBorder(), (double) iQuantitativeValidationSingelton.getLeftGraphBorder());
@@ -220,20 +232,17 @@ public class ProteinBarPanel extends JPanel {
         for (int j = 0; j < lPeptideGroups.size(); j++) {
             RatioGroup lRatioGroup = lPeptideGroups.get(j).getRatioGroups().get(0);
 
-            boolean lRatioGroupedLinkedToMultipleProteins = true;
-            if(lRatioGroup.getProteinAccessions().length == 1){
-                lRatioGroupedLinkedToMultipleProteins = false;
-            }
+            boolean lRatioGroupedLinkedToMultipleProteins = lPeptideGroups.get(j).isLinkedToMoreProteins(); 
 
-            int lPeptideStart = iSequence.indexOf(lRatioGroup.getPeptideSequence());
+            int lPeptideStart = lPeptideGroups.get(j).getStartPosition();
             int lPeptideEnd = lPeptideStart + lRatioGroup.getPeptideSequence().length();
 
             if (lPeptideStart > -1) {
                 //only show it if it is found
-                int lXratioBoxStart = (int) Math.round((double) lBoxWidth * ((double) lPeptideStart / (double) iSequence.length()));
-                int lXratioBoxEnd = (int) Math.round((double) lBoxWidth * ((double) lPeptideEnd / (double) iSequence.length()));
+                int lXratioBoxStart = (int) Math.round((double) lBoxWidth * ((double) lPeptideStart / (double) iSequenceLength));
+                int lXratioBoxEnd = (int) Math.round((double) lBoxWidth * ((double) lPeptideEnd / (double) iSequenceLength));
                 Color lColor;
-                if(iProtein.getAccession().trim().equalsIgnoreCase(lRatioGroup.getRazorProteinAccession().trim()) && lRatioGroupedLinkedToMultipleProteins){
+                if(iProtein.getAccession().trim().equalsIgnoreCase(lPeptideGroups.get(j).getRazorAccession()) && lRatioGroupedLinkedToMultipleProteins){
                     lColor = Color.RED;
                 } else if (lRatioGroupedLinkedToMultipleProteins) {
                     lColor = Color.ORANGE;

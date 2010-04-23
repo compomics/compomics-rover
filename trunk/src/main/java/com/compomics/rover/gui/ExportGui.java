@@ -1,5 +1,7 @@
 package com.compomics.rover.gui;
 
+import org.apache.log4j.Logger;
+
 import com.compomics.rover.general.sequenceretriever.TairSequenceRetriever;
 import com.compomics.rover.general.singelton.QuantitativeValidationSingelton;
 import com.compomics.rover.general.quantitation.QuantitativeProtein;
@@ -46,6 +48,8 @@ import com.lowagie.text.pdf.DefaultFontMapper;
  * Time: 14:30:30
  */
 public class ExportGui extends JFrame {
+	// Class specific log4j logger for ExportGui instances.
+	 private static Logger logger = Logger.getLogger(ExportGui.class);
     private JPanel jpanContent;
     private JRadioButton validatedProteinsRadioButton;
     private JRadioButton selectedProteinsRadioButton;
@@ -373,11 +377,11 @@ public class ExportGui extends JFrame {
                     document.close();
 
                 } catch (InterruptedException e) {
-                    e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+                    logger.error(e.getMessage(), e);
                 } catch (DocumentException e) {
-                    e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+                    logger.error(e.getMessage(), e);
                 } catch (FileNotFoundException e) {
-                    e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+                    logger.error(e.getMessage(), e);
                 }
                 // step 7.2 dispose the iText components.
                 return true;
@@ -421,7 +425,11 @@ public class ExportGui extends JFrame {
         if (returnVal == JFileChooser.APPROVE_OPTION) {
             File file = fc.getSelectedFile();
             iQuantitativeValidationSingelton.setFileLocationOpener(file.getParent());
-            lPath = fc.getSelectedFile().getAbsolutePath() + ".csv";
+            String lTemplPath = fc.getSelectedFile().getAbsolutePath();
+            if (!lTemplPath.endsWith(".csv")) {
+                lTemplPath = lTemplPath + ".csv";
+            }
+            lPath = lTemplPath;
         } else {
             JOptionPane.showMessageDialog(new JFrame(), "Save command cancelled by user.", "Info", JOptionPane.INFORMATION_MESSAGE);
             return;
@@ -437,34 +445,43 @@ public class ExportGui extends JFrame {
                     //get the ratiotypes
                     String[] lTypes = iQuantitativeValidationSingelton.getReferenceSet().getTypes();
                     //get the ratio components
-                    String[] lComponents = iQuantitativeValidationSingelton.getReferenceSet().getComponents();
+                    Vector<String> lComponentsVector = iQuantitativeValidationSingelton.getComponentTypes();
+                    String[] lComponents = new String[lComponentsVector.size()];
+                    lComponentsVector.toArray(lComponents);
                     //create the writer
                     BufferedWriter out = new BufferedWriter(new FileWriter(lPath));
 
                     boolean hasMaxQuant = false;
-                    boolean hasMsQuant = false;
+                    boolean hasMsQuantCensus = false;
                     boolean hasDistiller = false;
-                    boolean hasCensus = false;
+
 
                     for (int p = 0; p < iQuantitativeValidationSingelton.getRoverSources().size(); p++) {
                         if (iQuantitativeValidationSingelton.getRoverSources().get(p) == RoverSource.DISTILLER_QUANT_TOOLBOX_ROV || iQuantitativeValidationSingelton.getRoverSources().get(p) == RoverSource.DISTILLER_QUANT_TOOLBOX_MS_LIMS) {
                             hasDistiller = true;
                         } else if (iQuantitativeValidationSingelton.getRoverSources().get(p) == RoverSource.MAX_QUANT || iQuantitativeValidationSingelton.getRoverSources().get(p) == RoverSource.MAX_QUANT_NO_SIGN) {
                             hasMaxQuant = true;
+                        } else {
+                            hasMsQuantCensus = true;
                         }
                     }
 
                     //1.WRITE THE TITLE
-                    String lTitle = "accession" + lSeparator + "comment" + lSeparator + "selected" + lSeparator + "validated" + lSeparator + "sequence" + lSeparator + "start" + lSeparator + "end";
+                    String lTitle = "accession" + lSeparator + "comment" + lSeparator + "selected" + lSeparator + "validated" + lSeparator + "sequence" + lSeparator + "start" + lSeparator + "end" + lSeparator + "color type";
 
                     if (hasMaxQuant) {
                         lTitle = lTitle + lSeparator + "PEP";
-                        hasMaxQuant = true;
                     }
 
                     for (int k = 0; k < lTypes.length; k++) {
-                        lTitle = lTitle + lSeparator + lTypes[k] + " part number" + lSeparator + lTypes[k] + " protein ratio" + lSeparator + lTypes[k] + " peptide grouped protein ratio" + lSeparator + lTypes[k] + " peptide grouped ratio";
-                        lTitle = lTitle + lSeparator + lTypes[k] + " peptide group ratio SD" + lSeparator + lTypes[k] + " ratio" + lSeparator + lTypes[k] + " comment" + lSeparator + lTypes[k] + " status" + lSeparator + lTypes[k] + " Z-score";
+                        if (iQuantitativeValidationSingelton.isNormalization()) {
+                            //lTitle = lTitle + lSeparator + lTypes[k] + " part number" + lSeparator + lTypes[k] + " pre Norm MAD" + lSeparator + lTypes[k] + " Norm MAD" + lSeparator + lTypes[k] + " protein ratio" + lSeparator + lTypes[k] + " peptide grouped protein ratio" + lSeparator + lTypes[k] + " peptide grouped ratio";
+                            lTitle = lTitle + lSeparator + lTypes[k] + " protein ratio" + lSeparator + lTypes[k] + " peptide grouped protein ratio" + lSeparator + lTypes[k] + " peptide grouped ratio";
+                            lTitle = lTitle + lSeparator + lTypes[k] + " peptide group ratio SD" + lSeparator + lTypes[k] + " ratio" + lSeparator + lTypes[k] + " original ratio" + lSeparator + lTypes[k] + " normalization ratio diff (in log2)" + lSeparator + lTypes[k] + " comment" + lSeparator + lTypes[k] + " status" + lSeparator + lTypes[k] + " Z-score";
+                        } else {
+                            lTitle = lTitle + lSeparator + lTypes[k] + " protein ratio" + lSeparator + lTypes[k] + " peptide grouped protein ratio" + lSeparator + lTypes[k] + " peptide grouped ratio";
+                            lTitle = lTitle + lSeparator + lTypes[k] + " peptide group ratio SD" + lSeparator + lTypes[k] + " ratio" + lSeparator + lTypes[k] + " comment" + lSeparator + lTypes[k] + " status" + lSeparator + lTypes[k] + " Z-score";
+                        }
                         if (hasDistiller) {
                             lTitle = lTitle + lSeparator + lTypes[k] + " quality";
                             hasDistiller = true;
@@ -484,20 +501,20 @@ public class ExportGui extends JFrame {
 
                     if (hasDistiller) {
                         // distiller mode => we have a correlation, fraction, hit and .rov filename
-                        lTitle = lTitle + lSeparator + "correlation" + lSeparator + "fraction" + lSeparator + "hit" + lSeparator + "rov file name";
+                        lTitle = lTitle + lSeparator + "correlation" + lSeparator + "fraction" + lSeparator + "hit";
+                    }
+                    if (hasMaxQuant || hasDistiller) {
                         for (int k = 0; k < lComponents.length; k++) {
                             lTitle = lTitle + lSeparator + lComponents[k] + " absolute intensity";
                         }
-                    } else {
-                        if (!hasMaxQuant) {
-                            // not in distiller mode => we only have a filename
-                            lTitle = lTitle + lSeparator + "quantitation file name";
-                        } else {
-                            for (int k = 0; k < lComponents.length; k++) {
-                                lTitle = lTitle + lSeparator + lComponents[k] + " absolute intensity";
-                            }
-                        }
+                    }
+                    if (hasMsQuantCensus || hasDistiller) {
+                        // not in distiller mode => we only have a filename
+                        lTitle = lTitle + lSeparator + "quantitation file name";
+                    }
 
+                    if (iQuantitativeValidationSingelton.isMultipleSources()) {
+                        lTitle = lTitle + lSeparator + "Source";
                     }
                     out.write(lTitle + "\n");
 
@@ -525,8 +542,7 @@ public class ExportGui extends JFrame {
                                 }
                             }
                         } catch (Exception e) {
-                            //sequence not found
-                            //e.printStackTrace();
+                            logger.error(e.getMessage(), e);
                         }
 
                         for (int j = 0; j < lProtein.getPeptideGroups(true).size(); j++) {
@@ -536,18 +552,20 @@ public class ExportGui extends JFrame {
                                 //the ratiogroups
                                 RatioGroup lRatioGroup = lProtein.getPeptideGroups(true).get(j).getRatioGroups().get(l);
                                 //get the start and end position of the identified peptide
-                                int lStart = -1;
-                                int lEnd = -1;
-                                if (lProtein.getSequence() != null) {
-                                    lStart = lProtein.getSequence().indexOf(lRatioGroup.getPeptideSequence());
-                                    if (lStart != -1) {
-                                        lEnd = lStart + lRatioGroup.getPeptideSequence().length();
-                                    }
+                                int lStart = lProtein.getPeptideGroups(true).get(j).getStartPosition();
+                                int lEnd = lProtein.getPeptideGroups(true).get(j).getEndPosition();
+                                String lColor = "blue";
+                                if (!lProtein.getPeptideGroups(true).get(j).isLinkedToMoreProteins()) {
+                                    lColor = "blue";
+                                } else if (lProtein.getAccession().trim().equalsIgnoreCase(lRatioGroup.getRazorProteinAccession().trim())) {
+                                    lColor = "red";
+                                } else {
+                                    lColor = "orange";
                                 }
 
                                 //fill the result string
                                 //write protein information
-                                lResult = lResult + lProtein.getAccession() + lSeparator + lProtein.getProteinComment() + lSeparator + lProtein.getSelected() + lSeparator + lProtein.getValidated() + lSeparator + lRatioGroup.getPeptideSequence() + lSeparator + lStart + lSeparator + lEnd;
+                                lResult = lResult + lProtein.getAccession() + lSeparator + lProtein.getProteinComment() + lSeparator + lProtein.getSelected() + lSeparator + lProtein.getValidated() + lSeparator + lRatioGroup.getPeptideSequence() + lSeparator + lStart + lSeparator + lEnd + lSeparator + lColor;
                                 if (hasMaxQuant) {
                                     if (lRatioGroup.getParentCollection().getRoverSource() == RoverSource.MAX_QUANT || lRatioGroup.getParentCollection().getRoverSource() == RoverSource.MAX_QUANT_NO_SIGN) {
                                         MaxQuantRatioGroup lMQGroup = (MaxQuantRatioGroup) lRatioGroup;
@@ -562,13 +580,19 @@ public class ExportGui extends JFrame {
                                     //write the peptide ratios, significance and comment
                                     Ratio lRatio = lRatioGroup.getRatioByType(lTypes[k]);
                                     if (lRatio != null) {
+                                        if (iQuantitativeValidationSingelton.isNormalization()) {
+                                            //add the protein ratios
+                                            //lResult = lResult + lSeparator + (lRatio.getNormatlizationPart() + 1) + lSeparator + lRatio.getPreNormalizedMAD() + lSeparator + lRatio.getNormalizedMAD() + lSeparator + lProtein.getProteinRatio(lTypes[k]) + lSeparator + lProtein.getGroupedProteinRatio(lTypes[k]) + lSeparator + lProtein.getPeptideGroups(true).get(j).getMeanRatioForGroup(lTypes[k]) + lSeparator + lProtein.getPeptideGroups(true).get(j).getSDForGroup(lTypes[k]);
+                                            lResult = lResult + lSeparator + lProtein.getProteinRatio(lTypes[k]) + lSeparator + lProtein.getGroupedProteinRatio(lTypes[k]) + lSeparator + lProtein.getPeptideGroups(true).get(j).getMeanRatioForGroup(lTypes[k]) + lSeparator + lProtein.getPeptideGroups(true).get(j).getSDForGroup(lTypes[k]);
+                                            lResult = lResult + lSeparator + lRatio.getRatio(iQuantitativeValidationSingelton.isLog2()) + lSeparator + lRatio.getOriginalRatio(iQuantitativeValidationSingelton.isLog2()) + lSeparator + (lRatio.getRatio(true) - lRatio.getOriginalRatio(true));
+                                        } else {
+                                            //add the protein ratios
+                                            lResult = lResult + lSeparator + lProtein.getProteinRatio(lTypes[k]) + lSeparator + lProtein.getGroupedProteinRatio(lTypes[k]) + lSeparator + lProtein.getPeptideGroups(true).get(j).getMeanRatioForGroup(lTypes[k]) + lSeparator + lProtein.getPeptideGroups(true).get(j).getSDForGroup(lTypes[k]);
+                                            lResult = lResult + lSeparator + lRatio.getRatio(iQuantitativeValidationSingelton.isLog2());
+                                        }
 
-                                        //add the protein ratios
-                                        lResult = lResult + lSeparator + lRatio.getNormatlizationPart() + lSeparator + lProtein.getProteinRatio(lTypes[k]) + lSeparator + lProtein.getGroupedProteinRatio(lTypes[k]) + lSeparator + lProtein.getPeptideGroups(true).get(j).getMeanRatioForGroup(lTypes[k]) + lSeparator + lProtein.getPeptideGroups(true).get(j).getSDForGroup(lTypes[k]);
                                         HashMap lStatMeas = iQuantitativeValidationSingelton.getReferenceSet().getStatisticalMeasermentForRatio(lRatio.getType(), lRatio);
-
-                                        lResult = lResult + lSeparator + lRatio.getRatio(iQuantitativeValidationSingelton.isLog2());
-                                        //check if we hava a comment
+                                        //check if we have a comment
                                         String lComment = lRatio.getComment();
                                         if (lComment == null) {
                                             lComment = "/";
@@ -581,14 +605,22 @@ public class ExportGui extends JFrame {
                                                 lResult = lResult + lSeparator + lDistillerRatio.getQuality();
                                             } else {
                                                 lResult = lResult + lSeparator;
-
                                             }
                                         }
                                     } else {
-                                        lResult = lResult + lSeparator + lSeparator + lSeparator + lSeparator + lSeparator;
-                                        lResult = lResult + lSeparator;
+                                        if (iQuantitativeValidationSingelton.isNormalization()) {
+                                            //add the protein ratios
+                                            lResult = lResult + lSeparator + lSeparator + lSeparator + lSeparator + lSeparator + lSeparator + lSeparator;
+                                            lResult = lResult + lSeparator + lSeparator + lSeparator;
+                                        } else {
+                                            //add the protein ratios
+                                            lResult = lResult + lSeparator + lSeparator + lSeparator + lSeparator;
+                                            lResult = lResult + lSeparator;
+                                        }
                                         lResult = lResult + lSeparator + lSeparator + lSeparator;
-                                        lResult = lResult + lSeparator;
+                                        if (hasDistiller) {
+                                            lResult = lResult + lSeparator;
+                                        }
                                     }
 
                                 }
@@ -599,33 +631,78 @@ public class ExportGui extends JFrame {
                                             IdentificationExtension lIdEx = (IdentificationExtension) lIdentification;
                                             lResult = lResult + lSeparator + lIdEx.getIdentificationid();
                                         } else {
-                                            lResult = lResult + lSeparator + "identified";
+                                            if (lRatioGroup.getParentCollection().getRoverSource() == RoverSource.CENSUS) {
+                                                lResult = lResult + lSeparator + "Y";
+                                            } else {
+                                                lResult = lResult + lSeparator + lIdentification.getScore();
+                                            }
                                         }
                                     } else {
-                                        lResult = lResult + lSeparator + "/";
+                                        lResult = lResult + lSeparator + "NA";
                                     }
                                 }
                                 if (hasDistiller) {
                                     if (lRatioGroup.getParentCollection().getRoverSource() == RoverSource.DISTILLER_QUANT_TOOLBOX_MS_LIMS || lRatioGroup.getParentCollection().getRoverSource() == RoverSource.DISTILLER_QUANT_TOOLBOX_ROV) {
                                         DistillerRatioGroup lDistillerRatioGroup = (DistillerRatioGroup) lRatioGroup;
-                                        lResult = lResult + lSeparator + lDistillerRatioGroup.getCorrelation() + lSeparator + lDistillerRatioGroup.getFraction() + lSeparator + lDistillerRatioGroup.getReferenceOfParentHit() + lSeparator + lRatioGroup.getParentCollection().getMetaData(QuantitationMetaType.FILENAME);
+                                        lResult = lResult + lSeparator + lDistillerRatioGroup.getCorrelation() + lSeparator + lDistillerRatioGroup.getFraction() + lSeparator + lDistillerRatioGroup.getReferenceOfParentHit();
                                         for (int k = 0; k < lComponents.length; k++) {
                                             DistillerRatioGroup lDistRatioGroup = (DistillerRatioGroup) lRatioGroup;
                                             lResult = lResult + lSeparator + lDistRatioGroup.getAbsoluteIntensities()[k];
                                         }
+                                        lResult = lResult + lSeparator + lRatioGroup.getParentCollection().getMetaData(QuantitationMetaType.FILENAME);
                                     } else {
-                                        lResult = lResult + lSeparator + lSeparator + lSeparator + lSeparator;
+                                        lResult = lResult + lSeparator + lSeparator;
+                                        if (lRatioGroup.getParentCollection().getRoverSource() == RoverSource.MAX_QUANT_NO_SIGN || lRatioGroup.getParentCollection().getRoverSource() == RoverSource.MAX_QUANT) {
+                                            lResult = lResult + lSeparator;
+                                            for (int k = 0; k < lComponents.length; k++) {
+                                                MaxQuantRatioGroup lMaxQuantRatioGroup = (MaxQuantRatioGroup) lRatioGroup;
+                                                lResult = lResult + lSeparator + lMaxQuantRatioGroup.getAbsoluteIntensities()[k];
+                                            }
+                                            lResult = lResult + lSeparator;
+                                        } else {
+                                            for (int k = 0; k < lComponents.length; k++) {
+                                                lResult = lResult + lSeparator;
+                                            }
+                                            if (lRatioGroup.getParentCollection().getMetaData(QuantitationMetaType.FILENAME) == null) {
+                                                lResult = lResult + lSeparator;
+                                            } else {
+                                                lResult = lResult + lSeparator + lRatioGroup.getParentCollection().getMetaData(QuantitationMetaType.FILENAME);
+                                            }
+                                        }
+
                                     }
 
                                 } else {
-                                    if (!hasMaxQuant) {
-                                        lResult = lResult + lSeparator + lRatioGroup.getParentCollection().getMetaData(QuantitationMetaType.FILENAME);
+                                    if (hasMaxQuant) {
+                                        if (lRatioGroup.getParentCollection().getRoverSource() == RoverSource.MAX_QUANT_NO_SIGN || lRatioGroup.getParentCollection().getRoverSource() == RoverSource.MAX_QUANT) {
+                                            for (int k = 0; k < lComponents.length; k++) {
+                                                MaxQuantRatioGroup lMaxQuantRatioGroup = (MaxQuantRatioGroup) lRatioGroup;
+                                                lResult = lResult + lSeparator + lMaxQuantRatioGroup.getAbsoluteIntensities()[k];
+                                            }
+                                            if (hasMsQuantCensus) {
+                                                lResult = lResult + lSeparator;
+                                            }
+                                        } else {
+                                            for (int k = 0; k < lComponents.length; k++) {
+                                                lResult = lResult + lSeparator;
+                                            }
+                                            if (lRatioGroup.getParentCollection().getMetaData(QuantitationMetaType.FILENAME) == null) {
+                                                lResult = lResult + lSeparator;
+                                            } else {
+                                                lResult = lResult + lSeparator + lRatioGroup.getParentCollection().getMetaData(QuantitationMetaType.FILENAME);
+                                            }
+                                        }
                                     } else {
-                                        for (int k = 0; k < lComponents.length; k++) {
-                                            MaxQuantRatioGroup lMaxQuantRatioGroup = (MaxQuantRatioGroup) lRatioGroup;
-                                            lResult = lResult + lSeparator + lMaxQuantRatioGroup.getAbsoluteIntensities()[k];
+                                        if (lRatioGroup.getParentCollection().getMetaData(QuantitationMetaType.FILENAME) == null) {
+                                            lResult = lResult + lSeparator;
+                                        } else {
+                                            lResult = lResult + lSeparator + lRatioGroup.getParentCollection().getMetaData(QuantitationMetaType.FILENAME);
                                         }
                                     }
+                                }
+
+                                if (iQuantitativeValidationSingelton.isMultipleSources()) {
+                                    lResult = lResult + lSeparator + iQuantitativeValidationSingelton.getTitles().get(lRatioGroup.getParentCollection().getIndex());
                                 }
                                 out.write(lResult + "\n");
                             }
@@ -641,6 +718,7 @@ public class ExportGui extends JFrame {
                     //show that the saving is done
                     JOptionPane.showMessageDialog(new JFrame(), "Saving with errors: " + e.getMessage(), "Info", JOptionPane.INFORMATION_MESSAGE);
                     cancelButton.setText("Close");
+                    logger.error(e.getMessage(), e);
                 }
 
                 return true;
@@ -676,7 +754,11 @@ public class ExportGui extends JFrame {
         if (returnVal == JFileChooser.APPROVE_OPTION) {
             File file = fc.getSelectedFile();
             iQuantitativeValidationSingelton.setFileLocationOpener(file.getParent());
-            lPath = fc.getSelectedFile().getAbsolutePath() + ".csv";
+            String lTemplPath = fc.getSelectedFile().getAbsolutePath();
+            if (!lTemplPath.endsWith(".csv")) {
+                lTemplPath = lTemplPath + ".csv";
+            }
+            lPath = lTemplPath;
         } else {
             JOptionPane.showMessageDialog(new JFrame(), "Save command cancelled by user.", "Info", JOptionPane.INFORMATION_MESSAGE);
             return;
@@ -701,10 +783,17 @@ public class ExportGui extends JFrame {
                     String lTitle = "accession" + lSeparator + "comment" + lSeparator + "selected" + lSeparator + "validated" + lSeparator + "number of identifications" + lSeparator + "number of different peptides" + lSeparator + "number of ratiogroups" + lSeparator + "protein coverage";
 
                     for (int k = 0; k < lTypes.length; k++) {
-                        lTitle = lTitle + lSeparator + lTypes[k] + " protein ratio" + lSeparator + lTypes[k] + " protein ratio SD" + lSeparator + lTypes[k] + " protein P-value" + lSeparator + lTypes[k] + " protein Z-score" + lSeparator + lTypes[k] + " protein Power" + lSeparator + lTypes[k] + " protein mean Random Z-Score" + lSeparator + lTypes[k] + " protein SD Random Z-Score" + lSeparator + lTypes[k] + " number of peptide ratios used";
-                        lTitle = lTitle + lSeparator + lTypes[k] + " protein intensity sum " + lSeparator + lTypes[k] + " protein intensity mean" + lSeparator + lTypes[k] + " protein intensity median" + lSeparator + lTypes[k] + " protein intenisty SD" + lSeparator + lTypes[k] + " intensity sum Z-score" + lSeparator + lTypes[k] + " intensity mean Z-score" + lSeparator + lTypes[k] + " intensity median Z-score" + lSeparator + lTypes[k] + " intensity sd Z-score" + lSeparator + lTypes[k] + " peptide grouped protein ratio" + lSeparator + lTypes[k] + " ratios valid" + lSeparator + "Number of distinct peptide with one valid " + lTypes[k] + " ratio";
+                        //lTitle = lTitle + lSeparator + lTypes[k] + " protein ratio" + lSeparator + lTypes[k] + " protein ratio SD" + lSeparator + lTypes[k] + " number of peptide ratios used";
+
+                        //lTitle = lTitle + lSeparator + lTypes[k] + " protein ratio" + lSeparator + lTypes[k] + " protein ratio SD" + lSeparator + lTypes[k] + " protein ratio MAD" + lSeparator + lTypes[k] + " protein P-value" + lSeparator + lTypes[k] + " protein Z-score" + lSeparator + lTypes[k] + " protein Power" + lSeparator + lTypes[k] + " protein mean Random Z-Score" + lSeparator + lTypes[k] + " protein SD Random Z-Score" + lSeparator + lTypes[k] + " number of peptide ratios used";
+                        //lTitle = lTitle + lSeparator + lTypes[k] + " protein intensity sum " + lSeparator + lTypes[k] + " protein intensity mean" + lSeparator + lTypes[k] + " protein intensity median" + lSeparator + lTypes[k] + " protein intensity SD" + lSeparator + lTypes[k] + " intensity sum Z-score" + lSeparator + lTypes[k] + " intensity mean Z-score" + lSeparator + lTypes[k] + " intensity median Z-score" + lSeparator + lTypes[k] + " intensity sd Z-score" + lSeparator + lTypes[k] + " original MAD SD" + lSeparator + lTypes[k] + " normalized MAD SD" + lSeparator + lTypes[k] + " original MAD Mean" + lSeparator + lTypes[k] + " normalized MAD Mean" + lSeparator + lTypes[k] + " peptide grouped protein ratio" + lSeparator + lTypes[k] + " ratios valid" + lSeparator + "Number of distinct peptide with one valid " + lTypes[k] + " ratio";
+
+                        lTitle = lTitle + lSeparator + lTypes[k] + " protein ratio" + lSeparator + lTypes[k] + " protein ratio SD" + lSeparator + lTypes[k] + " protein Z-score" + lSeparator + lTypes[k] + " number of peptide ratios used";
+                        lTitle = lTitle + lSeparator + lTypes[k] + " peptide grouped protein ratio" + lSeparator + lTypes[k] + " ratios valid" + lSeparator + "Number of distinct peptide with one valid " + lTypes[k] + " ratio";
+
                     }
-                    String lSources = "";
+
+                    /*String lSources = "";
                     if (iQuantitativeValidationSingelton.isMultipleSources()) {
                         lTitle = lTitle + lSeparator + "Sources used";
                         Vector<Boolean> lSelectedIndices = iQuantitativeValidationSingelton.getSelectedIndexes();
@@ -714,7 +803,7 @@ public class ExportGui extends JFrame {
                             }
                         }
                         lSources = lSources.substring(0, lSources.lastIndexOf("_"));
-                    }
+                    } */
 
                     out.write(lTitle + "\n");
 
@@ -729,18 +818,26 @@ public class ExportGui extends JFrame {
                         progressBar1.setValue(progressBar1.getValue() + 1);
                         QuantitativeProtein lProtein = iProteinsToExport.get(i);
 
+                        //System.out.print("\n" + i);
                         String lResult = "";
                         lResult = lResult + lProtein.getAccession() + lSeparator + lProtein.getProteinComment() + lSeparator + lProtein.getSelected() + lSeparator + lProtein.getValidated() + lSeparator + lProtein.getNumberOfIdentifications() + lSeparator + lProtein.getPeptideGroups(true).size() + lSeparator + lProtein.getNumberOfRatioGroups() + lSeparator + lProtein.getProteinCoverage();
                         for (int k = 0; k < lTypes.length; k++) {
-                            lResult = lResult + lSeparator + lProtein.getProteinRatio(lTypes[k]) + lSeparator + lProtein.getProteinRatioStandardDeviationForType(lTypes[k]) + lSeparator + lProtein.getProteinPvalue(lTypes[k], -1) + lSeparator + lProtein.getProteinZScore(lTypes[k], -1) + lSeparator + lProtein.getPower(lTypes[k], -1, 1.96) + lSeparator + lReferenceSet.getZscoreForRatioMean(lProtein.getProteinRatio(lTypes[k], -1, true), lProtein.getNumberOfRatiosUsedForProteinMean(lTypes[k]), lTypes[k]) + lSeparator + lReferenceSet.getZscoreForRatioSd(lProtein.getProteinRatioStandardDeviationForType(lTypes[k]), lProtein.getNumberOfRatiosUsedForProteinMean(lTypes[k]), lTypes[k]) + lSeparator + lProtein.getNumberOfRatiosUsedForProteinMean(lTypes[k]);
-                            lResult = lResult + lSeparator + lProtein.getSummedProteinIntensities(lTypes[k], -1, true) + lSeparator + lProtein.getMeanProteinIntensity(lTypes[k], -1, true) + lSeparator + lProtein.getMedianProteinIntensity(lTypes[k], -1, true) + lSeparator + lProtein.getStandardDeviationProteinIntensities(lTypes[k], -1, true) + lSeparator + lReferenceSet.getZscoreForIntensitySum(lProtein.getSummedProteinIntensities(lTypes[k], -1, true), lProtein.getNumberOfRatiosUsedForProteinMean(lTypes[k]), lTypes[k]) + lSeparator + lReferenceSet.getZscoreForIntensityMean(lProtein.getMeanProteinIntensity(lTypes[k], -1, true), lProtein.getNumberOfRatiosUsedForProteinMean(lTypes[k]), lTypes[k]) + lSeparator + lReferenceSet.getZscoreForIntensityMedian(lProtein.getMedianProteinIntensity(lTypes[k], -1, true), lProtein.getNumberOfRatiosUsedForProteinMean(lTypes[k]), lTypes[k]) + lSeparator + lReferenceSet.getZscoreForIntensitySd(lProtein.getStandardDeviationProteinIntensities(lTypes[k], -1, true), lProtein.getNumberOfRatiosUsedForProteinMean(lTypes[k]), lTypes[k]) + lSeparator + lProtein.getGroupedProteinRatio(lTypes[k]) + lSeparator + lProtein.getNumberOfValidRatioByType(lTypes[k]) + lSeparator + lProtein.getNumberOfDistinctPeptidesWithOneValidRatioByType(lTypes[k]);
+                            //lResult = lResult + lSeparator + lProtein.getProteinRatio(lTypes[k]) + lSeparator + lProtein.getProteinRatioStandardDeviationForType(lTypes[k]) + lSeparator + lProtein.getNumberOfRatiosUsedForProteinMean(lTypes[k]);
+
+                            //lResult = lResult + lSeparator + lProtein.getProteinRatio(lTypes[k]) + lSeparator + lProtein.getProteinRatioStandardDeviationForType(lTypes[k]) + lSeparator + lProtein.getProteinRatioMADForType(lTypes[k]) + lSeparator + lProtein.getProteinPvalue(lTypes[k], -1) + lSeparator + lProtein.getProteinZScore(lTypes[k], -1) + lSeparator + lProtein.getPower(lTypes[k], -1, 1.96) + lSeparator + lReferenceSet.getZscoreForRatioMean(lProtein.getRatioIndexMeanForType(lTypes[k]), lProtein.getNumberOfRatiosUsedForProteinMean(lTypes[k]), lTypes[k]) + lSeparator + lReferenceSet.getZscoreForRatioSd(lProtein.getRatioIndexSDForType(lTypes[k]), lProtein.getNumberOfRatiosUsedForProteinMean(lTypes[k]), lTypes[k]) + lSeparator + lProtein.getNumberOfRatiosUsedForProteinMean(lTypes[k]);
+                            //lResult = lResult + lSeparator + lProtein.getSummedProteinIntensities(lTypes[k], -1, true) + lSeparator + lProtein.getMeanProteinIntensity(lTypes[k], -1, true) + lSeparator + lProtein.getMedianProteinIntensity(lTypes[k], -1, true) + lSeparator + lProtein.getStandardDeviationProteinIntensities(lTypes[k], -1, true) + lSeparator + lReferenceSet.getZscoreForIntensitySum(lProtein.getSummedProteinIntensities(lTypes[k], -1, true), lProtein.getNumberOfRatiosUsedForProteinMean(lTypes[k]), lTypes[k]) + lSeparator + lReferenceSet.getZscoreForIntensityMean(lProtein.getMeanProteinIntensity(lTypes[k], -1, true), lProtein.getNumberOfRatiosUsedForProteinMean(lTypes[k]), lTypes[k]) + lSeparator + lReferenceSet.getZscoreForIntensityMedian(lProtein.getMedianProteinIntensity(lTypes[k], -1, true), lProtein.getNumberOfRatiosUsedForProteinMean(lTypes[k]), lTypes[k]) + lSeparator + lReferenceSet.getZscoreForIntensitySd(lProtein.getStandardDeviationProteinIntensities(lTypes[k], -1, true), lProtein.getNumberOfRatiosUsedForProteinMean(lTypes[k]), lTypes[k]) + lSeparator + lProtein.getOriginalMadSD(lTypes[k]) + lSeparator + lProtein.getNormalizedMadSD(lTypes[k]) + lSeparator + lProtein.getOriginalMadMean(lTypes[k]) + lSeparator + lProtein.getNormalizedMadMean(lTypes[k]) + lSeparator + lProtein.getGroupedProteinRatio(lTypes[k]) + lSeparator + lProtein.getNumberOfValidRatioByType(lTypes[k]) + lSeparator + lProtein.getNumberOfDistinctPeptidesWithOneValidRatioByType(lTypes[k]);
+
+                            lResult = lResult + lSeparator + lProtein.getProteinRatio(lTypes[k]) + lSeparator + lProtein.getProteinRatioStandardDeviationForType(lTypes[k]) + lSeparator + lProtein.getProteinZScore(lTypes[k], -1) + lSeparator + lProtein.getNumberOfRatiosUsedForProteinMean(lTypes[k]);
+                            lResult = lResult + lSeparator + lProtein.getGroupedProteinRatio(lTypes[k]) + lSeparator + lProtein.getNumberOfValidRatioByType(lTypes[k]) + lSeparator + lProtein.getNumberOfDistinctPeptidesWithOneValidRatioByType(lTypes[k]);
                         }
+
+                        /*
                         if (iQuantitativeValidationSingelton.isMultipleSources()) {
                             lResult = lResult + lSeparator + lSources;
-                        }
+                        } */
 
                         out.write(lResult + "\n");
-
+                        //System.out.print("   done");
                     }
                     progressBar1.setVisible(false);
                     out.close();
@@ -751,6 +848,7 @@ public class ExportGui extends JFrame {
                     //show that the saving is done
                     JOptionPane.showMessageDialog(new JFrame(), "Saving with errors: " + e.getMessage(), "Info", JOptionPane.INFORMATION_MESSAGE);
                     cancelButton.setText("Close");
+                    logger.error(e.getMessage(), e);
                 }
 
                 return true;
@@ -836,7 +934,7 @@ public class ExportGui extends JFrame {
             JOptionPane.showMessageDialog(new JFrame(), "Saving done", "Info", JOptionPane.INFORMATION_MESSAGE);
             cancelButton.setText("Close");
         } catch (IOException e) {
-            e.printStackTrace();
+            logger.error(e.getMessage(), e);
         }
 
 

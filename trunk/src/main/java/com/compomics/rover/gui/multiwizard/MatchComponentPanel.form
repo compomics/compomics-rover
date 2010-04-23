@@ -15,105 +15,106 @@
         <properties/>
         <border type="none"/>
         <children>
-          <component id="f06e2" class="javax.swing.JLabel">
+          <grid id="5a715" binding="panel1" layout-manager="GridBagLayout">
             <constraints>
-              <grid row="0" column="0" row-span="1" col-span="2" vsize-policy="0" hsize-policy="0" anchor="0" fill="0" indent="0" use-parent-layout="false"/>
-              <gridbag top="5" left="5" bottom="5" right="5" weightx="0.0" weighty="0.0"/>
-            </constraints>
-            <properties>
-              <font size="16" style="1"/>
-              <text value="Merge component types from different sources"/>
-            </properties>
-          </component>
-          <scrollpane id="e55d1">
-            <constraints>
-              <grid row="1" column="1" row-span="3" col-span="1" vsize-policy="7" hsize-policy="7" anchor="0" fill="3" indent="0" use-parent-layout="false"/>
-              <gridbag top="5" left="5" bottom="5" right="5" weightx="0.5" weighty="0.0"/>
+              <grid row="0" column="0" row-span="9" col-span="2" vsize-policy="3" hsize-policy="3" anchor="0" fill="3" indent="0" use-parent-layout="false"/>
+              <gridbag weightx="1.0" weighty="1.0"/>
             </constraints>
             <properties/>
             <border type="none"/>
             <children>
-              <component id="6add4" class="javax.swing.JList" binding="list1" custom-create="true" default-binding="true">
-                <constraints/>
+              <component id="f06e2" class="javax.swing.JLabel">
+                <constraints>
+                  <grid row="0" column="0" row-span="1" col-span="2" vsize-policy="0" hsize-policy="0" anchor="0" fill="0" indent="0" use-parent-layout="false"/>
+                  <gridbag top="5" left="5" bottom="5" right="5" weightx="0.0" weighty="0.0"/>
+                </constraints>
+                <properties>
+                  <font size="16" style="1"/>
+                  <text value="Merge component types from different sources"/>
+                </properties>
+              </component>
+              <scrollpane id="e55d1">
+                <constraints>
+                  <grid row="1" column="1" row-span="3" col-span="1" vsize-policy="7" hsize-policy="7" anchor="0" fill="3" indent="0" use-parent-layout="false"/>
+                  <gridbag top="5" left="5" bottom="5" right="5" weightx="0.5" weighty="0.0"/>
+                </constraints>
+                <properties/>
+                <border type="none"/>
+                <children>
+                  <component id="6add4" class="javax.swing.JList" binding="list1" custom-create="true" default-binding="true">
+                    <constraints/>
+                    <properties/>
+                  </component>
+                </children>
+              </scrollpane>
+              <component id="fa681" class="javax.swing.JLabel" binding="lblSet">
+                <constraints>
+                  <grid row="1" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+                  <gridbag top="5" left="5" bottom="5" right="5" weightx="0.5" weighty="0.0"/>
+                </constraints>
+                <properties>
+                  <text value="Set 1"/>
+                </properties>
+              </component>
+              <component id="b772a" class="javax.swing.JLabel" binding="lblComponentLabelCount">
+                <constraints>
+                  <grid row="2" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+                  <gridbag top="5" left="5" bottom="5" right="5" weightx="0.0" weighty="0.0"/>
+                </constraints>
+                <properties>
+                  <text value="Component 1"/>
+                </properties>
+              </component>
+              <component id="ebe0d" class="javax.swing.JLabel" binding="lblLabel">
+                <constraints>
+                  <grid row="3" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="0" fill="0" indent="0" use-parent-layout="false"/>
+                  <gridbag weightx="0.0" weighty="0.0"/>
+                </constraints>
+                <properties>
+                  <font size="20" style="1"/>
+                  <horizontalAlignment value="0"/>
+                  <horizontalTextPosition value="0"/>
+                  <text value="Light"/>
+                </properties>
+              </component>
+              <component id="d4db6" class="javax.swing.JButton" binding="linkToSelectedMergedButton" default-binding="true">
+                <constraints>
+                  <grid row="4" column="0" row-span="1" col-span="2" vsize-policy="0" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
+                  <gridbag top="5" left="5" bottom="5" right="5" weightx="0.0" weighty="0.0"/>
+                </constraints>
+                <properties>
+                  <text value="Link to selected merged component type"/>
+                </properties>
+              </component>
+              <component id="f44f8" class="javax.swing.JButton" binding="linkToANewlyButton" default-binding="true">
+                <constraints>
+                  <grid row="5" column="0" row-span="1" col-span="2" vsize-policy="0" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
+                  <gridbag top="5" left="5" bottom="5" right="5" weightx="0.0" weighty="0.0"/>
+                </constraints>
+                <properties>
+                  <text value="Link to a newly created merged component type"/>
+                </properties>
+              </component>
+              <component id="5c93d" class="javax.swing.JTextField" binding="newlyCreatedRatioTypeTextField" default-binding="true">
+                <constraints>
+                  <grid row="6" column="1" row-span="1" col-span="1" vsize-policy="0" hsize-policy="6" anchor="8" fill="1" indent="0" use-parent-layout="false">
+                    <preferred-size width="150" height="-1"/>
+                  </grid>
+                  <gridbag top="5" left="5" bottom="5" right="5" weightx="0.0" weighty="0.0"/>
+                </constraints>
+                <properties>
+                  <text value="Newly created component type name"/>
+                </properties>
+              </component>
+              <component id="e6063" class="javax.swing.JProgressBar" binding="progressBar1" default-binding="true">
+                <constraints>
+                  <grid row="7" column="0" row-span="1" col-span="2" vsize-policy="0" hsize-policy="6" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
+                  <gridbag top="5" left="5" bottom="5" right="5" weightx="0.0" weighty="0.0"/>
+                </constraints>
                 <properties/>
               </component>
             </children>
-          </scrollpane>
-          <component id="fa681" class="javax.swing.JLabel" binding="lblSet">
-            <constraints>
-              <grid row="1" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
-              <gridbag top="5" left="5" bottom="5" right="5" weightx="0.5" weighty="0.0"/>
-            </constraints>
-            <properties>
-              <text value="Set 1"/>
-            </properties>
-          </component>
-          <component id="b772a" class="javax.swing.JLabel" binding="lblComponentLabelCount">
-            <constraints>
-              <grid row="2" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
-              <gridbag top="5" left="5" bottom="5" right="5" weightx="0.0" weighty="0.0"/>
-            </constraints>
-            <properties>
-              <text value="Component 1"/>
-            </properties>
-          </component>
-          <component id="ebe0d" class="javax.swing.JLabel" binding="lblLabel">
-            <constraints>
-              <grid row="3" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="0" fill="0" indent="0" use-parent-layout="false"/>
-              <gridbag weightx="0.0" weighty="0.0"/>
-            </constraints>
-            <properties>
-              <font size="20" style="1"/>
-              <horizontalAlignment value="0"/>
-              <horizontalTextPosition value="0"/>
-              <text value="Light"/>
-            </properties>
-          </component>
-          <component id="d4db6" class="javax.swing.JButton" binding="linkToSelectedMergedButton" default-binding="true">
-            <constraints>
-              <grid row="4" column="0" row-span="1" col-span="2" vsize-policy="0" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
-              <gridbag top="5" left="5" bottom="5" right="5" weightx="0.0" weighty="0.0"/>
-            </constraints>
-            <properties>
-              <text value="Link to selected merged component type"/>
-            </properties>
-          </component>
-          <component id="f44f8" class="javax.swing.JButton" binding="linkToANewlyButton" default-binding="true">
-            <constraints>
-              <grid row="5" column="0" row-span="1" col-span="2" vsize-policy="0" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
-              <gridbag top="5" left="5" bottom="5" right="5" weightx="0.0" weighty="0.0"/>
-            </constraints>
-            <properties>
-              <text value="Link to a newly created merged component type"/>
-            </properties>
-          </component>
-          <component id="5c93d" class="javax.swing.JTextField" binding="newlyCreatedRatioTypeTextField" default-binding="true">
-            <constraints>
-              <grid row="6" column="1" row-span="1" col-span="1" vsize-policy="0" hsize-policy="6" anchor="8" fill="1" indent="0" use-parent-layout="false">
-                <preferred-size width="150" height="-1"/>
-              </grid>
-              <gridbag top="5" left="5" bottom="5" right="5" weightx="0.0" weighty="0.0"/>
-            </constraints>
-            <properties>
-              <text value="Newly created component type name"/>
-            </properties>
-          </component>
-          <component id="4e4e6" class="javax.swing.JButton" binding="renameRatioComponentsAndButton" default-binding="true">
-            <constraints>
-              <grid row="7" column="0" row-span="1" col-span="2" vsize-policy="0" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
-              <gridbag top="5" left="5" bottom="5" right="5" weightx="0.0" weighty="0.0"/>
-            </constraints>
-            <properties>
-              <text value="Rename ratio components and types"/>
-            </properties>
-          </component>
-          <component id="e6063" class="javax.swing.JProgressBar" binding="progressBar1" default-binding="true">
-            <constraints>
-              <grid row="8" column="0" row-span="1" col-span="2" vsize-policy="0" hsize-policy="6" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
-              <gridbag top="5" left="5" bottom="5" right="5" weightx="0.0" weighty="0.0"/>
-            </constraints>
-            <properties/>
-          </component>
+          </grid>
         </children>
       </grid>
     </children>

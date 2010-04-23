@@ -1,5 +1,7 @@
 package com.compomics.rover.gui;
 
+import org.apache.log4j.Logger;
+
 import com.compomics.rover.general.enumeration.RoverSource;
 import com.compomics.rover.general.fileio.files.RovFile;
 import com.compomics.rover.general.quantitation.QuantitativeProtein;
@@ -8,7 +10,7 @@ import com.compomics.rover.general.quantitation.sorters.QuantitativeProteinSorte
 import com.compomics.rover.general.quantitation.sorters.QuantitativeProteinSorterByRatioGroupNumbers;
 import com.compomics.rover.general.quantitation.source.distiller.DistillerRatioGroup;
 import com.compomics.rover.general.singelton.QuantitativeValidationSingelton;
-import com.compomics.util.sun.*;
+import com.compomics.util.sun.SwingWorker;
 import com.sun.jndi.dns.DnsName;
 
 import javax.swing.*;
@@ -29,6 +31,8 @@ import java.util.Vector;
  * To change this template use File | Settings | File Templates.
  */
 public class ParameterFinderGui extends JFrame {
+	// Class specific log4j logger for ParameterFinderGui instances.
+	 private static Logger logger = Logger.getLogger(ParameterFinderGui.class);
     private JButton openButton;
     private JLabel lblInfo;
     private JTextArea txtInfo;
@@ -133,9 +137,9 @@ public class ParameterFinderGui extends JFrame {
                         }
 
                     } catch (FileNotFoundException e) {
-                        e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+                        e.printStackTrace();  
                     } catch (IOException e) {
-                        e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+                        e.printStackTrace();
                     }
                 }
 

@@ -1,5 +1,7 @@
 package com.compomics.rover.general.fileio.readers;
 
+import org.apache.log4j.Logger;
+
 import com.compomics.rover.general.quantitation.RatioGroupCollection;
 import com.compomics.rover.general.quantitation.RatioGroup;
 import com.compomics.rover.general.quantitation.source.DatFileiTraq.ITraqRatio;
@@ -22,6 +24,8 @@ import java.util.*;
  * This class will create a RatioGroupCollection for MsQuant result files
  */
 public class MsQuantReader {
+	// Class specific log4j logger for MsQuantReader instances.
+	 private static Logger logger = Logger.getLogger(MsQuantReader.class);
     /**
      * The MsQuant file
      */
@@ -88,15 +92,15 @@ public class MsQuantReader {
                     }
                 }
             }
-        } catch (FileNotFoundException e1) {
+        } catch (FileNotFoundException e) {
             iFlamable.passHotPotato(new Throwable("Problem reading the msquant file"));
-            e1.printStackTrace();
-        } catch (IOException e1) {
+            logger.error(e.getMessage(), e);
+        } catch (IOException e) {
             iFlamable.passHotPotato(new Throwable("Problem reading the msquant file"));
-            e1.printStackTrace();
+            logger.error(e.getMessage(), e);
         } catch (Exception e){
             iFlamable.passHotPotato(new Throwable("Problem reading the msquant file"));
-            e.printStackTrace();
+            logger.error(e.getMessage(), e);
         }
     }
 
@@ -121,7 +125,7 @@ public class MsQuantReader {
         for(int i = 0; i<iPeptideLines.size(); i ++){
 
             if( i == 0){
-                System.out.println("Reading results for: " + iPeptideLines.get(i)[(Integer)iHeaderMap.get("Result file")]  + " (" + iMsQuantFile.getName() + ")");
+                logger.info("Reading results for: " + iPeptideLines.get(i)[(Integer)iHeaderMap.get("Result file")]  + " (" + iMsQuantFile.getName() + ")");
             }
             //create the ratiogroup
             RatioGroup lRatioGroup = new RatioGroup(iRatioGroupCollection);

@@ -1,5 +1,7 @@
 package com.compomics.rover.general.enumeration;
 
+import org.apache.log4j.Logger;
+
 /**
  * Created by IntelliJ IDEA.
  * User: niklaas
@@ -11,5 +13,5 @@ package com.compomics.rover.general.enumeration;
  * The types of max quant ratio
  */
 public enum MaxQuantScoreType {
-    RATIO, NORMALIZED, SIGN_A, SIGN_B
+    RATIO, NORMALIZED
 }

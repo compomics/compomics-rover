@@ -1,5 +1,7 @@
 package com.compomics.rover.general.quantitation;
 
+import org.apache.log4j.Logger;
+
 import com.compomics.rover.general.interfaces.Ratio;
 import com.compomics.rover.general.db.accessors.QuantitationExtension;
 import com.compomics.rover.general.singelton.QuantitativeValidationSingelton;
@@ -13,6 +15,8 @@ import com.compomics.rover.general.singelton.QuantitativeValidationSingelton;
  * The default ratio
  */
 public class DefaultRatio implements Ratio {
+	// Class specific log4j logger for DefaultRatio instances.
+	 private static Logger logger = Logger.getLogger(DefaultRatio.class);
 
        /**
        * The ratio itself.
@@ -43,10 +47,38 @@ public class DefaultRatio implements Ratio {
        * The Parent RatioGroup for this ratio
        */
       private RatioGroup iParentRatioGroup;
+    /**
+     * The original ratio
+     */
     private double iOriginalRatio;
+    /**
+     * The number of the part in the list of the intensity sorted ratios
+     */
     private int iPartNumber = 0;
+    /**
+     * The MAD before normalization
+     */
     private double iPreNormMAD;
+    /**
+     * The MAD after normalization
+     */
     private double iNormMAD;
+    /**
+     * The number of times the ratio is updated
+     */
+    private int iUpdates = 0;
+    /**
+     * The index of the data source
+     */
+    private double iIndex = -1.0;
+    /**
+     * The original source index
+     */
+    private double iOriginalIndex = -1.0;
+    /**
+     * boolean that indicates if the ratio was inverted
+     */
+    private boolean iInverted = false;
 
 
     /**
@@ -181,6 +213,11 @@ public class DefaultRatio implements Ratio {
 
     public void setRecalculatedRatio(double lNewRatio) {
         iRatio = Math.pow(2,lNewRatio);
+        iUpdates = iUpdates + 1;
+    }
+
+    public void setOriginalRatio(double lOriginalRatio){
+        iOriginalRatio = Math.pow(2,lOriginalRatio);
     }
 
     public void setNormalizationPart(int lNumber){
@@ -205,5 +242,33 @@ public class DefaultRatio implements Ratio {
 
     public void setNormalizedMAD(double lMAD){
         this.iNormMAD = lMAD;
+    }
+
+    public int getNumberOfRatioUpdates(){
+        return iUpdates;
+    }
+
+    public void setIndex(double v){
+        iIndex = v;
+    }
+
+    public void setOriginalIndex(double v){
+        iOriginalIndex = v;
+    }
+
+    public double getIndex(){
+        return iIndex;
+    }
+
+    public double getOriginalIndex(){
+        return iOriginalIndex;
+    }
+
+    public void setInverted(boolean lInverted){
+        this.iInverted = lInverted;
+    }
+
+    public boolean getInverted(){
+        return this.iInverted;
     }
 }

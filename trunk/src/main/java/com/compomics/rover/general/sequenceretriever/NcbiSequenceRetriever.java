@@ -1,5 +1,7 @@
 package com.compomics.rover.general.sequenceretriever;
 
+import org.apache.log4j.Logger;
+
 import java.io.BufferedInputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
@@ -18,6 +20,8 @@ import java.net.URL;
  * This class can retrieve the protein sequence for an NCBI protien accession
  */
 public class NcbiSequenceRetriever {
+	// Class specific log4j logger for NcbiSequenceRetriever instances.
+	 private static Logger logger = Logger.getLogger(NcbiSequenceRetriever.class);
     /**
      * The protein sequence
      */

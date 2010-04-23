@@ -1,5 +1,7 @@
 package com.compomics.rover.general.PeptideIdentification;
 
+import org.apache.log4j.Logger;
+
 import com.compomics.mslims.db.accessors.Identification;
 import com.compomics.rover.general.interfaces.PeptideIdentification;
 
@@ -19,7 +21,8 @@ import java.util.HashMap;
  * This class implements the PeptideIdentification interface.
  */
 public class DatfilePeptideIdentification implements PeptideIdentification {
-
+	// Class specific log4j logger for DatfilePeptideIdentification instances.
+    private static Logger logger = Logger.getLogger(DatfilePeptideIdentification.class);
 
    /** This variable represents the contents for the 'datfile_query'. */
    private long iDatfile_query = Long.MIN_VALUE;

@@ -1,5 +1,7 @@
 package com.compomics.rover.general.fileio.files;
 
+import org.apache.log4j.Logger;
+
 import com.compomics.mascotdatfile.util.mascot.*;
 import com.compomics.mascotdatfile.util.mascot.index.QueryToPeptideMap_Index;
 import com.compomics.mascotdatfile.util.mascot.enumeration.MascotDatfileType;
@@ -29,6 +31,8 @@ import java.sql.Connection;
  * This class holds the datfile and sometimes a mergefile with spectra.
  */
 public class DatFile {
+	// Class specific log4j logger for DatFile instances.
+	 private static Logger logger = Logger.getLogger(DatFile.class);
     /**
      * Original dat file
      */
@@ -285,7 +289,7 @@ public class DatFile {
             }
         } catch (Exception e){
             iFlamable.passHotPotato(new Throwable("Problem reading the dat file"));
-            e.printStackTrace();
+            logger.error(e.getMessage(), e);
         }
     	return result;
     }

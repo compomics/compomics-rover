@@ -1,5 +1,7 @@
 package com.compomics.rover.gui;
 
+import org.apache.log4j.Logger;
+
 import com.compomics.rover.general.singelton.Log;
 
 import javax.swing.*;
@@ -16,6 +18,8 @@ import java.awt.*;
  * Time: 11:19:20
  */
 public class LogGui extends JFrame implements Observer {
+	// Class specific log4j logger for LogGui instances.
+	 private static Logger logger = Logger.getLogger(LogGui.class);
     private JTextArea textArea1;
     private JButton closeLogButton;
     private JPanel jpanContent;

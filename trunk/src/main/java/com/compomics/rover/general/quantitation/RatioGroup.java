@@ -1,5 +1,7 @@
 package com.compomics.rover.general.quantitation;
 
+import org.apache.log4j.Logger;
+
 import com.compomics.rover.general.interfaces.Ratio;
 import com.compomics.rover.general.interfaces.PeptideIdentification;
 import com.compomics.rover.general.quantitation.source.distiller.DistillerRatio;
@@ -28,6 +30,8 @@ import java.util.StringTokenizer;
  *
  */
 public class RatioGroup {
+	// Class specific log4j logger for RatioGroup instances.
+	 private static Logger logger = Logger.getLogger(RatioGroup.class);
     /**
      * The List with Identification instances to be linked to a ratio.
      */
@@ -324,6 +328,10 @@ public class RatioGroup {
 
 
     public double getSummedIntensityForRatioType(String lType){
+        return 0.0;
+    }
+
+    public double getIntensityForComponent(String lComponent){
         return 0.0;
     }
 

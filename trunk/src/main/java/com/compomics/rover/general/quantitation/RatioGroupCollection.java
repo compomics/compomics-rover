@@ -1,5 +1,7 @@
 package com.compomics.rover.general.quantitation;
 
+import org.apache.log4j.Logger;
+
 import com.compomics.rover.general.enumeration.QuantitationMetaType;
 import com.compomics.rover.general.enumeration.DataType;
 import com.compomics.rover.general.enumeration.RoverSource;
@@ -19,6 +21,8 @@ import java.util.Vector;
  * ex: Mascot Distiller filename, the runname
  */
 public class RatioGroupCollection extends ArrayList{
+	// Class specific log4j logger for RatioGroupCollection instances.
+	 private static Logger logger = Logger.getLogger(RatioGroupCollection.class);
 
     /**
      * The Meta information on the collection.
@@ -146,18 +150,34 @@ public class RatioGroupCollection extends ArrayList{
         iType = aType;
     }
 
+    /**
+     * Getter for the roversource
+     * @return The roversource
+     */
     public RoverSource getRoverSource() {
         return iRoverSource;
     }
 
+    /**
+     * Setter for the rover source
+     * @param iRoverSource The rover source
+     */
     public void setRoverSource(RoverSource iRoverSource) {
         this.iRoverSource = iRoverSource;
     }
 
+    /**
+     * Getter for the index
+     * @return int with the index
+     */
     public int getIndex() {
         return iIndex;
     }
 
+    /**
+     * Setter for the index
+     * @param iIndex the index
+     */
     public void setIndex(int iIndex) {
         this.iIndex = iIndex;
     }

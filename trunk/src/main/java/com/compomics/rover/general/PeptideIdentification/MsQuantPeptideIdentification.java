@@ -1,5 +1,7 @@
 package com.compomics.rover.general.PeptideIdentification;
 
+import org.apache.log4j.Logger;
+
 import com.compomics.rover.general.interfaces.PeptideIdentification;
 
 import java.util.HashMap;
@@ -11,6 +13,8 @@ import java.util.HashMap;
  * Time: 15:14:55
  */
 public class MsQuantPeptideIdentification implements PeptideIdentification {
+	// Class specific log4j logger for MsQuantPeptideIdentification instances.
+	 private static Logger logger = Logger.getLogger(MsQuantPeptideIdentification.class);
 
 
    /** This variable represents the contents for the 'datfile_query'. */

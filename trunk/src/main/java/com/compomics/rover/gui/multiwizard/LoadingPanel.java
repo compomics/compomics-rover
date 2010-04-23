@@ -1,5 +1,7 @@
 package com.compomics.rover.gui.multiwizard;
 
+import org.apache.log4j.Logger;
+
 import com.compomics.rover.general.interfaces.WizardPanel;
 import com.compomics.rover.general.enumeration.QuantitationMetaType;
 import com.compomics.rover.general.enumeration.RoverSource;
@@ -54,6 +56,8 @@ import java.math.BigDecimal;
  * This class will create a panel that will show the status of the loaded data
  */
 public class LoadingPanel implements WizardPanel {
+	// Class specific log4j logger for LoadingPanel instances.
+	 private static Logger logger = Logger.getLogger(LoadingPanel.class);
 
     //gui stuff
     private JLabel lblCheckFiles;
@@ -62,14 +66,11 @@ public class LoadingPanel implements WizardPanel {
     private JPanel jpanId;
     private JPanel jpanQuant;
     private JPanel jpanMatch;
-    private JPanel jpanCreate;
     private JPanel jpanContent;
     private JLabel lblId;
     private JLabel lblQuant;
     private JLabel lblMatch;
-    private JLabel lblCreate;
-    private JPanel jpanDownload;
-    private JLabel lblDownload;
+    private JLabel lblSet;
 
     private Vector<RatioGroupCollection> iCollection = new Vector<RatioGroupCollection>();
     private Vector<Integer> iCollectionIndexes = new Vector<Integer>();
@@ -98,12 +99,10 @@ public class LoadingPanel implements WizardPanel {
         this.iParent = aParent;
         this.iFlamable = iParent;
         $$$setupUI$$$();
-        setIconOnPanel(jpanCheck, "empty.png", 3, 1);
-        setIconOnPanel(jpanId, "empty.png", 3, 2);
-        setIconOnPanel(jpanQuant, "empty.png", 3, 3);
-        setIconOnPanel(jpanMatch, "empty.png", 3, 4);
-        setIconOnPanel(jpanCreate, "empty.png", 3, 5);
-        setIconOnPanel(jpanDownload, "empty.png", 3, 6);
+        setIconOnPanel(jpanCheck, "empty.png", 3, 2);
+        setIconOnPanel(jpanId, "empty.png", 3, 3);
+        setIconOnPanel(jpanQuant, "empty.png", 3, 4);
+        setIconOnPanel(jpanMatch, "empty.png", 3, 5);
     }
 
     /**
@@ -161,7 +160,7 @@ public class LoadingPanel implements WizardPanel {
             public Boolean construct() {
                 Vector<RoverSource> lSources = iParent.getRoverSources();
                 for (int i = 0; i < lSources.size(); i++) {
-                    System.out.println("Analyzing data set " + (i + 1));
+                    lblSet.setText(" Analyzing data set: " + iParent.getTitle(i) + " ");
                     if (lSources.get(i) == RoverSource.DISTILLER_QUANT_TOOLBOX_ROV) {
                         startFileRov(i);
                     } else if (lSources.get(i) == RoverSource.DISTILLER_QUANT_TOOLBOX_MS_LIMS) {
@@ -178,6 +177,8 @@ public class LoadingPanel implements WizardPanel {
                         startMaxQuant(i);
                     } else if (lSources.get(i) == RoverSource.CENSUS) {
                         startCensus(i);
+                    } else if (lSources.get(i) == RoverSource.TMT_DAT) {
+                        startFileDat(i);
                     }
                 }
 
@@ -192,6 +193,8 @@ public class LoadingPanel implements WizardPanel {
                     iCollection.get(i).setRoverSource(iParent.getRoverSource(iCollectionIndexes.get(i)));
                 }
                 iParent.setNextButtonEnabled(true);
+                progressBar.setEnabled(false);
+                iParent.clickNextButton();
 
 
                 return true;
@@ -257,7 +260,7 @@ public class LoadingPanel implements WizardPanel {
                     progressBar.setIndeterminate(true);
                     //set id loading
                     lblId.setEnabled(true);
-                    setIconOnPanel(jpanId, "clock.png", 3, 2);
+                    setIconOnPanel(jpanId, "clock.png", 3, 3);
 
                     //1. get IdentificationExtension for a specific project
                     IdentificationExtension[] lQuantPeptides;
@@ -275,10 +278,10 @@ public class LoadingPanel implements WizardPanel {
 
                     //2. get all the quantitation linkers (identification_to_quantitation)
                     //set id done
-                    setIconOnPanel(jpanId, "apply.png", 3, 2);
+                    setIconOnPanel(jpanId, "apply.png", 3, 3);
                     //set quant loading
                     lblQuant.setEnabled(true);
-                    setIconOnPanel(jpanQuant, "clock.png", 3, 3);
+                    setIconOnPanel(jpanQuant, "clock.png", 3, 4);
 
                     Identification_to_quantitation[] lQuantLinkers = Identification_to_quantitation.getIdentification_to_quantitationForIdentificationIds(iParent.getMs_limsConnection(), lIdentificationsIds);
                     //now add them to the correct quantitative peptide
@@ -397,15 +400,6 @@ public class LoadingPanel implements WizardPanel {
 
                         //_____Do garbage collection______
                         System.gc();
-
-                        //ToDo delete me
-
-                        //i = i + 40;
-                        //progressBar.setValue(progressBar.getValue() + 40);
-
-                        //ToDo delete me
-
-
                     }
 
                     //_____Do garbage collection______
@@ -415,10 +409,10 @@ public class LoadingPanel implements WizardPanel {
                     progressBar.setIndeterminate(true);
 
                     //Show in the gui that we found all the rov files
-                    setIconOnPanel(jpanQuant, "apply.png", 3, 3);
+                    setIconOnPanel(jpanQuant, "apply.png", 3, 4);
                     //set match  loading
                     lblMatch.setEnabled(true);
-                    setIconOnPanel(jpanMatch, "clock.png", 3, 4);
+                    setIconOnPanel(jpanMatch, "clock.png", 3, 5);
 
                     //5. couple the quantitative peptides to the ratio groups
                     //get all the quantitations from the db
@@ -488,12 +482,6 @@ public class LoadingPanel implements WizardPanel {
                         //_____Do garbage collection______
                         System.gc();
 
-                        //ToDo delete me
-
-                        //i = i + 40;
-                        //progressBar.setValue(progressBar.getValue() + 40);
-                        //ToDo delete me
-
                     }
 
                     //update progress bar
@@ -504,11 +492,6 @@ public class LoadingPanel implements WizardPanel {
                     //_____Do garbage collection______
                     System.gc();
 
-                    //Show in the gui that the matching is done
-                    setIconOnPanel(jpanMatch, "apply.png", 3, 4);
-                    //set create loading
-                    lblCreate.setEnabled(true);
-                    setIconOnPanel(jpanCreate, "clock.png", 3, 5);
 
                     //6. get all the protein accessions from the identifications
                     for (int i = 0; i < lRatioGroupCollection.length; i++) {
@@ -533,11 +516,6 @@ public class LoadingPanel implements WizardPanel {
                             }
                         }
 
-                        //ToDo delete me
-
-                        //i = i + 40;
-
-                        //ToDo delete me
                     }
 
                     if (lRatioGroupCollection.length == 0) {
@@ -557,88 +535,14 @@ public class LoadingPanel implements WizardPanel {
                     String[] lComponentTypes = new String[lComponentList.size()];
                     lComponentList.toArray(lComponentTypes);
                     iCollectionComponents.add(lComponentTypes);
-                    /*
 
-
-                    //8. create all the distiller proteins
-                    Vector<QuantitativeProtein> lQuantProtein = new Vector<QuantitativeProtein>();
-                    for (int i = 0; i < lProteinAccessions.size(); i++) {
-                        lQuantProtein.add(new QuantitativeProtein(lProteinAccessions.get(i), lRatioTypes));
-                    }
-
-                    //9. couple the distiller ratio groups to the distiller proteins
-                    for (int i = 0; i < lRatioGroupCollection.length; i++) {
-
-                        for (int j = 0; j < lRatioGroupCollection[i].size(); j++) {
-                            //get the ratio group
-                            RatioGroup lRatioGroup = lRatioGroupCollection[i].get(j);
-                            //get all the protein accession linked to this ratiogroup
-                            String[] lAccessions = lRatioGroup.getProteinAccessions();
-                            for (int k = 0; k < lAccessions.length; k++) {
-                                for (int l = 0; l < lQuantProtein.size(); l++) {
-                                    if (lAccessions[k].equalsIgnoreCase(lQuantProtein.get(l).getAccession())) {
-                                        //add the ratio group to the protein if the accession is the same
-                                        lQuantProtein.get(l).addRatioGroup(lRatioGroup);
-                                    }
-                                }
-                            }
-                        }
-
-                        //ToDo delete me
-
-                        //i = i + 40;
-
-                        //ToDo delete me
-                    }
-
-                    calculateRazorPeptides(lQuantProtein);
-
-                    //10. create a reference set with the "household" proteins with the most ratiogroups
-                    ReferenceSet lReferenceSet = new ReferenceSet(new ArrayList<QuantitativeProtein>(), lRatioTypes, lComponentTypes);
-                    //sort by the ratio group numbers
-                    Collections.sort(lQuantProtein, new QuantitativeProteinSorterByRatioGroupNumbers());
-                    //get the reference set size from the singelton
-                    int lReferenceSetSize = iQuantitativeValidationSingelton.getNumberOfProteinsInReferenceSet();
-                    if (iQuantitativeValidationSingelton.getUseAllProteinsForReferenceSet()) {
-                        lReferenceSetSize = lQuantProtein.size();
-                    }
-                    if (lReferenceSetSize > lQuantProtein.size()) {
-                        lReferenceSetSize = lQuantProtein.size();
-                    }
-                    for (int i = 0; i < lReferenceSetSize; i++) {
-                        lReferenceSet.addReferenceProtein(lQuantProtein.get(i));
-                    }
-                    //set the refernce set
-                    iQuantitativeValidationSingelton.setReferenceSet(lReferenceSet);
-
-
-                    //Show in the gui that the creation of the proteins is done
-                    setIconOnPanel(jpanCreate, "apply.png", 3, 5);
-
-                    //download the protein sequence
-                    lblDownload.setEnabled(true);
-                    setIconOnPanel(jpanDownload, "clock.png", 3, 6);
-                    downloadProteinSequences(lQuantProtein);
-                    setIconOnPanel(jpanDownload, "apply.png", 3, 6);
-                    //update progress bar
-                    progressBar.setIndeterminate(false);
-
-                    //sort by the protein accession
-                    Collections.sort(lQuantProtein, new QuantitativeProteinSorterByAccession());
-
-                    //_____Do garbage collection______
-                    System.gc();
-
-                    //show gui
-                    JOptionPane.showMessageDialog(iParent, "All the data is loaded, ready to validate!", "INFO", JOptionPane.INFORMATION_MESSAGE);
-                    QuantitationValidationGUI gui = new QuantitationValidationGUI(lQuantProtein, iParent.getMs_limsConnection(), iParent.isStandAlone());
-                    gui.setVisible(true);        */
-
+                    //Show in the gui that the matching is done
+                    setIconOnPanel(jpanMatch, "apply.png", 3, 5);
 
                 } catch (SQLException e) {
-                    e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+                    logger.error(e.getMessage(), e);
                 } catch (IOException e) {
-                    e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+                    logger.error(e.getMessage(), e);
                 }
                 // step 7.2 dispose the iText components.
                 return true;
@@ -671,7 +575,7 @@ public class LoadingPanel implements WizardPanel {
                     progressBar.setIndeterminate(true);
                     //set id loading
                     lblId.setEnabled(true);
-                    setIconOnPanel(jpanId, "clock.png", 3, 2);
+                    setIconOnPanel(jpanId, "clock.png", 3, 3);
 
                     //1. get IdentificationExtension for a specific project
                     IdentificationExtension[] lQuantPeptides;
@@ -702,10 +606,10 @@ public class LoadingPanel implements WizardPanel {
                         return false;
                     }
                     //Show in the gui that we found all the identifications
-                    setIconOnPanel(jpanId, "apply.png", 3, 2);
+                    setIconOnPanel(jpanId, "apply.png", 3, 3);
                     //set quant  loading
                     lblQuant.setEnabled(true);
-                    setIconOnPanel(jpanQuant, "clock.png", 3, 3);
+                    setIconOnPanel(jpanQuant, "clock.png", 3, 4);
 
                     //3.get for all the QuantPeptides the original rov file name
                     ArrayList<Long> lRovFileIds = new ArrayList<Long>();
@@ -771,15 +675,6 @@ public class LoadingPanel implements WizardPanel {
 
                         //_____Do garbage collection______
                         System.gc();
-
-                        //ToDo delete me
-
-                        //i = i + 40;
-                        //progressBar.setValue(progressBar.getValue() + 40);
-
-                        //ToDo delete me
-
-
                     }
 
                     //_____Do garbage collection______
@@ -790,11 +685,11 @@ public class LoadingPanel implements WizardPanel {
                     progressBar.setIndeterminate(true);
 
                     //Show in the gui that we found all the rov files
-                    setIconOnPanel(jpanQuant, "apply.png", 3, 3);
+                    setIconOnPanel(jpanQuant, "apply.png", 3, 4);
 
                     //set match  loading
                     lblMatch.setEnabled(true);
-                    setIconOnPanel(jpanMatch, "clock.png", 3, 4);
+                    setIconOnPanel(jpanMatch, "clock.png", 3, 5);
 
                     //5. couple the quantitative peptides to the distiller ratio groups
                     //get all the quantitations from the db
@@ -882,18 +777,11 @@ public class LoadingPanel implements WizardPanel {
 
                         //_____Do garbage collection______
                         System.gc();
-
-                        //ToDo delete me
-
-                        //i = i + 40;
-                        //progressBar.setValue(progressBar.getValue() + 40);
-                        //ToDo delete me
-
                     }
 
-                    if (lQuantitations.size() > 0) {
+                    /*if (lQuantitations.size() > 0) {
                         System.out.println(lQuantitations.size());
-                    }
+                    } */
 
                     //update progress bar
                     progressBar.setIndeterminate(true);
@@ -903,11 +791,6 @@ public class LoadingPanel implements WizardPanel {
                     //_____Do garbage collection______
                     System.gc();
 
-                    //Show in the gui that the matching is done
-                    setIconOnPanel(jpanMatch, "apply.png", 3, 4);
-                    //set create loading
-                    lblCreate.setEnabled(true);
-                    setIconOnPanel(jpanCreate, "clock.png", 3, 5);
 
                     //6. get all the protein accessions from the identifications
                     for (int i = 0; i < lRatioGroupCollection.length; i++) {
@@ -932,15 +815,9 @@ public class LoadingPanel implements WizardPanel {
 
                                 }
                             } else {
-                                System.out.println("No identification found");
+                                //System.out.println("No identification found");
                             }
                         }
-
-                        //ToDo delete me
-
-                        //i = i + 40;
-
-                        //ToDo delete me
                     }
 
                     if (lRatioGroupCollection.length == 0) {
@@ -960,88 +837,15 @@ public class LoadingPanel implements WizardPanel {
                     String[] lComponentTypes = new String[lComponentList.size()];
                     lComponentList.toArray(lComponentTypes);
                     iCollectionComponents.add(lComponentTypes);
-                    /*
 
+                    //Show in the gui that the matching is done
+                    setIconOnPanel(jpanMatch, "apply.png", 3, 5);
 
-                    //8. create all the distiller proteins
-                    Vector<QuantitativeProtein> lDistillerProtein = new Vector<QuantitativeProtein>();
-                    for (int i = 0; i < lProteinAccessions.size(); i++) {
-                        lDistillerProtein.add(new QuantitativeProtein(lProteinAccessions.get(i), lRatioTypes));
-                    }
-
-                    //9. couple the distiller ratio groups to the distiller proteins
-                    for (int i = 0; i < lRatioGroupCollection.length; i++) {
-
-                        for (int j = 0; j < lRatioGroupCollection[i].size(); j++) {
-                            //get the ratio group
-                            DistillerRatioGroup lRatioGroup = (DistillerRatioGroup) lRatioGroupCollection[i].get(j);
-                            //get all the protein accession linked to this ratiogroup
-                            String[] lAccessions = lRatioGroup.getProteinAccessions();
-                            for (int k = 0; k < lAccessions.length; k++) {
-                                for (int l = 0; l < lDistillerProtein.size(); l++) {
-                                    if (lAccessions[k].equalsIgnoreCase(lDistillerProtein.get(l).getAccession())) {
-                                        //add the ratio group to the protein if the accession is the same
-                                        lDistillerProtein.get(l).addRatioGroup(lRatioGroup);
-                                    }
-                                }
-                            }
-                        }
-
-                        //ToDo delete me
-
-                        //i = i + 40;
-
-                        //ToDo delete me
-                    }
-                    calculateRazorPeptides(lDistillerProtein);
-
-                    //10. create a reference set with the "household" proteins with the most ratiogroups
-                    ReferenceSet lReferenceSet = new ReferenceSet(new ArrayList<QuantitativeProtein>(), lRatioTypes, lComponentTypes);
-                    //sort by the ratio group numbers
-                    Collections.sort(lDistillerProtein, new QuantitativeProteinSorterByRatioGroupNumbers());
-
-
-                    //get the reference set size from the singelton
-                    int lReferenceSetSize = iQuantitativeValidationSingelton.getNumberOfProteinsInReferenceSet();
-                    if (iQuantitativeValidationSingelton.getUseAllProteinsForReferenceSet()) {
-                        lReferenceSetSize = lDistillerProtein.size();
-                    }
-                    if (lReferenceSetSize > lDistillerProtein.size()) {
-                        lReferenceSetSize = lDistillerProtein.size();
-                    }
-                    for (int i = 0; i < lReferenceSetSize; i++) {
-                        lReferenceSet.addReferenceProtein(lDistillerProtein.get(i));
-                    }
-                    iQuantitativeValidationSingelton.setReferenceSet(lReferenceSet);
-
-
-                    //Show in the gui that the creation of the proteins is done
-                    setIconOnPanel(jpanCreate, "apply.png", 3, 5);
-
-                    //download the protein sequence
-                    lblDownload.setEnabled(true);
-                    setIconOnPanel(jpanDownload, "clock.png", 3, 6);
-                    downloadProteinSequences(lDistillerProtein);
-                    setIconOnPanel(jpanDownload, "apply.png", 3, 6);
-
-                    //update progress bar
-                    progressBar.setIndeterminate(false);
-
-                    //sort by the protein accession
-                    Collections.sort(lDistillerProtein, new QuantitativeProteinSorterByAccession());
-
-                    //_____Do garbage collection______
-                    System.gc();
-
-                    //show gui
-                    JOptionPane.showMessageDialog(iParent, "All the data is loaded, ready to validate!", "INFO", JOptionPane.INFORMATION_MESSAGE);
-                    QuantitationValidationGUI gui = new QuantitationValidationGUI(lDistillerProtein, iParent.getMs_limsConnection(), iParent.isStandAlone());
-                    gui.setVisible(true);                 */
 
                 } catch (SQLException e) {
-                    e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+                    logger.error(e.getMessage(), e);
                 } catch (IOException e) {
-                    e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+                    logger.error(e.getMessage(), e);
                 }
                 // step 7.2 dispose the iText components.
                 return true;
@@ -1075,7 +879,7 @@ public class LoadingPanel implements WizardPanel {
         progressBar.setStringPainted(true);
         progressBar.setIndeterminate(false);
         //set check loading
-        setIconOnPanel(jpanCheck, "clock.png", 3, 1);
+        setIconOnPanel(jpanCheck, "clock.png", 3, 2);
         lblCheckFiles.setEnabled(true);
 
         for (int i = 0; i < lFiles.size(); i++) {
@@ -1092,28 +896,22 @@ public class LoadingPanel implements WizardPanel {
                 //no problem
                 lRovFiles.add(lRovFile);
             }
-
-            //ToDo delete me
-
-            //i = i + 10;
-
-            //ToDo delete me
         }
         //Show in the gui that we found all the rov files
         //update progress bar
         progressBar.setString("");
         progressBar.setStringPainted(false);
         progressBar.setIndeterminate(true);
-        setIconOnPanel(jpanCheck, "apply.png", 3, 1);
+        setIconOnPanel(jpanCheck, "apply.png", 3, 2);
 
         //2.read the quantitation and the identification files
 
         //set id loading
         lblId.setEnabled(true);
-        setIconOnPanel(jpanId, "clock.png", 3, 2);
+        setIconOnPanel(jpanId, "clock.png", 3, 3);
         //set quant  loading
         lblQuant.setEnabled(true);
-        setIconOnPanel(jpanQuant, "clock.png", 3, 3);
+        setIconOnPanel(jpanQuant, "clock.png", 3, 4);
 
         //update progress bar
         progressBar.setValue(lRovFiles.size());
@@ -1136,13 +934,6 @@ public class LoadingPanel implements WizardPanel {
 
             //_____Do garbage collection______
             System.gc();
-
-            //ToDo delete me
-
-            //i = i + 10;
-
-            //ToDo delete me
-
         }
 
         //_____Do garbage collection______
@@ -1154,9 +945,9 @@ public class LoadingPanel implements WizardPanel {
         progressBar.setIndeterminate(true);
 
         //set id done
-        setIconOnPanel(jpanId, "apply.png", 3, 2);
+        setIconOnPanel(jpanId, "apply.png", 3, 3);
         //set quant done
-        setIconOnPanel(jpanQuant, "apply.png", 3, 3);
+        setIconOnPanel(jpanQuant, "apply.png", 3, 4);
 
         //3.match ids to quantitations
 
@@ -1169,7 +960,7 @@ public class LoadingPanel implements WizardPanel {
 
         //set match loading
         lblMatch.setEnabled(true);
-        setIconOnPanel(jpanMatch, "clock.png", 3, 4);
+        setIconOnPanel(jpanMatch, "clock.png", 3, 5);
 
         for (int i = 0; i < lRovFiles.size(); i++) {
 
@@ -1178,18 +969,13 @@ public class LoadingPanel implements WizardPanel {
             progressBar.setString("Matching identification with ratios from .rov file number " + (i + 1) + " of " + lRovFiles.size() + " distiller quantitation files");
 
             RovFile lRovFile = lRovFiles.get(i);
+            lRovFile.setThreshold(1.0 - iParent.getThreshold(iIndex));
             lRovFile.match();
             iCollection.add(lRovFile.getRatioGroupCollection());
             iCollectionIndexes.add(iIndex);
 
             //_____Do garbage collection______
             System.gc();
-
-            //ToDo delete me
-
-            //i = i + 10;
-
-            //ToDo delete me
         }
 
         //_____Do garbage collection______
@@ -1200,14 +986,10 @@ public class LoadingPanel implements WizardPanel {
         progressBar.setStringPainted(false);
         progressBar.setIndeterminate(true);
 
-        //set match done
-        setIconOnPanel(jpanMatch, "apply.png", 3, 4);
 
         //6. get all the protein accessions from the identifications
 
-        //set create loading
-        lblCreate.setEnabled(true);
-        setIconOnPanel(jpanCreate, "clock.png", 3, 5);
+
 
         for (int i = 0; i < lRovFiles.size(); i++) {
             RovFile lRovFile = lRovFiles.get(i);
@@ -1230,12 +1012,6 @@ public class LoadingPanel implements WizardPanel {
 
                 }
             }
-
-            //ToDo delete me
-
-            //i = i + 10;
-
-            //ToDo delete me
         }
 
         if (lRovFiles.size() == 0) {
@@ -1256,6 +1032,9 @@ public class LoadingPanel implements WizardPanel {
         String[] lComponentTypes = new String[lComponentList.size()];
         lComponentList.toArray(lComponentTypes);
         iCollectionComponents.add(lComponentTypes);
+
+        //set match done
+        setIconOnPanel(jpanMatch, "apply.png", 3, 5);
 
 
     }
@@ -1281,7 +1060,7 @@ public class LoadingPanel implements WizardPanel {
         progressBar.setIndeterminate(false);
         //set checking files
         lblCheckFiles.setEnabled(true);
-        setIconOnPanel(jpanCheck, "clock.png", 3, 1);
+        setIconOnPanel(jpanCheck, "clock.png", 3, 2);
 
         //1.check the datfiles
         for (int i = 0; i < lFiles.size(); i++) {
@@ -1295,14 +1074,14 @@ public class LoadingPanel implements WizardPanel {
         //update progress bar
         progressBar.setIndeterminate(true);
         //Show in the gui that we found all the rov files
-        setIconOnPanel(jpanCheck, "apply.png", 3, 1);
+        setIconOnPanel(jpanCheck, "apply.png", 3, 2);
 
         //set id loading
         lblId.setEnabled(true);
-        setIconOnPanel(jpanId, "clock.png", 3, 2);
+        setIconOnPanel(jpanId, "clock.png", 3, 3);
         //set quant loading
         lblQuant.setEnabled(true);
-        setIconOnPanel(jpanQuant, "clock.png", 3, 3);
+        setIconOnPanel(jpanQuant, "clock.png", 3, 4);
 
         //3.match ids to quantitations
 
@@ -1314,12 +1093,12 @@ public class LoadingPanel implements WizardPanel {
         progressBar.setValue(0);
 
         //set id done
-        setIconOnPanel(jpanId, "apply.png", 3, 2);
+        setIconOnPanel(jpanId, "apply.png", 3, 3);
         //set quant done
-        setIconOnPanel(jpanQuant, "apply.png", 3, 3);
+        setIconOnPanel(jpanQuant, "apply.png", 3, 4);
         //set match loading
         lblMatch.setEnabled(true);
-        setIconOnPanel(jpanMatch, "clock.png", 3, 4);
+        setIconOnPanel(jpanMatch, "clock.png", 3, 5);
 
         Vector<RatioGroupCollection> lRatioGroupCollection = new Vector<RatioGroupCollection>();
         for (int i = 0; i < lDatFiles.size(); i++) {
@@ -1344,11 +1123,7 @@ public class LoadingPanel implements WizardPanel {
         progressBar.setStringPainted(false);
         progressBar.setIndeterminate(true);
 
-        //set match done
-        setIconOnPanel(jpanMatch, "apply.png", 3, 4);
-        //set create loading
-        lblCreate.setEnabled(true);
-        setIconOnPanel(jpanCreate, "clock.png", 3, 5);
+
 
         //6. get all the protein accessions from the identifications
         for (int i = 0; i < lRatioGroupCollection.size(); i++) {
@@ -1390,6 +1165,9 @@ public class LoadingPanel implements WizardPanel {
         lComponentList.toArray(lComponentTypes);
         iCollectionComponents.add(lComponentTypes);
 
+        //set match done
+        setIconOnPanel(jpanMatch, "apply.png", 3, 5);
+
 
     }
 
@@ -1413,7 +1191,7 @@ public class LoadingPanel implements WizardPanel {
         progressBar.setIndeterminate(false);
         //set checking files
         lblCheckFiles.setEnabled(true);
-        setIconOnPanel(jpanCheck, "clock.png", 3, 1);
+        setIconOnPanel(jpanCheck, "clock.png", 3, 2);
 
         //1.check the MsQuant files
         for (int i = 0; i < lFiles.size(); i++) {
@@ -1425,14 +1203,14 @@ public class LoadingPanel implements WizardPanel {
         //update progress bar
         progressBar.setIndeterminate(true);
         //Show in the gui that we found all the rov files
-        setIconOnPanel(jpanCheck, "apply.png", 3, 1);
+        setIconOnPanel(jpanCheck, "apply.png", 3, 2);
 
         //set id loading
         lblId.setEnabled(true);
-        setIconOnPanel(jpanId, "clock.png", 3, 2);
+        setIconOnPanel(jpanId, "clock.png", 3, 3);
         //set quant loading
         lblQuant.setEnabled(true);
-        setIconOnPanel(jpanQuant, "clock.png", 3, 3);
+        setIconOnPanel(jpanQuant, "clock.png", 3, 4);
 
         //3.match ids to quantitations
 
@@ -1444,12 +1222,12 @@ public class LoadingPanel implements WizardPanel {
         progressBar.setValue(0);
 
         //set id done
-        setIconOnPanel(jpanId, "apply.png", 3, 2);
+        setIconOnPanel(jpanId, "apply.png", 3, 3);
         //set quant done
-        setIconOnPanel(jpanQuant, "apply.png", 3, 3);
+        setIconOnPanel(jpanQuant, "apply.png", 3, 4);
         //set match loading
         lblMatch.setEnabled(true);
-        setIconOnPanel(jpanMatch, "clock.png", 3, 4);
+        setIconOnPanel(jpanMatch, "clock.png", 3, 5);
 
         Vector<RatioGroupCollection> lRatioGroupCollection = new Vector<RatioGroupCollection>();
         for (int i = 0; i < lFiles.size(); i++) {
@@ -1476,11 +1254,7 @@ public class LoadingPanel implements WizardPanel {
         progressBar.setStringPainted(false);
         progressBar.setIndeterminate(true);
 
-        //set match done
-        setIconOnPanel(jpanMatch, "apply.png", 3, 4);
-        //set create loading
-        lblCreate.setEnabled(true);
-        setIconOnPanel(jpanCreate, "clock.png", 3, 5);
+
 
         //6. get all the protein accessions from the identifications
         for (int i = 0; i < lRatioGroupCollection.size(); i++) {
@@ -1522,6 +1296,9 @@ public class LoadingPanel implements WizardPanel {
         lComponentList.toArray(lComponentTypes);
         iCollectionComponents.add(lComponentTypes);
 
+        //set match done
+        setIconOnPanel(jpanMatch, "apply.png", 3, 5);
+
 
     }
 
@@ -1544,7 +1321,7 @@ public class LoadingPanel implements WizardPanel {
         progressBar.setIndeterminate(true);
         //set checking files
         lblCheckFiles.setEnabled(true);
-        setIconOnPanel(jpanCheck, "clock.png", 3, 1);
+        setIconOnPanel(jpanCheck, "clock.png", 3, 2);
 
         //1.check the MaxQuant files
         for (int i = 0; i < lFiles.size(); i++) {
@@ -1554,14 +1331,14 @@ public class LoadingPanel implements WizardPanel {
 
         //update progress bar
         //Show in the gui that we found all the rov files
-        setIconOnPanel(jpanCheck, "apply.png", 3, 1);
+        setIconOnPanel(jpanCheck, "apply.png", 3, 2);
 
         //set id loading
         lblId.setEnabled(true);
-        setIconOnPanel(jpanId, "clock.png", 3, 2);
+        setIconOnPanel(jpanId, "clock.png", 3, 3);
         //set quant loading
         lblQuant.setEnabled(true);
-        setIconOnPanel(jpanQuant, "clock.png", 3, 3);
+        setIconOnPanel(jpanQuant, "clock.png", 3, 4);
 
         //3.match ids to quantitations
 
@@ -1569,12 +1346,12 @@ public class LoadingPanel implements WizardPanel {
         progressBar.setString("");
 
         //set id done
-        setIconOnPanel(jpanId, "apply.png", 3, 2);
+        setIconOnPanel(jpanId, "apply.png", 3, 3);
         //set quant done
-        setIconOnPanel(jpanQuant, "apply.png", 3, 3);
+        setIconOnPanel(jpanQuant, "apply.png", 3, 4);
         //set match loading
         lblMatch.setEnabled(true);
-        setIconOnPanel(jpanMatch, "clock.png", 3, 4);
+        setIconOnPanel(jpanMatch, "clock.png", 3, 5);
 
         Vector<RatioGroupCollection> lRatioGroupCollection = new Vector<RatioGroupCollection>();
         for (int i = 0; i < lFiles.size(); i++) {
@@ -1603,11 +1380,7 @@ public class LoadingPanel implements WizardPanel {
         //update progress bar
         progressBar.setString("");
 
-        //set match done
-        setIconOnPanel(jpanMatch, "apply.png", 3, 4);
-        //set create loading
-        lblCreate.setEnabled(true);
-        setIconOnPanel(jpanCreate, "clock.png", 3, 5);
+
 
         //6. get all the protein accessions from the identifications
         for (int i = 0; i < lRatioGroupCollection.size(); i++) {
@@ -1649,6 +1422,9 @@ public class LoadingPanel implements WizardPanel {
         lComponentList.toArray(lComponentTypes);
         iCollectionComponents.add(lComponentTypes);
 
+        //set match done
+        setIconOnPanel(jpanMatch, "apply.png", 3, 5);
+
 
     }
 
@@ -1670,7 +1446,7 @@ public class LoadingPanel implements WizardPanel {
         progressBar.setIndeterminate(true);
         //set checking files
         lblCheckFiles.setEnabled(true);
-        setIconOnPanel(jpanCheck, "clock.png", 3, 1);
+        setIconOnPanel(jpanCheck, "clock.png", 3, 2);
 
         //1.check the MaxQuant files
         for (int i = 0; i < lFiles.size(); i++) {
@@ -1680,14 +1456,14 @@ public class LoadingPanel implements WizardPanel {
 
         //update progress bar
         //Show in the gui that we found all the rov files
-        setIconOnPanel(jpanCheck, "apply.png", 3, 1);
+        setIconOnPanel(jpanCheck, "apply.png", 3, 2);
 
         //set id loading
         lblId.setEnabled(true);
-        setIconOnPanel(jpanId, "clock.png", 3, 2);
+        setIconOnPanel(jpanId, "clock.png", 3, 3);
         //set quant loading
         lblQuant.setEnabled(true);
-        setIconOnPanel(jpanQuant, "clock.png", 3, 3);
+        setIconOnPanel(jpanQuant, "clock.png", 3, 4);
 
         //3.match ids to quantitations
 
@@ -1695,12 +1471,12 @@ public class LoadingPanel implements WizardPanel {
         progressBar.setString("");
 
         //set id done
-        setIconOnPanel(jpanId, "apply.png", 3, 2);
+        setIconOnPanel(jpanId, "apply.png", 3, 3);
         //set quant done
-        setIconOnPanel(jpanQuant, "apply.png", 3, 3);
+        setIconOnPanel(jpanQuant, "apply.png", 3, 4);
         //set match loading
         lblMatch.setEnabled(true);
-        setIconOnPanel(jpanMatch, "clock.png", 3, 4);
+        setIconOnPanel(jpanMatch, "clock.png", 3, 5);
 
         Vector<RatioGroupCollection> lRatioGroupCollection = new Vector<RatioGroupCollection>();
         for (int i = 0; i < lFiles.size(); i++) {
@@ -1730,11 +1506,7 @@ public class LoadingPanel implements WizardPanel {
         //update progress bar
         progressBar.setString("");
 
-        //set match done
-        setIconOnPanel(jpanMatch, "apply.png", 3, 4);
-        //set create loading
-        lblCreate.setEnabled(true);
-        setIconOnPanel(jpanCreate, "clock.png", 3, 5);
+
 
         //6. get all the protein accessions from the identifications
         for (int i = 0; i < lRatioGroupCollection.size(); i++) {
@@ -1775,6 +1547,9 @@ public class LoadingPanel implements WizardPanel {
         String[] lComponentTypes = new String[lComponentList.size()];
         lComponentList.toArray(lComponentTypes);
         iCollectionComponents.add(lComponentTypes);
+
+        //set match done
+        setIconOnPanel(jpanMatch, "apply.png", 3, 5);
 
 
     }
@@ -1875,7 +1650,6 @@ public class LoadingPanel implements WizardPanel {
                                         new FileInputStream(lRovFile)));
                         ZipEntry entry;
                         while ((entry = in.getNextEntry()) != null) {
-                            //System.out.println("Extracting: " + entry);
                             int count;
                             byte data[] = new byte[1000];
 
@@ -1913,7 +1687,7 @@ public class LoadingPanel implements WizardPanel {
                         lDatFiles.add(new DatFile(lDatFile, lMgfFiles.get(i), iFlamable));
                     }
                 } catch (IOException e) {
-                    e.printStackTrace();
+                    logger.error(e.getMessage(), e);
                 }
             }
 
@@ -1922,14 +1696,14 @@ public class LoadingPanel implements WizardPanel {
         //update progress bar
         progressBar.setIndeterminate(true);
         //Show in the gui that we found all the rov files
-        setIconOnPanel(jpanCheck, "apply.png", 3, 1);
+        setIconOnPanel(jpanCheck, "apply.png", 3, 2);
 
         //set id done
         lblId.setEnabled(true);
-        setIconOnPanel(jpanId, "apply.png", 3, 2);
+        setIconOnPanel(jpanId, "apply.png", 3, 3);
         //set quant done
         lblQuant.setEnabled(true);
-        setIconOnPanel(jpanQuant, "apply.png", 3, 3);
+        setIconOnPanel(jpanQuant, "apply.png", 3, 4);
 
         //3.match ids to quantitations
 
@@ -1942,7 +1716,7 @@ public class LoadingPanel implements WizardPanel {
 
         //set match loading
         lblMatch.setEnabled(true);
-        setIconOnPanel(jpanMatch, "clock.png", 3, 4);
+        setIconOnPanel(jpanMatch, "clock.png", 3, 5);
 
         Vector<RatioGroupCollection> lRatioGroupCollection = new Vector<RatioGroupCollection>();
         for (int i = 0; i < lDatFiles.size(); i++) {
@@ -1964,11 +1738,7 @@ public class LoadingPanel implements WizardPanel {
         progressBar.setStringPainted(false);
         progressBar.setIndeterminate(true);
 
-        //set match done
-        setIconOnPanel(jpanMatch, "apply.png", 3, 4);
-        //set create loading
-        lblCreate.setEnabled(true);
-        setIconOnPanel(jpanCreate, "clock.png", 3, 5);
+
 
         //6. get all the protein accessions from the identifications
         for (int i = 0; i < lRatioGroupCollection.size(); i++) {
@@ -2010,87 +1780,12 @@ public class LoadingPanel implements WizardPanel {
         lComponentList.toArray(lComponentTypes);
         iCollectionComponents.add(lComponentTypes);
 
+        //set match done
+        setIconOnPanel(jpanMatch, "apply.png", 3, 5);
+
 
     }
 
-    /**
-     * This method will calculate the razor accession for every ratiogroup linked to the given proteins
-     *
-     * @param aProteins
-     */
-    public void calculateRazorPeptides(Vector<QuantitativeProtein> aProteins) {
-        //create a hashmap with the protein accession and the number of peptide groups linked to the protein
-        HashMap lProteinsPeptideNumber = new HashMap();
-        HashMap lProteinsIdentificationNumber = new HashMap();
-        for (int i = 0; i < aProteins.size(); i++) {
-            lProteinsPeptideNumber.put(aProteins.get(i).getAccession().trim(), aProteins.get(i).getNumberOfPeptideGroups());
-            lProteinsIdentificationNumber.put(aProteins.get(i).getAccession().trim(), aProteins.get(i).getNumberOfIdentifications());
-        }
-        //we will get the razor accession for every ratio group
-        for (int i = 0; i < aProteins.size(); i++) {
-            for (int j = 0; j < aProteins.get(i).getPeptideGroups(false).size(); j++) {
-                for (int k = 0; k < aProteins.get(i).getPeptideGroups(false).get(j).getRatioGroups().size(); k++) {
-                    RatioGroup lRatioGroup = aProteins.get(i).getPeptideGroups(false).get(j).getRatioGroups().get(k);
-                    if (lRatioGroup.getRazorProteinAccession() == null) {
-                        //the razor accession in not set yet
-                        int lPeptideGroupsLinked = 0;
-                        int lIdentficationsLinked = 0;
-                        String lRazorAccession = null;
-                        for (int l = 0; l < lRatioGroup.getProteinAccessions().length; l++) {
-                            if (lPeptideGroupsLinked < (Integer) lProteinsPeptideNumber.get(lRatioGroup.getProteinAccessions()[l].trim())) {
-                                lRazorAccession = lRatioGroup.getProteinAccessions()[l].trim();
-                                lPeptideGroupsLinked = (Integer) lProteinsPeptideNumber.get(lRatioGroup.getProteinAccessions()[l].trim());
-                                lIdentficationsLinked = (Integer) lProteinsIdentificationNumber.get(lRatioGroup.getProteinAccessions()[l].trim());
-                            } else if (lPeptideGroupsLinked == (Integer) lProteinsPeptideNumber.get(lRatioGroup.getProteinAccessions()[l].trim())) {
-                                if (lIdentficationsLinked < (Integer) lProteinsIdentificationNumber.get(lRatioGroup.getProteinAccessions()[l].trim())) {
-                                    lRazorAccession = lRatioGroup.getProteinAccessions()[l].trim();
-                                    lPeptideGroupsLinked = (Integer) lProteinsPeptideNumber.get(lRatioGroup.getProteinAccessions()[l].trim());
-                                    lIdentficationsLinked = (Integer) lProteinsIdentificationNumber.get(lRatioGroup.getProteinAccessions()[l].trim());
-                                }
-                            }
-                        }
-                        lRatioGroup.setRazorProteinAccession(lRazorAccession);
-                    }
-                }
-            }
-        }
-    }
-
-    /**
-     * This method will download all the protein sequences for the given proteins
-     *
-     * @param aProteins
-     */
-    public void downloadProteinSequences(Vector<QuantitativeProtein> aProteins) {
-        progressBar.setString("Downloading protein sequences");
-        progressBar.setStringPainted(true);
-        progressBar.setMaximum(aProteins.size());
-        progressBar.setIndeterminate(false);
-        for (int i = 0; i < aProteins.size(); i++) {
-            progressBar.setValue(progressBar.getValue() + 1);
-            QuantitativeProtein lProtein = aProteins.get(i);
-
-            try {
-                if (lProtein.getSequence() == null) {
-                    if (iQuantitativeValidationSingelton.getDatabaseType().equals(ProteinDatabaseType.UNIPROT)) {
-                        lProtein.setSequence((new UniprotSequenceRetriever(lProtein.getAccession())).getSequence());
-                    } else if (iQuantitativeValidationSingelton.getDatabaseType().equals(ProteinDatabaseType.IPI)) {
-                        lProtein.setSequence((new IpiSequenceRetriever(lProtein.getAccession())).getSequence());
-                    } else if (iQuantitativeValidationSingelton.getDatabaseType().equals(ProteinDatabaseType.NCBI)) {
-                        lProtein.setSequence((new NcbiSequenceRetriever(lProtein.getAccession())).getSequence());
-                    } else if (iQuantitativeValidationSingelton.getDatabaseType().equals(ProteinDatabaseType.TAIR)) {
-                        lProtein.setSequence((new TairSequenceRetriever(lProtein.getAccession())).getSequence());
-                    }
-                }
-                if (lProtein.getSequence() != null && lProtein.getSequence().length() > 0) {
-                    iQuantitativeValidationSingelton.addProteinSequence(lProtein.getAccession(), lProtein.getSequence());
-                }
-            } catch (Exception e) {
-                //sequence not found
-                //e.printStackTrace();
-            }
-        }
-    }
 
 
     private void createUIComponents() {
@@ -2098,8 +1793,6 @@ public class LoadingPanel implements WizardPanel {
         jpanId = new JPanel();
         jpanQuant = new JPanel();
         jpanMatch = new JPanel();
-        jpanCreate = new JPanel();
-        jpanDownload = new JPanel();
     }
 
     /**
@@ -2120,7 +1813,7 @@ public class LoadingPanel implements WizardPanel {
         GridBagConstraints gbc;
         gbc = new GridBagConstraints();
         gbc.gridx = 0;
-        gbc.gridy = 1;
+        gbc.gridy = 2;
         gbc.anchor = GridBagConstraints.WEST;
         gbc.insets = new Insets(10, 5, 10, 5);
         jpanContent.add(lblCheckFiles, gbc);
@@ -2130,7 +1823,7 @@ public class LoadingPanel implements WizardPanel {
         lblId.setText("Loading identifications");
         gbc = new GridBagConstraints();
         gbc.gridx = 0;
-        gbc.gridy = 2;
+        gbc.gridy = 3;
         gbc.anchor = GridBagConstraints.WEST;
         gbc.insets = new Insets(10, 5, 10, 5);
         jpanContent.add(lblId, gbc);
@@ -2140,7 +1833,7 @@ public class LoadingPanel implements WizardPanel {
         lblQuant.setText("Loading quantitations");
         gbc = new GridBagConstraints();
         gbc.gridx = 0;
-        gbc.gridy = 3;
+        gbc.gridy = 4;
         gbc.anchor = GridBagConstraints.WEST;
         gbc.insets = new Insets(10, 5, 10, 5);
         jpanContent.add(lblQuant, gbc);
@@ -2150,123 +1843,84 @@ public class LoadingPanel implements WizardPanel {
         lblMatch.setText("Matching identifications and quantitations");
         gbc = new GridBagConstraints();
         gbc.gridx = 0;
-        gbc.gridy = 4;
-        gbc.anchor = GridBagConstraints.WEST;
-        gbc.insets = new Insets(10, 5, 10, 5);
-        jpanContent.add(lblMatch, gbc);
-        lblCreate = new JLabel();
-        lblCreate.setEnabled(false);
-        lblCreate.setFont(new Font("Tahoma", lblCreate.getFont().getStyle(), lblCreate.getFont().getSize()));
-        lblCreate.setText("Creating proteins and reference set");
-        gbc = new GridBagConstraints();
-        gbc.gridx = 0;
         gbc.gridy = 5;
         gbc.anchor = GridBagConstraints.WEST;
         gbc.insets = new Insets(10, 5, 10, 5);
-        jpanContent.add(lblCreate, gbc);
+        jpanContent.add(lblMatch, gbc);
         gbc = new GridBagConstraints();
         gbc.gridx = 3;
-        gbc.gridy = 1;
+        gbc.gridy = 2;
         gbc.weightx = 1.0;
         gbc.fill = GridBagConstraints.BOTH;
         gbc.insets = new Insets(5, 5, 5, 5);
         jpanContent.add(jpanCheck, gbc);
         gbc = new GridBagConstraints();
         gbc.gridx = 3;
-        gbc.gridy = 2;
+        gbc.gridy = 3;
         gbc.weightx = 1.0;
         gbc.fill = GridBagConstraints.BOTH;
         gbc.insets = new Insets(5, 5, 5, 5);
         jpanContent.add(jpanId, gbc);
         gbc = new GridBagConstraints();
         gbc.gridx = 3;
-        gbc.gridy = 3;
+        gbc.gridy = 4;
         gbc.weightx = 1.0;
         gbc.fill = GridBagConstraints.BOTH;
         gbc.insets = new Insets(5, 5, 5, 5);
         jpanContent.add(jpanQuant, gbc);
         gbc = new GridBagConstraints();
         gbc.gridx = 3;
-        gbc.gridy = 4;
-        gbc.weightx = 1.0;
-        gbc.fill = GridBagConstraints.BOTH;
-        gbc.insets = new Insets(5, 5, 5, 5);
-        jpanContent.add(jpanMatch, gbc);
-        gbc = new GridBagConstraints();
-        gbc.gridx = 3;
         gbc.gridy = 5;
         gbc.weightx = 1.0;
         gbc.fill = GridBagConstraints.BOTH;
         gbc.insets = new Insets(5, 5, 5, 5);
-        jpanContent.add(jpanCreate, gbc);
+        jpanContent.add(jpanMatch, gbc);
         final JPanel spacer1 = new JPanel();
         gbc = new GridBagConstraints();
         gbc.gridx = 1;
-        gbc.gridy = 1;
+        gbc.gridy = 2;
         gbc.weightx = 1.0;
         gbc.fill = GridBagConstraints.HORIZONTAL;
         jpanContent.add(spacer1, gbc);
         final JPanel spacer2 = new JPanel();
         gbc = new GridBagConstraints();
         gbc.gridx = 1;
-        gbc.gridy = 2;
+        gbc.gridy = 3;
         gbc.weightx = 1.0;
         gbc.fill = GridBagConstraints.HORIZONTAL;
         jpanContent.add(spacer2, gbc);
         final JPanel spacer3 = new JPanel();
         gbc = new GridBagConstraints();
         gbc.gridx = 1;
-        gbc.gridy = 3;
+        gbc.gridy = 4;
         gbc.weightx = 1.0;
         gbc.fill = GridBagConstraints.HORIZONTAL;
         jpanContent.add(spacer3, gbc);
         final JPanel spacer4 = new JPanel();
         gbc = new GridBagConstraints();
         gbc.gridx = 1;
-        gbc.gridy = 4;
-        gbc.weightx = 1.0;
-        gbc.fill = GridBagConstraints.HORIZONTAL;
-        jpanContent.add(spacer4, gbc);
-        final JPanel spacer5 = new JPanel();
-        gbc = new GridBagConstraints();
-        gbc.gridx = 1;
         gbc.gridy = 5;
         gbc.weightx = 1.0;
         gbc.fill = GridBagConstraints.HORIZONTAL;
-        jpanContent.add(spacer5, gbc);
+        jpanContent.add(spacer4, gbc);
         progressBar = new JProgressBar();
         progressBar.setFont(new Font("Tahoma", progressBar.getFont().getStyle(), progressBar.getFont().getSize()));
         gbc = new GridBagConstraints();
         gbc.gridx = 0;
-        gbc.gridy = 0;
+        gbc.gridy = 1;
         gbc.gridwidth = 5;
         gbc.fill = GridBagConstraints.HORIZONTAL;
         gbc.insets = new Insets(5, 5, 5, 5);
         jpanContent.add(progressBar, gbc);
-        lblDownload = new JLabel();
-        lblDownload.setEnabled(false);
-        lblDownload.setFont(new Font("Tahoma", lblDownload.getFont().getStyle(), lblDownload.getFont().getSize()));
-        lblDownload.setText("Downloading protein sequence");
+        lblSet = new JLabel();
+        lblSet.setFont(new Font("Tahoma", Font.ITALIC, 14));
+        lblSet.setHorizontalAlignment(0);
+        lblSet.setHorizontalTextPosition(0);
+        lblSet.setText("Label");
         gbc = new GridBagConstraints();
         gbc.gridx = 0;
-        gbc.gridy = 6;
-        gbc.anchor = GridBagConstraints.WEST;
-        gbc.insets = new Insets(10, 5, 10, 5);
-        jpanContent.add(lblDownload, gbc);
-        gbc = new GridBagConstraints();
-        gbc.gridx = 3;
-        gbc.gridy = 6;
-        gbc.weightx = 1.0;
-        gbc.fill = GridBagConstraints.BOTH;
-        gbc.insets = new Insets(5, 5, 5, 5);
-        jpanContent.add(jpanDownload, gbc);
-        final JPanel spacer6 = new JPanel();
-        gbc = new GridBagConstraints();
-        gbc.gridx = 1;
-        gbc.gridy = 6;
-        gbc.weightx = 1.0;
-        gbc.fill = GridBagConstraints.HORIZONTAL;
-        jpanContent.add(spacer6, gbc);
+        gbc.gridy = 0;
+        jpanContent.add(lblSet, gbc);
     }
 
     /**

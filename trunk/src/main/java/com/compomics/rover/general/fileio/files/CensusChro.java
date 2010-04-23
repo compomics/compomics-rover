@@ -1,5 +1,7 @@
 package com.compomics.rover.general.fileio.files;
 
+import org.apache.log4j.Logger;
+
 import psidev.psi.tools.xxindex.index.StandardXpathIndex;
 import psidev.psi.tools.xxindex.index.XmlXpathIndexer;
 import psidev.psi.tools.xxindex.StandardXpathAccess;
@@ -21,6 +23,8 @@ import com.compomics.util.interfaces.Flamable;
  * This class reads the Census chro file
  */
 public class CensusChro {
+	// Class specific log4j logger for CensusChro instances.
+	 private static Logger logger = Logger.getLogger(CensusChro.class);
     /**
      * The Census chro file
      */
@@ -85,15 +89,15 @@ public class CensusChro {
                 }
             }
 
-         } catch (FileNotFoundException e1) {
+         } catch (FileNotFoundException e) {
             iFlamable.passHotPotato(new Throwable("Problem reading the census chro file"));
-            e1.printStackTrace();
-        } catch (IOException e1) {
+            logger.error(e.getMessage(), e);
+        } catch (IOException e) {
             iFlamable.passHotPotato(new Throwable("Problem reading the census chro file"));
-            e1.printStackTrace();
+            logger.error(e.getMessage(), e);
         } catch (Exception e){
             iFlamable.passHotPotato(new Throwable("Problem reading the census chro file"));
-            e.printStackTrace();
+            logger.error(e.getMessage(), e);
         }
     }
 

@@ -1,5 +1,7 @@
 package com.compomics.rover.general.quantitation.source.MaxQuant;
 
+import org.apache.log4j.Logger;
+
 import com.compomics.rover.general.quantitation.RatioGroup;
 import com.compomics.rover.general.quantitation.RatioGroupCollection;
 import com.compomics.rover.general.quantitation.RatioType;
@@ -28,6 +30,8 @@ import org.jfree.data.category.DefaultCategoryDataset;
  * The MaxQuant RatioGroup
  */
 public class MaxQuantRatioGroup  extends RatioGroup {
+	// Class specific log4j logger for MaxQuantRatioGroup instances.
+	 private static Logger logger = Logger.getLogger(MaxQuantRatioGroup.class);
 
     /**
      * The absolute intensities found in the DistillerRatioGroup in the distiller quantitation file.
@@ -68,6 +72,14 @@ public class MaxQuantRatioGroup  extends RatioGroup {
         return iRatioGroupAbsoluteIntensities;
     }
 
+     public double getIntensityForComponent(String aComponent){
+        for(int i = 0; i<this.getParentCollection().getComponentTypes().size();  i ++){
+            if(aComponent.equalsIgnoreCase(this.getParentCollection().getComponentTypes().get(i))){
+                return this.getAbsoluteIntensities()[i];
+            }
+        }
+        return 0.0;
+    }
 
     public double getSummedIntensityForRatioType(String aType){
         Vector<RatioType> iRatioTypes =  iQuantitativeValidationSingelton.getMatchedRatioTypes();

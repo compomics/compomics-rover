@@ -1,5 +1,7 @@
 package com.compomics.rover.general.PeptideIdentification;
 
+import org.apache.log4j.Logger;
+
 import com.compomics.rover.general.interfaces.PeptideIdentification;
 
 import java.util.HashMap;
@@ -15,6 +17,8 @@ import java.util.HashMap;
  * The default peptide indentification
  */
 public class DefaultPeptideIdentification implements PeptideIdentification {
+	// Class specific log4j logger for DefaultPeptideIdentification instances.
+	 private static Logger logger = Logger.getLogger(DefaultPeptideIdentification.class);
 
     private int iId;
 

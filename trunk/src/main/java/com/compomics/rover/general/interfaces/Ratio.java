@@ -1,5 +1,7 @@
 package com.compomics.rover.general.interfaces;
 
+import org.apache.log4j.Logger;
+
 import com.compomics.rover.general.quantitation.source.distiller.DistillerRatioGroup;
 import com.compomics.rover.general.quantitation.RatioGroup;
 
@@ -70,6 +72,8 @@ public interface Ratio {
      */
     public void setRecalculatedRatio(double lNewRatio);
 
+    public void setOriginalRatio(double lOriginalRatio);
+
     public void setNormalizationPart(int j);
 
     public int getNormatlizationPart();
@@ -82,5 +86,18 @@ public interface Ratio {
 
     public void setNormalizedMAD(double lMAD);
 
+    public int getNumberOfRatioUpdates();
 
+
+    public void setIndex(double v);
+
+    public void setOriginalIndex(double v);
+
+    public double getIndex();
+
+    public double getOriginalIndex();
+
+    public void setInverted(boolean lInverted);
+
+    public boolean getInverted();
 }

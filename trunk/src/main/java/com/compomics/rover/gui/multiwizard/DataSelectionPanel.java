@@ -1,5 +1,9 @@
 package com.compomics.rover.gui.multiwizard;
 
+import com.compomics.util.enumeration.CompomicsTools;
+import com.compomics.util.io.PropertiesManager;
+import org.apache.log4j.Logger;
+
 import com.compomics.mslims.db.accessors.Project;
 import com.compomics.mslims.db.accessors.Protocol;
 import com.compomics.util.gui.dialogs.ConnectionDialog;
@@ -21,6 +25,7 @@ import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
 import java.awt.*;
 import java.io.File;
+import java.util.Properties;
 import java.util.Vector;
 
 
@@ -36,6 +41,8 @@ import java.util.Vector;
  */
 
 public class DataSelectionPanel implements Connectable, WizardPanel {
+	// Class specific log4j logger for DataSelectionPanel instances.
+	 private static Logger logger = Logger.getLogger(DataSelectionPanel.class);
 
     //gui stuff
     private JPanel jpanContent;
@@ -158,8 +165,9 @@ public class DataSelectionPanel implements Connectable, WizardPanel {
     private void loadProjects() {
         try {
             iProjects = Project.getAllProjects(iConn);
-        } catch (SQLException sqle) {
-            iParent.passHotPotato(sqle, "Unable to load projects from DB!");
+        } catch (SQLException e) {
+            iParent.passHotPotato(e, "Unable to load projects from DB!");
+            logger.error(e.getMessage(), e);
         }
     }
 
@@ -169,8 +177,9 @@ public class DataSelectionPanel implements Connectable, WizardPanel {
     private void loadProtocol() {
         try {
             iProtocols = Protocol.getAllProtocols(iConn);
-        } catch (SQLException sqle) {
-            iParent.passHotPotato(sqle, "Unable to load protocol types from DB!");
+        } catch (SQLException e) {
+            iParent.passHotPotato(e, "Unable to load protocol types from DB!");
+            logger.error(e.getMessage(), e);
         }
     }
 
@@ -207,6 +216,8 @@ public class DataSelectionPanel implements Connectable, WizardPanel {
 
         iFeasableToProceed = true;
         iNotFeasableReason = null;
+        iFiles.removeAllElements();
+        iQuantitationSingelton.removeLastRoverDataType();
     }
 
     /**
@@ -335,6 +346,7 @@ public class DataSelectionPanel implements Connectable, WizardPanel {
             if (lSelectedFiles.size() != 2 && RoverSource.MAX_QUANT == iRoverSource || RoverSource.CENSUS == iRoverSource) {
                 iFeasableToProceed = false;
                 iNotFeasableReason = "You have to select two files!";
+                return;
             }
 
 
@@ -350,6 +362,9 @@ public class DataSelectionPanel implements Connectable, WizardPanel {
      * {@inheritDoc}
      */
     public boolean feasableToProceed() {
+        if(!iFeasableToProceed){
+            iFiles.removeAllElements();
+        }
         return iFeasableToProceed;
     }
 
@@ -377,8 +392,15 @@ public class DataSelectionPanel implements Connectable, WizardPanel {
             //check if we have a connection
             iConn = iParent.getMs_limsConnection();
             if (iConn == null) {
-                ConnectionDialog cd = new ConnectionDialog(iParent, this, "Establish DB connection for ms_lims", "connection.properties");
+                Properties lConnectionProperties = PropertiesManager.getInstance().getProperties(CompomicsTools.MSLIMS, "ms-lims.properties");
+                ConnectionDialog cd = new ConnectionDialog(iParent, this, "Establish DB connection for ms_lims", lConnectionProperties);
                 cd.setVisible(true);
+            }
+
+            if(iConn == null){
+                iParent.getPreviousButton().doClick();
+                iQuantitationSingelton.removeLastRoverDataType();
+                return;
             }
             this.loadProjects();
             this.loadProtocol();
