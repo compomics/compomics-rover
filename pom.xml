@@ -88,27 +88,6 @@
                 </executions>
             </plugin>
 
-             <!-- Dependency plugin -->
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-dependency-plugin</artifactId>
-                <executions>
-                    <execution>
-                        <id>copy-dependencies</id>
-                        <phase>package</phase>
-                        <goals>
-                            <goal>copy-dependencies</goal>
-                        </goals>
-                        <configuration>
-                            <outputDirectory>${project.build.directory}/rover-${project.version}/lib</outputDirectory>
-                            <overWriteReleases>true</overWriteReleases>
-                            <overWriteSnapshots>true</overWriteSnapshots>
-                            <excludeTransitive>false</excludeTransitive>
-                        </configuration>
-                    </execution>
-                </executions>
-            </plugin>
-
             <!-- Resources plugin -->
             <plugin>
                 <artifactId>maven-resources-plugin</artifactId>
@@ -253,16 +232,6 @@
             <artifactId>junit</artifactId>
             <version>3.8.1</version>
             <scope>build</scope>
-        </dependency>
-
-
-        <!-- This project depends on the junit JAR file.
-          -->
-        <dependency>
-            <groupId>junit</groupId>
-            <artifactId>junit</artifactId>
-            <version>3.8.1</version>
-            <type>jar</type>
         </dependency>
 
         <!-- This project depends on the JAR file "lmjunit-1.1.jar" (TestCaseLM)
