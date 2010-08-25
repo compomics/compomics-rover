@@ -42,8 +42,8 @@ import java.util.Vector;
  */
 
 public class DataSelectionPanel implements Connectable, WizardPanel {
-	// Class specific log4j logger for DataSelectionPanel instances.
-	 private static Logger logger = Logger.getLogger(DataSelectionPanel.class);
+    // Class specific log4j logger for DataSelectionPanel instances.
+    private static Logger logger = Logger.getLogger(DataSelectionPanel.class);
 
     //gui stuff
     private JPanel jpanContent;
@@ -397,13 +397,13 @@ public class DataSelectionPanel implements Connectable, WizardPanel {
                 ConnectionDialog cd = new ConnectionDialog(iParent, this, "Establish DB connection for ms_lims", lConnectionProperties);
                 cd.setVisible(true);
             }
-            if(iConn == null){
+            if (iConn == null) {
                 iParent.getPreviousButton().doClick();
                 iQuantitationSingelton.removeLastRoverDataType();
                 return;
             } else {
                 //check if we are working with a 7.1 ms_lims version or earlier
-                try{
+                try {
                     String query = "select * from quantitation_group where quantitation_groupid = 1";
 
                     PreparedStatement ps = iConn.prepareStatement(query);
@@ -669,6 +669,7 @@ public class DataSelectionPanel implements Connectable, WizardPanel {
 
 
     //_____________________some file filters
+
     /**
      * A .rov file filter
      */

@@ -358,7 +358,7 @@ public class QuantitativePeptideGroup {
                                 if(lRatio.getParentRatioGroup().getParentCollection().getRoverSource() == RoverSource.DISTILLER_QUANT_TOOLBOX_ROV || lRatio.getParentRatioGroup().getParentCollection().getRoverSource() == RoverSource.DISTILLER_QUANT_TOOLBOX_MS_LIMS){
                                     DistillerRatioGroup lRatioGroup = (DistillerRatioGroup) lRatio.getParentRatioGroup();
                                     lResult.add(lRatioGroup.getSummedIntensityForRatioType(aType));
-                                } else if(lRatio.getParentRatioGroup().getParentCollection().getRoverSource() == RoverSource.MAX_QUANT_NO_SIGN || lRatio.getParentRatioGroup().getParentCollection().getRoverSource() == RoverSource.MAX_QUANT){
+                                } else if(lRatio.getParentRatioGroup().getParentCollection().getRoverSource() == RoverSource.MAX_QUANT_NO_SIGN || lRatio.getParentRatioGroup().getParentCollection().getRoverSource() == RoverSource.MAX_QUANT || lRatio.getParentRatioGroup().getParentCollection().getRoverSource() == RoverSource.MAX_QUANT_MS_LIMS){
                                     MaxQuantRatioGroup lRatioGroup = (MaxQuantRatioGroup) lRatio.getParentRatioGroup();
                                     lResult.add(lRatioGroup.getSummedIntensityForRatioType(aType));
                                 } else {
@@ -373,7 +373,7 @@ public class QuantitativePeptideGroup {
                             if(lRatio.getParentRatioGroup().getParentCollection().getRoverSource() == RoverSource.DISTILLER_QUANT_TOOLBOX_ROV || lRatio.getParentRatioGroup().getParentCollection().getRoverSource() == RoverSource.DISTILLER_QUANT_TOOLBOX_MS_LIMS){
                                 DistillerRatioGroup lRatioGroup = (DistillerRatioGroup) lRatio.getParentRatioGroup();
                                 lResult.add(lRatioGroup.getSummedIntensityForRatioType(aType));
-                            } else if(lRatio.getParentRatioGroup().getParentCollection().getRoverSource() == RoverSource.MAX_QUANT_NO_SIGN || lRatio.getParentRatioGroup().getParentCollection().getRoverSource() == RoverSource.MAX_QUANT){
+                            } else if(lRatio.getParentRatioGroup().getParentCollection().getRoverSource() == RoverSource.MAX_QUANT_NO_SIGN || lRatio.getParentRatioGroup().getParentCollection().getRoverSource() == RoverSource.MAX_QUANT || lRatio.getParentRatioGroup().getParentCollection().getRoverSource() == RoverSource.MAX_QUANT_MS_LIMS){
                                 MaxQuantRatioGroup lRatioGroup = (MaxQuantRatioGroup) lRatio.getParentRatioGroup();
                                 lResult.add(lRatioGroup.getSummedIntensityForRatioType(aType));
                             } else {

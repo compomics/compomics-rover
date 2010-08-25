@@ -46,6 +46,8 @@ public class MsQuantReader {
      */
     private Flamable iFlamable;
 
+    private int lNumberOfIntensities = 0;
+
 
     /**
      * Constructor
@@ -69,7 +71,9 @@ public class MsQuantReader {
             boolean lHeaderParsed = false;
             while ((line = lnreader.readLine()) != null) {
                 //check if the file has tabs
-                if(line.length() != 0 && line.indexOf("\t")>0){
+                if(line.startsWith("Dishes")){
+                    lNumberOfIntensities = Integer.valueOf(line.substring(line.indexOf(":") + 2).trim());   
+                } else if(line.length() != 0 && line.indexOf("\t")>0){
                     //check if it could be the headet
                     if(line.indexOf("Accession") > 0 && line.indexOf("Sequence") > 0){
                         //it's the header
@@ -111,13 +115,43 @@ public class MsQuantReader {
     public RatioGroupCollection getRatioGroupCollection(){
         iRatioGroupCollection = new RatioGroupCollection(DataType.MSQUANT);
         Vector<String> lComp = new Vector<String>();
-        lComp.add("light");
-        lComp.add("heavy");
+        if(lNumberOfIntensities == 2){
+            lComp.add("light");
+            lComp.add("heavy");
+        } else if (lNumberOfIntensities == 3){
+            lComp.add("light");
+            lComp.add("medium");
+            lComp.add("heavy");
+        } else if (lNumberOfIntensities == 4){
+            lComp.add("1");
+            lComp.add("2");
+            lComp.add("3");
+            lComp.add("4");
+        }
         Vector<String> lType = new Vector<String>();
-        lType.add("L/H");
+        if(lNumberOfIntensities == 2){
+            lType.add("L/H");
+        } else if (lNumberOfIntensities == 3){
+            lType.add("L/H");
+            lType.add("L/M");
+            lType.add("M/H");
+        } else if (lNumberOfIntensities == 4){
+            lType.add("2/1");
+            lType.add("3/1");
+            lType.add("4/1");
+        }
         iRatioGroupCollection.setComponentTypes(lComp);
         iRatioGroupCollection.setRatioTypes(lType);
-
+        int lOne = (Integer) iHeaderMap.get("Intensity 1");
+        int lTwo = (Integer) iHeaderMap.get("Intensity 2");
+        int lThree = 0;
+        int lFour = 0;
+        try{
+            lThree = (Integer) iHeaderMap.get("Intensity 3");
+            lFour = (Integer) iHeaderMap.get("Intensity 4");
+        } catch(Exception e){
+            // no problem if it is not found
+        }
         //set the filename
         iRatioGroupCollection.putMetaData(QuantitationMetaType.FILENAME, iMsQuantFile.getName());
 
@@ -125,33 +159,85 @@ public class MsQuantReader {
         for(int i = 0; i<iPeptideLines.size(); i ++){
 
             if( i == 0){
-                logger.info("Reading results for: " + iPeptideLines.get(i)[(Integer)iHeaderMap.get("Result file")]  + " (" + iMsQuantFile.getName() + ")");
+                logger.info("Reading results for: " + iPeptideLines.get(i)[((Integer)iHeaderMap.get("Result file")).intValue()]  + " (" + iMsQuantFile.getName() + ")");
             }
             //create the ratiogroup
             RatioGroup lRatioGroup = new RatioGroup(iRatioGroupCollection);
-            //create a ratio
-            double lCalRatio = Math.round(Double.valueOf(iPeptideLines.get(i)[(Integer) iHeaderMap.get("Intensity 1")]) / Double.valueOf(iPeptideLines.get(i)[(Integer)iHeaderMap.get("Intensity 2")])*1000.0)/1000.0;
-            ITraqRatio lRatio = new ITraqRatio(lCalRatio, "L/H", true, lRatioGroup);
-            //add the ratio to the ratiogroup
-            lRatio.setValid(new Boolean (iPeptideLines.get(i)[(Integer)iHeaderMap.get("Used in protein quantitation")]));
-            lRatioGroup.addRatio(lRatio);
+            if(lNumberOfIntensities == 2){
+                //create a ratio
+                double lCalRatio = Math.round(Double.valueOf(iPeptideLines.get(i)[lOne]) / Double.valueOf(iPeptideLines.get(i)[lTwo])*1000.0)/1000.0;
+                ITraqRatio lRatio = new ITraqRatio(lCalRatio, "L/H", true, lRatioGroup);
+                //add the ratio to the ratiogroup
+                lRatio.setValid(new Boolean (iPeptideLines.get(i)[((Integer)iHeaderMap.get("Used in protein quantitation")).intValue()]));
+                lRatioGroup.addRatio(lRatio);
+            } else if (lNumberOfIntensities == 3){
+
+                //create a ratio
+                double lCalRatio = Math.round(Double.valueOf(iPeptideLines.get(i)[lOne]) / Double.valueOf(iPeptideLines.get(i)[lTwo])*1000.0)/1000.0;
+                ITraqRatio lRatio = new ITraqRatio(lCalRatio, "L/M", true, lRatioGroup);
+                //add the ratio to the ratiogroup
+                lRatio.setValid(new Boolean (iPeptideLines.get(i)[((Integer)iHeaderMap.get("Used in protein quantitation")).intValue()]));
+                lRatioGroup.addRatio(lRatio);
+
+                //create a ratio
+                double lCalRatioLH = Math.round(Double.valueOf(iPeptideLines.get(i)[lOne]) / Double.valueOf(iPeptideLines.get(i)[lThree])*1000.0)/1000.0;
+                ITraqRatio lRatioLH = new ITraqRatio(lCalRatioLH, "L/H", true, lRatioGroup);
+                //add the ratio to the ratiogroup
+                lRatioLH.setValid(new Boolean (iPeptideLines.get(i)[((Integer)iHeaderMap.get("Used in protein quantitation")).intValue()]));
+                lRatioGroup.addRatio(lRatioLH);
+
+                //create a ratio
+                double lCalRatioMH = Math.round(Double.valueOf(iPeptideLines.get(i)[lTwo]) / Double.valueOf(iPeptideLines.get(i)[lThree])*1000.0)/1000.0;
+                ITraqRatio lRatioMH = new ITraqRatio(lCalRatioMH, "M/H", true, lRatioGroup);
+                //add the ratio to the ratiogroup
+                lRatioMH.setValid(new Boolean (iPeptideLines.get(i)[((Integer)iHeaderMap.get("Used in protein quantitation")).intValue()]));
+                lRatioGroup.addRatio(lRatioMH);
+            } else if (lNumberOfIntensities == 4){
+
+                //create a ratio
+                double lCalRatio = Math.round(Double.valueOf(iPeptideLines.get(i)[lTwo]) / Double.valueOf(iPeptideLines.get(i)[lOne])*1000.0)/1000.0;
+                ITraqRatio lRatio = new ITraqRatio(lCalRatio, "2/1", true, lRatioGroup);
+                //add the ratio to the ratiogroup
+                lRatio.setValid(new Boolean (iPeptideLines.get(i)[((Integer)iHeaderMap.get("Used in protein quantitation")).intValue()]));
+                lRatioGroup.addRatio(lRatio);
+
+                //create a ratio
+                double lCalRatioLH = Math.round(Double.valueOf(iPeptideLines.get(i)[lThree]) / Double.valueOf(iPeptideLines.get(i)[lOne])*1000.0)/1000.0;
+                ITraqRatio lRatioLH = new ITraqRatio(lCalRatioLH, "3/1", true, lRatioGroup);
+                //add the ratio to the ratiogroup
+                lRatioLH.setValid(new Boolean (iPeptideLines.get(i)[((Integer)iHeaderMap.get("Used in protein quantitation")).intValue()]));
+                lRatioGroup.addRatio(lRatioLH);
+
+                //create a ratio
+                double lCalRatioMH = Math.round(Double.valueOf(iPeptideLines.get(i)[lFour]) / Double.valueOf(iPeptideLines.get(i)[lOne])*1000.0)/1000.0;
+                ITraqRatio lRatioMH = new ITraqRatio(lCalRatioMH, "4/1", true, lRatioGroup);
+                //add the ratio to the ratiogroup
+                lRatioMH.setValid(new Boolean (iPeptideLines.get(i)[((Integer)iHeaderMap.get("Used in protein quantitation")).intValue()]));
+                lRatioGroup.addRatio(lRatioMH);
+            }
+
+
                                                                             
             //create an identification and add it to the ratio
             HashMap lIdentificationParameters = new HashMap();
-            lIdentificationParameters.put("SCORE", Long.valueOf(iPeptideLines.get(i)[(Integer)iHeaderMap.get("Score")].substring(0,iPeptideLines.get(i)[(Integer)iHeaderMap.get("Score")].indexOf(".") )));
-            lIdentificationParameters.put("MODIFIED_SEQUENCE", iPeptideLines.get(i)[(Integer)iHeaderMap.get("Modifications")]);
-            lIdentificationParameters.put("CAL_MASS", Double.valueOf(iPeptideLines.get(i)[(Integer)iHeaderMap.get("Measured mass [Da]")]));
-            lIdentificationParameters.put("EXP_MASS", Double.valueOf(iPeptideLines.get(i)[(Integer)iHeaderMap.get("Mascot calculated mass [Da]")]));
-            lIdentificationParameters.put("SEQUENCE",iPeptideLines.get(i)[(Integer)iHeaderMap.get("Sequence")]);
-            lIdentificationParameters.put("VALID", new Integer(1));
-            lIdentificationParameters.put("PRECURSOR",  Double.valueOf(iPeptideLines.get(i)[(Integer)iHeaderMap.get("MCR (Mass charge ratio) [Th]")]));
-            lIdentificationParameters.put("CHARGE", Integer.valueOf(iPeptideLines.get(i)[(Integer)iHeaderMap.get("Charge")]));
+            String lScore = iPeptideLines.get(i)[((Integer)iHeaderMap.get("Score")).intValue()];
+            if(lScore.indexOf(".")>0){
+                lScore = lScore.substring(0, lScore.indexOf("."));
+            }
+            lIdentificationParameters.put("SCORE", Long.valueOf(lScore));
+            lIdentificationParameters.put("MODIFIED_SEQUENCE", iPeptideLines.get(i)[((Integer)iHeaderMap.get("Modifications")).intValue()]);
+            lIdentificationParameters.put("CAL_MASS", Double.valueOf(iPeptideLines.get(i)[((Integer)iHeaderMap.get("Measured mass [Da]")).intValue()]));
+            lIdentificationParameters.put("EXP_MASS", Double.valueOf(iPeptideLines.get(i)[((Integer)iHeaderMap.get("Mascot calculated mass [Da]")).intValue()]));
+            lIdentificationParameters.put("SEQUENCE",iPeptideLines.get(i)[((Integer)iHeaderMap.get("Sequence")).intValue()]);
+            lIdentificationParameters.put("VALID", new Integer(1).intValue());
+            lIdentificationParameters.put("PRECURSOR",  Double.valueOf(iPeptideLines.get(i)[((Integer)iHeaderMap.get("MCR (Mass charge ratio) [Th]")).intValue()]));
+            lIdentificationParameters.put("CHARGE", Integer.valueOf(iPeptideLines.get(i)[((Integer)iHeaderMap.get("Charge")).intValue()]));
             lIdentificationParameters.put("TITLE", null);
-            lIdentificationParameters.put("DATFILE_QUERY", new Long(iPeptideLines.get(i)[(Integer)iHeaderMap.get("Query number")]));
-            lIdentificationParameters.put("ACCESSION", iPeptideLines.get(i)[(Integer)iHeaderMap.get("Accession number")]);
-            lIdentificationParameters.put("END", new Long (iPeptideLines.get(i)[(Integer)iHeaderMap.get("End position in protein")]));
-            lIdentificationParameters.put("START", new Long (iPeptideLines.get(i)[(Integer)iHeaderMap.get("Start position in protein")]));
-            lIdentificationParameters.put("DESCRIPTION",iPeptideLines.get(i)[(Integer)iHeaderMap.get("Description")]);
+            lIdentificationParameters.put("DATFILE_QUERY", new Long(iPeptideLines.get(i)[((Integer)iHeaderMap.get("Query number")).intValue()]));
+            lIdentificationParameters.put("ACCESSION", iPeptideLines.get(i)[((Integer)iHeaderMap.get("Accession number")).intValue()]);
+            lIdentificationParameters.put("END", new Long (iPeptideLines.get(i)[((Integer)iHeaderMap.get("End position in protein")).intValue()]));
+            lIdentificationParameters.put("START", new Long (iPeptideLines.get(i)[((Integer)iHeaderMap.get("Start position in protein")).intValue()]));
+            lIdentificationParameters.put("DESCRIPTION",iPeptideLines.get(i)[((Integer)iHeaderMap.get("Description")).intValue()]);
             lIdentificationParameters.put("ISOFORMS", "");
 
             MsQuantPeptideIdentification lid = new MsQuantPeptideIdentification(lIdentificationParameters);

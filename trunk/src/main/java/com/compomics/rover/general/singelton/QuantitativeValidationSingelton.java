@@ -19,11 +19,11 @@ import com.compomics.rover.general.enumeration.QuantitationMetaType;
 import com.compomics.rover.general.enumeration.RoverSource;
 import com.compomics.rover.general.enumeration.MaxQuantScoreType;
 
+import java.io.*;
 import java.util.Vector;
 import java.util.HashMap;
-import java.io.BufferedWriter;
-import java.io.FileWriter;
-import java.io.IOException;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipInputStream;
 
 import org.apache.commons.math.special.Erf;
 import org.apache.commons.math.MathException;
@@ -242,7 +242,7 @@ public class QuantitativeValidationSingelton {
         boolean lDatabaseMode = false;
         for(int i = 0;i<iRoverSources.size(); i ++){
             RoverSource lRoverSource = iRoverSources.get(i);
-            if(lRoverSource ==  RoverSource.ITRAQ_MS_LIMS || lRoverSource == RoverSource.DISTILLER_QUANT_TOOLBOX_MS_LIMS){
+            if(lRoverSource ==  RoverSource.ITRAQ_MS_LIMS || lRoverSource == RoverSource.DISTILLER_QUANT_TOOLBOX_MS_LIMS || lRoverSource == RoverSource.MAX_QUANT_MS_LIMS){
                 lDatabaseMode = true;
             }
         }
@@ -265,6 +265,57 @@ public class QuantitativeValidationSingelton {
      */
     public Vector<Ratio> getValidatedRatios(){
         return iValidatedRatios;
+    }
+
+    /**
+     * This method will unzip the specified zip entry from the specified zip input stream and store it relative to the
+     * specified parent folder. It will handle both folders and files.
+     *
+     * @param aParent File with the parent folder to place the unzipped files relative to.
+     * @param ze      ZipEntry to unzip from the stream.
+     * @param aZis    ZipInputStream to read the unzipped bytes for the entry from.
+     * @throws java.io.IOException when the unzipping failed.
+     */
+    public static void unzipEntry(File aParent, ZipEntry ze, ZipInputStream aZis) throws IOException {
+        // Get the name for the zip entry. This name contains the relative path.
+        String name = ze.getName();
+        // If the entry is a directory, create it if it does not already exists.
+        if (ze.isDirectory()) {
+            File dir = new File(aParent, name);
+            // Only attempt to create it if it doesn't exist already.
+            if (!dir.exists()) {
+                boolean result = dir.mkdirs();
+                // Check for successful creation.
+                if (!result) {
+                    throw new IOException("Creation of directory '" + dir.getAbsolutePath() + "' failed miserably!");
+                }
+            }
+        } else {
+            File file = new File(aParent, name);
+            // If the file already exists, break with an IOException!
+            if (file.exists()) {
+                throw new IOException("File '" + file.getAbsolutePath() + "' already exists! Aborting unzip operation!");
+            }
+            // Okay, first create the file.
+            boolean result = file.createNewFile();
+            // Check to see if the creation worked.
+            if (!result) {
+                throw new IOException("Creation of file '" + file.getAbsolutePath() + "' failed miserably!");
+            }
+            // Now write the unzipped contents to the output file.
+            BufferedOutputStream bos = new BufferedOutputStream(new FileOutputStream(file));
+            byte[] read = new byte[1024];
+            int readBytes = 0;
+            while ((readBytes = aZis.read(read)) != -1) {
+                if (readBytes < 1024) {
+                    bos.write(read, 0, readBytes);
+                } else {
+                    bos.write(read);
+                }
+            }
+            bos.flush();
+            bos.close();
+        }
     }
 
     /**
@@ -434,7 +485,7 @@ public class QuantitativeValidationSingelton {
         boolean lMaxQuantQuantitation = false;
         for(int i = 0;i<iRoverSources.size(); i ++){
             RoverSource lRoverSource = iRoverSources.get(i);
-            if(lRoverSource == RoverSource.MAX_QUANT || lRoverSource == RoverSource.MAX_QUANT_NO_SIGN){
+            if(lRoverSource == RoverSource.MAX_QUANT || lRoverSource == RoverSource.MAX_QUANT_NO_SIGN || lRoverSource == RoverSource.MAX_QUANT_MS_LIMS){
                 lMaxQuantQuantitation = true;
             }
         }

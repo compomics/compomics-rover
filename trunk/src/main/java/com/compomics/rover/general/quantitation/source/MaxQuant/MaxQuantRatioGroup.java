@@ -1,5 +1,8 @@
 package com.compomics.rover.general.quantitation.source.MaxQuant;
 
+import com.compomics.rover.general.db.accessors.IdentificationExtension;
+import com.compomics.rover.general.interfaces.PeptideIdentification;
+import com.compomics.rover.general.quantitation.source.distiller.DistillerPeptide;
 import org.apache.log4j.Logger;
 
 import com.compomics.rover.general.quantitation.RatioGroup;
@@ -46,14 +49,17 @@ public class MaxQuantRatioGroup  extends RatioGroup {
      */
     private double iPEP;
 
+    private int iId;
+
     /**
      * Creates a DistillerRatioGroup implementing the RatioGroup interfaces
      * as well as the logic to tie up the Distiller structure to ms_lims Identifcation instances.
      * @param aRatioGroupCollection The RatioGroupCollection wherein this DistillerRatioGroup resides.
      */
-    public MaxQuantRatioGroup(final RatioGroupCollection aRatioGroupCollection, double aPEP){
+    public MaxQuantRatioGroup(final RatioGroupCollection aRatioGroupCollection, double aPEP, int lId){
         super(aRatioGroupCollection);
         this.iPEP = aPEP;
+        this.iId = lId;
     }
 
     /**
@@ -64,6 +70,10 @@ public class MaxQuantRatioGroup  extends RatioGroup {
         this.iRatioGroupAbsoluteIntensities = aRatioGroupAbsoluteIntensities;
     }
 
+    public int getId() {
+        return iId;
+    }
+
     /**
      * Getter for the absolute intensities
      * @return Double[] with the absolute intensities
@@ -71,6 +81,37 @@ public class MaxQuantRatioGroup  extends RatioGroup {
     public Double[] getAbsoluteIntensities(){
         return iRatioGroupAbsoluteIntensities;
     }
+
+    /**
+     * This method will link identifications to the ratios. This is done by comparing the query number.
+     * These identifications were found in the database for a specific datfile linked to the mascot distiller rov file.
+     * @param aIdentifications Identifications to match. <b>Hence, the final aim is to link ms_lims Identifications to Quantitation information</b>
+     */
+    public void linkIdentificationsAndQueries(IdentificationExtension[] aIdentifications){
+
+        // The idea of this method is as following.
+        // In general, the QueryNumber is the hub connnecting three objects all having their information.
+
+        // First, the current DistillerRatioGroup and Identification are matched by QueryNumber (and peptide sequence)
+
+        // Second, the DistillerPeptide and Identifcation are then also matched by QueryNumber.
+
+        // Finally, the DistillerRatioGroup saves the relevant Identifications together with their Type.
+
+        // The DistillerRatioGroup then reflects the many-to-many relationship in its data:
+        // One or more Identifications, with known type - together with a series of Ratio's;
+
+
+        // 1. Iterate over each of the given Identification instances.
+        for(int i = 0; i<aIdentifications.length; i ++){
+
+            if(aIdentifications[i].getFileRef() == iId){
+                //the file ref id is correct
+                this.addIdentification(aIdentifications[i], aIdentifications[i].getType());
+            }
+        }
+    }
+
 
      public double getIntensityForComponent(String aComponent){
         for(int i = 0; i<this.getParentCollection().getComponentTypes().size();  i ++){

@@ -38,8 +38,8 @@ import java.util.Vector;
  * This Class creates a frame with for the wizard
  */
 public class WizardFrameHolder extends JFrame implements Flamable {
-	// Class specific log4j logger for WizardFrameHolder instances.
-	private static Logger logger = Logger.getLogger(WizardFrameHolder.class);
+    // Class specific log4j logger for WizardFrameHolder instances.
+    private static Logger logger = Logger.getLogger(WizardFrameHolder.class);
 
     //gui stuff
     private JButton exitButton;
@@ -263,7 +263,7 @@ public class WizardFrameHolder extends JFrame implements Flamable {
         this.dispose();
     }
 
-    public JButton getPreviousButton(){
+    public JButton getPreviousButton() {
         return previousButton;
     }
 
@@ -463,7 +463,7 @@ public class WizardFrameHolder extends JFrame implements Flamable {
             UIManager.setLookAndFeel(new PlasticXPLookAndFeel());
         } catch (UnsupportedLookAndFeelException e) {
             // ignore exception
-        } 
+        }
         WizardFrameHolder launch = new WizardFrameHolder(true, null);
     }
 

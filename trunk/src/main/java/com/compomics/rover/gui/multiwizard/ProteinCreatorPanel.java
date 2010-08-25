@@ -165,7 +165,7 @@ public class ProteinCreatorPanel implements WizardPanel {
                 //show gui
                 JOptionPane.showMessageDialog(iParent, "All the data is loaded, ready to validate!", "INFO", JOptionPane.INFORMATION_MESSAGE);
                 iQuantitativeValidationSingelton.setAllProteins(iParent.getQuantitativeProtein());
-                QuantitationValidationGUI gui = new QuantitationValidationGUI(iParent.getQuantitativeProtein(), null, iParent.isStandAlone());
+                QuantitationValidationGUI gui = new QuantitationValidationGUI(iParent.getQuantitativeProtein(), iParent.getMs_limsConnection(), iParent.isStandAlone());
                 gui.setVisible(true);
 
                 return true;

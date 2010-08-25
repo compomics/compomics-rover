@@ -537,7 +537,7 @@
                           </component>
                           <component id="305be" class="javax.swing.JButton" binding="exportButton">
                             <constraints>
-                              <grid row="0" column="10" row-span="44" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
+                              <grid row="0" column="11" row-span="44" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
                               <gridbag weightx="0.0" weighty="0.0"/>
                             </constraints>
                             <properties>
@@ -553,7 +553,7 @@
                           </component>
                           <component id="9f406" class="javax.swing.JButton" binding="loadRoverFileButton" default-binding="true">
                             <constraints>
-                              <grid row="0" column="12" row-span="44" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
+                              <grid row="0" column="13" row-span="44" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
                               <gridbag weightx="0.0" weighty="0.0"/>
                             </constraints>
                             <properties>
@@ -568,7 +568,7 @@
                           </component>
                           <component id="9b302" class="javax.swing.JButton" binding="reconstructButton" default-binding="true">
                             <constraints>
-                              <grid row="0" column="11" row-span="44" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
+                              <grid row="0" column="12" row-span="44" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
                               <gridbag weightx="0.0" weighty="0.0"/>
                             </constraints>
                             <properties>
@@ -586,6 +586,17 @@
                             </constraints>
                             <properties/>
                           </component>
+                          <grid id="2ed2e" layout-manager="GridBagLayout">
+                            <constraints>
+                              <grid row="43" column="10" row-span="1" col-span="1" vsize-policy="3" hsize-policy="3" anchor="0" fill="3" indent="0" use-parent-layout="false"/>
+                              <gridbag weightx="1.0" weighty="0.0"/>
+                            </constraints>
+                            <properties>
+                              <background color="-1"/>
+                            </properties>
+                            <border type="none"/>
+                            <children/>
+                          </grid>
                         </children>
                       </grid>
                       <component id="75793" class="javax.swing.JButton" binding="showPossibleIsoformsButton" default-binding="true">
