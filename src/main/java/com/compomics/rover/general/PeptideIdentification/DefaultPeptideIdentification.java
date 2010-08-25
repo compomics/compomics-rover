@@ -20,7 +20,7 @@ public class DefaultPeptideIdentification implements PeptideIdentification {
 	// Class specific log4j logger for DefaultPeptideIdentification instances.
 	 private static Logger logger = Logger.getLogger(DefaultPeptideIdentification.class);
 
-    private int iId;
+    private int iId = 0;
 
 
    /** This variable represents the contents for the 'datfile_query'. */
@@ -124,6 +124,11 @@ public class DefaultPeptideIdentification implements PeptideIdentification {
      * This is the xcorr
      */
     private double iXcorr;
+    /**
+     * the Pep score
+     */
+    private double iPep = 0.0;
+    private int iIdentificationId  = 0;
 
 
     /**
@@ -341,5 +346,21 @@ public class DefaultPeptideIdentification implements PeptideIdentification {
 
     public void setId(int iId) {
         this.iId = iId;
+    }
+    
+    public int getIdentificationId() {
+        return iIdentificationId;
+    }
+
+    public void setIdentificationId(int iIdentificationId) {
+        this.iIdentificationId = iIdentificationId;
+    }
+
+    public void setPep(double lPep) {
+        this.iPep = lPep;
+    }
+
+    public double getPep() {
+        return iPep;
     }
 }

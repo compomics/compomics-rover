@@ -19,7 +19,7 @@ import com.compomics.rover.general.enumeration.RoverSource;
 import com.compomics.util.sun.*;
 
 import javax.swing.*;
-import javax.swing.SwingWorker;
+import com.compomics.util.sun.SwingWorker;
 import javax.swing.border.TitledBorder;
 import java.awt.*;
 import java.awt.event.ActionEvent;
@@ -39,8 +39,8 @@ import java.util.HashMap;
  * This class creates a JFrame where different filter are shown. This filters can filter the distiller proteins with quantitave information
  */
 public class FilterFrame extends JFrame {
-	// Class specific log4j logger for FilterFrame instances.
-	 private static Logger logger = Logger.getLogger(FilterFrame.class);
+    // Class specific log4j logger for FilterFrame instances.
+    private static Logger logger = Logger.getLogger(FilterFrame.class);
     //gui
     private JPanel contentPane;
     private JButton filterButton;
@@ -214,7 +214,7 @@ public class FilterFrame extends JFrame {
         //vector to store the filtered proteins in
         final Vector<QuantitativeProtein> lFiltered = new Vector<QuantitativeProtein>();
 
-        com.compomics.util.sun.SwingWorker lStarter = new com.compomics.util.sun.SwingWorker() {
+        SwingWorker lStarter = new SwingWorker() {
             public Boolean construct() {
                 boolean useOnlyTrueRatios = chbOnlyTrue.isSelected();
                 boolean useUniquePeptide = chbUnique.isSelected();
@@ -729,7 +729,7 @@ public class FilterFrame extends JFrame {
                                     lRatioGroups.get(j).setSelected(true);
                                 }
                             } else {
-                                if (lRatioGroups.get(j).getParentCollection().getRoverSource() == RoverSource.MAX_QUANT || lRatioGroups.get(j).getParentCollection().getRoverSource() == RoverSource.MAX_QUANT_NO_SIGN) {
+                                if (lRatioGroups.get(j).getParentCollection().getRoverSource() == RoverSource.MAX_QUANT || lRatioGroups.get(j).getParentCollection().getRoverSource() == RoverSource.MAX_QUANT_NO_SIGN || lRatioGroups.get(j).getParentCollection().getRoverSource() == RoverSource.MAX_QUANT_MS_LIMS) {
 
                                     //we're in maxquant mode
                                     MaxQuantRatioGroup lRatioGroup = (MaxQuantRatioGroup) lRatioGroups.get(j);

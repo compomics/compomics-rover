@@ -17,6 +17,8 @@ import javax.swing.*;
 import javax.swing.border.TitledBorder;
 import javax.swing.filechooser.FileFilter;
 import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.text.SimpleDateFormat;
 import java.awt.event.ItemListener;
@@ -41,8 +43,8 @@ import java.util.Vector;
  */
 
 public class DataSelectionPanel implements Connectable, WizardPanel {
-	// Class specific log4j logger for DataSelectionPanel instances.
-	 private static Logger logger = Logger.getLogger(DataSelectionPanel.class);
+    // Class specific log4j logger for DataSelectionPanel instances.
+    private static Logger logger = Logger.getLogger(DataSelectionPanel.class);
 
     //gui stuff
     private JPanel jpanContent;
@@ -362,7 +364,7 @@ public class DataSelectionPanel implements Connectable, WizardPanel {
      * {@inheritDoc}
      */
     public boolean feasableToProceed() {
-        if(!iFeasableToProceed){
+        if (!iFeasableToProceed) {
             iFiles.removeAllElements();
         }
         return iFeasableToProceed;
@@ -396,14 +398,27 @@ public class DataSelectionPanel implements Connectable, WizardPanel {
                 ConnectionDialog cd = new ConnectionDialog(iParent, this, "Establish DB connection for ms_lims", lConnectionProperties);
                 cd.setVisible(true);
             }
-
-            if(iConn == null){
+            if (iConn == null) {
                 iParent.getPreviousButton().doClick();
                 iQuantitationSingelton.removeLastRoverDataType();
                 return;
+            } else {
+                //check if we are working with a 7.1 ms_lims version or earlier
+                try {
+                    String query = "select * from quantitation_group where quantitation_groupid = 1";
+
+                    PreparedStatement ps = iConn.prepareStatement(query);
+                    ResultSet rs = ps.executeQuery();
+                    rs.close();
+                    ps.close();
+                    iQuantitationSingelton.setMsLimsPre7_2(false);
+                } catch (SQLException e) {
+                    iQuantitationSingelton.setMsLimsPre7_2(true);
+                }
             }
             this.loadProjects();
             this.loadProtocol();
+
 
             ms_limsPanel.remove(cmbProjects);
             cmbProjects = new JComboBox(iProjects);
@@ -657,6 +672,7 @@ public class DataSelectionPanel implements Connectable, WizardPanel {
 
 
     //_____________________some file filters
+
     /**
      * A .rov file filter
      */

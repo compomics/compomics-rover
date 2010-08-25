@@ -73,6 +73,7 @@ public class MaxQuantEvidenceFile {
             HashMap<Integer,DefaultPeptideIdentification> lIdentificationsMap = getIdentifications();
 
             int lCounter = 0;
+            int lAddedCounter = 0;
 
             Runtime r = Runtime.getRuntime();
             r.gc();
@@ -129,81 +130,98 @@ public class MaxQuantEvidenceFile {
 
 
                         //set the type
-                        String lType = new String(lColumns[(Integer) lHeaderMap.get("SILAC State")]);
+                        Integer lTypeInt = (Integer) lHeaderMap.get("SILAC State");
                         boolean lSILAC = true;
-                        if (lType.length() == 0) {
-                            lSILAC = false;
+                        if(lTypeInt!= null){
+                            String lType = new String(lColumns[lTypeInt]);
+                            if (lType.length() == 0) {
+                                lSILAC = false;
+                            }
+                        } else {
+                            Integer lRatioInt = (Integer) lHeaderMap.get("Ratio H/L");
+                            if(lRatioInt>= lColumns.length){
+                                lSILAC = false;
+                            } else {
+                                String lRatio = new String(lColumns[lRatioInt]);
+                                if (lRatio.length() == 0) {
+                                    lSILAC = false;
+                                }
+                            }
                         }
 
                         //only if we found a silac identification we will create  a ratio group
-                        if (lSILAC && (Integer) lHeaderMap.get("Intensity H") < lColumns.length) {
+                        if (lSILAC && ((Integer) lHeaderMap.get("Intensity H")).intValue() < lColumns.length) {
 
                             //only add a ratio if we find any
-                            if (lColumns[(Integer) lHeaderMap.get("Intensity L")] != "") {
-                                MaxQuantRatioGroup lGroup = new MaxQuantRatioGroup(lCollection, Double.valueOf(lColumns[(Integer) lHeaderMap.get("PEP")]));
-                                lGroup.setPeptideSequence(new String(lColumns[(Integer) lHeaderMap.get("Sequence")]));
+                            if (!lColumns[((Integer) lHeaderMap.get("Intensity L")).intValue()].equalsIgnoreCase("")) {
+                                MaxQuantRatioGroup lGroup = new MaxQuantRatioGroup(lCollection, Double.valueOf(lColumns[((Integer) lHeaderMap.get("PEP")).intValue()]), Integer.valueOf(lColumns[((Integer) lHeaderMap.get("id")).intValue()]));
+                                lGroup.setPeptideSequence(new String(lColumns[((Integer) lHeaderMap.get("Sequence")).intValue()]));
                                 //get the different identification ids
-                                String lMsmsIdsString = new String(lColumns[(Integer) lHeaderMap.get("MS/MS IDs")]);
+                                String lMsmsIdsString = new String(lColumns[((Integer) lHeaderMap.get("MS/MS IDs")).intValue()]);
                                 String[] lMsmss = lMsmsIdsString.split(";");
                                 for (int i = 0; i < lMsmss.length; i++) {
                                     int lMsms = Integer.valueOf(lMsmss[i]);
                                     DefaultPeptideIdentification lIdentification = lIdentificationsMap.get(lMsms);
                                     if(lIdentification != null){
                                         lGroup.addIdentification(lIdentification, lIdentification.getType());
+                                    } else {
+                                        System.out.println("Error"+ lMsmss[i]);
                                     }
                                 }
 
                                 //create a vector with the absolute intensities
                                 Vector<Double> lAbsoluteIntensityVector = new Vector<Double>();
-                                if (lColumns[(Integer) lHeaderMap.get("Intensity L")].length() > 0) {
-                                    lAbsoluteIntensityVector.add(Double.valueOf(lColumns[(Integer) lHeaderMap.get("Intensity L")]));
-                                    lAbsoluteIntensityVector.add(Double.valueOf(lColumns[(Integer) lHeaderMap.get("Intensity H")]));
+                                if (lColumns[((Integer) lHeaderMap.get("Intensity L")).intValue()].length() > 0) {
+                                    lAbsoluteIntensityVector.add(Double.valueOf(lColumns[((Integer) lHeaderMap.get("Intensity L")).intValue()]));
+                                    lAbsoluteIntensityVector.add(Double.valueOf(lColumns[((Integer) lHeaderMap.get("Intensity H")).intValue()]));
                                 } else {
                                     lAbsoluteIntensityVector.add(0.0);
                                     lAbsoluteIntensityVector.add(0.0);
                                 }
 
                                 //get the ratio(s)
-                                if(((String)lColumns[(Integer) lHeaderMap.get("Ratio H/L")]).length() != 0){
+                                if(((String)lColumns[((Integer) lHeaderMap.get("Ratio H/L")).intValue()]).length() != 0){
                                     MaxQuantRatio lHLRatio;
                                     if (lRatioSignificanceAFound) {
-                                        lHLRatio = new MaxQuantRatio(Double.valueOf(lColumns[(Integer) lHeaderMap.get("Ratio H/L")]), Double.valueOf(lColumns[(Integer) lHeaderMap.get("Ratio H/L Normalized")]), "H/L", true, lGroup);
+                                        lHLRatio = new MaxQuantRatio(Double.valueOf(lColumns[((Integer) lHeaderMap.get("Ratio H/L")).intValue()]), Double.valueOf(lColumns[((Integer) lHeaderMap.get("Ratio H/L Normalized")).intValue()]), "H/L", true, lGroup);
                                     } else {
-                                        lHLRatio = new MaxQuantRatio(Double.valueOf(lColumns[(Integer) lHeaderMap.get("Ratio H/L")]), Double.valueOf(lColumns[(Integer) lHeaderMap.get("Ratio H/L Normalized")]), "H/L", true, lGroup);
+                                        lHLRatio = new MaxQuantRatio(Double.valueOf(lColumns[((Integer) lHeaderMap.get("Ratio H/L")).intValue()]), Double.valueOf(lColumns[((Integer) lHeaderMap.get("Ratio H/L Normalized")).intValue()]), "H/L", true, lGroup);
                                     }
                                     lGroup.addRatio(lHLRatio);
                                 }
                                 //find the other ratios if it's triple silac
                                 if (lTripleSilac) {
-                                    if(((String)lColumns[(Integer) lHeaderMap.get("Ratio H/M")]).length() != 0){
+                                    if(((String)lColumns[((Integer) lHeaderMap.get("Ratio H/M")).intValue()]).length() != 0){
                                         MaxQuantRatio lHMRatio;
                                         if (lRatioSignificanceAFound) {
-                                            lHMRatio = new MaxQuantRatio(Double.valueOf(lColumns[(Integer) lHeaderMap.get("Ratio H/M")]), Double.valueOf(lColumns[(Integer) lHeaderMap.get("Ratio H/M Normalized")]), "H/M", true, lGroup);
+                                            lHMRatio = new MaxQuantRatio(Double.valueOf(lColumns[((Integer) lHeaderMap.get("Ratio H/M")).intValue()]), Double.valueOf(lColumns[((Integer) lHeaderMap.get("Ratio H/M Normalized")).intValue()]), "H/M", true, lGroup);
                                         } else {
-                                            lHMRatio = new MaxQuantRatio(Double.valueOf(lColumns[(Integer) lHeaderMap.get("Ratio H/M")]), Double.valueOf(lColumns[(Integer) lHeaderMap.get("Ratio H/M Normalized")]), "H/M", true, lGroup);
+                                            lHMRatio = new MaxQuantRatio(Double.valueOf(lColumns[((Integer) lHeaderMap.get("Ratio H/M")).intValue()]), Double.valueOf(lColumns[((Integer) lHeaderMap.get("Ratio H/M Normalized")).intValue()]), "H/M", true, lGroup);
                                         }
                                         lGroup.addRatio(lHMRatio);
                                     }
 
-                                    if(((String)lColumns[(Integer) lHeaderMap.get("Ratio M/L")]).length() != 0){
+                                    if(((String)lColumns[((Integer) lHeaderMap.get("Ratio M/L")).intValue()]).length() != 0){
                                         MaxQuantRatio lMLRatio;
                                         if (lRatioSignificanceAFound) {
-                                            lMLRatio = new MaxQuantRatio(Double.valueOf(lColumns[(Integer) lHeaderMap.get("Ratio M/L")]), Double.valueOf(lColumns[(Integer) lHeaderMap.get("Ratio M/L Normalized")]), "M/L", true, lGroup);
+                                            lMLRatio = new MaxQuantRatio(Double.valueOf(lColumns[((Integer) lHeaderMap.get("Ratio M/L")).intValue()]), Double.valueOf(lColumns[((Integer) lHeaderMap.get("Ratio M/L Normalized")).intValue()]), "M/L", true, lGroup);
                                         } else {
-                                            lMLRatio = new MaxQuantRatio(Double.valueOf(lColumns[(Integer) lHeaderMap.get("Ratio M/L")]), Double.valueOf(lColumns[(Integer) lHeaderMap.get("Ratio M/L Normalized")]), "M/L", true, lGroup);
+                                            lMLRatio = new MaxQuantRatio(Double.valueOf(lColumns[((Integer) lHeaderMap.get("Ratio M/L")).intValue()]), Double.valueOf(lColumns[((Integer) lHeaderMap.get("Ratio M/L Normalized")).intValue()]), "M/L", true, lGroup);
                                         }
                                         lGroup.addRatio(lMLRatio);
                                     }
 
-                                    lAbsoluteIntensityVector.add(Double.valueOf(lColumns[(Integer) lHeaderMap.get("Intensity M")]));
+                                    lAbsoluteIntensityVector.add(Double.valueOf(lColumns[((Integer) lHeaderMap.get("Intensity M")).intValue()]));
                                 }
 
                                 //set the absolute intensities
                                 Double[] lAbsoluteIntensities = new Double[lAbsoluteIntensityVector.size()];
                                 lAbsoluteIntensityVector.toArray(lAbsoluteIntensities);
                                 lGroup.setRatioGroupAbsoluteIntensities(lAbsoluteIntensities);
-                                lGroup.setRazorProteinAccession(new String(lColumns[(Integer) lHeaderMap.get("Leading Razor Protein")]));
+                                lGroup.setRazorProteinAccession(new String(lColumns[((Integer) lHeaderMap.get("Leading Razor Protein")).intValue()]));
 
+                                lAddedCounter = lAddedCounter + 1;
+                                //System.out.println(lCollection.size() + " " + Integer.valueOf(lColumns[(Integer) lHeaderMap.get("id")]) + " " + lCounter + " " + lAddedCounter);
                                 //add the ratiogroup to the collection
                                 lCollection.add(lGroup);
                             }
@@ -225,6 +243,7 @@ public class MaxQuantEvidenceFile {
             logger.error(e.getMessage(), e);
         } catch (Exception e) {
             iFlamable.passHotPotato(new Throwable("Problem reading the maxquant files"));
+            logger.error(e.getMessage(), e);
         }
 
 
@@ -232,7 +251,7 @@ public class MaxQuantEvidenceFile {
     }
 
 
-    private HashMap<Integer,DefaultPeptideIdentification> getIdentifications() throws IOException {
+    public HashMap<Integer,DefaultPeptideIdentification> getIdentifications() throws IOException {
             //1.read the msms file
             //create reader
             FileReader lMsmsReader = new FileReader(iMsmsFile);
@@ -309,6 +328,7 @@ public class MaxQuantEvidenceFile {
 
                     //set the score
                     lIdentification.setScore((Double.valueOf(lColumns[(Integer) lMsmsHeaderMap.get("Mascot Score")]).longValue()));
+                    lIdentification.setPep(Double.valueOf(lColumns[(Integer) lMsmsHeaderMap.get("PEP")]).doubleValue());
 
                     //set the type
                     String lType = new String(lColumns[(Integer) lMsmsHeaderMap.get("SILAC State")]);
@@ -319,7 +339,7 @@ public class MaxQuantEvidenceFile {
                     lIdentification.setType(lType);
 
                     //set the title
-                    lIdentification.setSpectrumFileName(new String(lColumns[(Integer) lMsmsHeaderMap.get("Raw File")]) + " scan: " + new String(lColumns[(Integer) lMsmsHeaderMap.get("Scan Number")]));
+                    lIdentification.setSpectrumFileName(new String(lColumns[(Integer) lMsmsHeaderMap.get("Raw File")]) + ".MQ." + new String(lColumns[(Integer) lMsmsHeaderMap.get("Scan Number")]) + "." + lColumns[(Integer) lMsmsHeaderMap.get("Charge")]);
 
                     lIdentificationsMap.put(lIdentification.getId(), lIdentification);
 

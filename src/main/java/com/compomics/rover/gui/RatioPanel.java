@@ -104,7 +104,7 @@ public class RatioPanel {
             lblError0.setText("XIC profile score: " + lCensusRatio.getProfileScore());
         }
 
-        if (aRatio.getParentRatioGroup().getParentCollection().getRoverSource() == RoverSource.MAX_QUANT || aRatio.getParentRatioGroup().getParentCollection().getRoverSource() == RoverSource.MAX_QUANT_NO_SIGN) {
+        if (aRatio.getParentRatioGroup().getParentCollection().getRoverSource() == RoverSource.MAX_QUANT || aRatio.getParentRatioGroup().getParentCollection().getRoverSource() == RoverSource.MAX_QUANT_NO_SIGN || aRatio.getParentRatioGroup().getParentCollection().getRoverSource() == RoverSource.MAX_QUANT_MS_LIMS) {
             lblQualityText.setText("PEP: ");
             lblQualityText.setVisible(true);
             lblQualityNumbers.setVisible(true);

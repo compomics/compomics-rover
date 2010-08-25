@@ -22,8 +22,8 @@ import java.awt.event.ActionEvent;
  * This class creates a panel where the type of the sources can be set
  */
 public class RoverSourcePanel implements WizardPanel {
-	// Class specific log4j logger for RoverSourcePanel instances.
-	 private static Logger logger = Logger.getLogger(RoverSourcePanel.class);
+    // Class specific log4j logger for RoverSourcePanel instances.
+    private static Logger logger = Logger.getLogger(RoverSourcePanel.class);
 
     //gui stuff
     private JRadioButton distillerQuantitationToolboxRovRadioButton;
@@ -33,6 +33,7 @@ public class RoverSourcePanel implements WizardPanel {
     private JRadioButton maxQuantRadioButton;
     private JRadioButton censusOutTxtAndRadioButton;
     private JTextField txtTitle;
+    private JRadioButton maxQuantMsLims;
 
 
     /**
@@ -66,6 +67,7 @@ public class RoverSourcePanel implements WizardPanel {
         msQuantTxtFilesRadioButton.addActionListener(listener);
         maxQuantRadioButton.addActionListener(listener);
         censusOutTxtAndRadioButton.addActionListener(listener);
+        maxQuantMsLims.addActionListener(listener);
     }
 
 
@@ -103,6 +105,8 @@ public class RoverSourcePanel implements WizardPanel {
             lSource = RoverSource.MAX_QUANT;
         } else if (censusOutTxtAndRadioButton.isSelected()) {
             lSource = RoverSource.CENSUS;
+        } else if (maxQuantMsLims.isSelected()) {
+            lSource = RoverSource.MAX_QUANT_MS_LIMS;
         }
 
         //check if anything was selected
@@ -159,6 +163,7 @@ public class RoverSourcePanel implements WizardPanel {
                 censusOutTxtAndRadioButton.setEnabled(false);
             } else {
                 distillerQuantitationToolboxMsLimsRadioButton.setEnabled(false);
+                maxQuantMsLims.setEnabled(false);
             }
         }
         if (distillerQuantitationToolboxMsLimsRadioButton.isSelected()) {
@@ -170,6 +175,8 @@ public class RoverSourcePanel implements WizardPanel {
         } else if (maxQuantRadioButton.isSelected()) {
             iParent.setNextButtonEnabled(true);
         } else if (censusOutTxtAndRadioButton.isSelected()) {
+            iParent.setNextButtonEnabled(true);
+        } else if (maxQuantMsLims.isSelected()) {
             iParent.setNextButtonEnabled(true);
         }
     }
@@ -192,7 +199,7 @@ public class RoverSourcePanel implements WizardPanel {
         GridBagConstraints gbc;
         gbc = new GridBagConstraints();
         gbc.gridx = 1;
-        gbc.gridy = 7;
+        gbc.gridy = 8;
         gbc.anchor = GridBagConstraints.WEST;
         gbc.insets = new Insets(5, 5, 5, 5);
         jpanContent.add(distillerQuantitationToolboxRovRadioButton, gbc);
@@ -201,7 +208,7 @@ public class RoverSourcePanel implements WizardPanel {
         distillerQuantitationToolboxMsLimsRadioButton.setText("Mascot distiller quantitation toolbox quantitation from ms_lims");
         gbc = new GridBagConstraints();
         gbc.gridx = 1;
-        gbc.gridy = 8;
+        gbc.gridy = 9;
         gbc.anchor = GridBagConstraints.WEST;
         gbc.insets = new Insets(5, 5, 5, 5);
         jpanContent.add(distillerQuantitationToolboxMsLimsRadioButton, gbc);
@@ -212,7 +219,7 @@ public class RoverSourcePanel implements WizardPanel {
         gbc = new GridBagConstraints();
         gbc.gridx = 0;
         gbc.gridy = 1;
-        gbc.gridheight = 8;
+        gbc.gridheight = 9;
         gbc.weightx = 1.0;
         gbc.anchor = GridBagConstraints.WEST;
         gbc.ipadx = 20;
@@ -236,6 +243,15 @@ public class RoverSourcePanel implements WizardPanel {
         gbc.anchor = GridBagConstraints.WEST;
         gbc.insets = new Insets(5, 5, 5, 5);
         jpanContent.add(maxQuantRadioButton, gbc);
+        maxQuantMsLims = new JRadioButton();
+        maxQuantMsLims.setFont(new Font("Tahoma", maxQuantMsLims.getFont().getStyle(), maxQuantMsLims.getFont().getSize()));
+        maxQuantMsLims.setText("MaxQuant quantifications from ms_lims");
+        gbc = new GridBagConstraints();
+        gbc.gridx = 1;
+        gbc.gridy = 7;
+        gbc.anchor = GridBagConstraints.WEST;
+        gbc.insets = new Insets(5, 5, 5, 5);
+        jpanContent.add(maxQuantMsLims, gbc);
         censusOutTxtAndRadioButton = new JRadioButton();
         censusOutTxtAndRadioButton.setFont(new Font("Tahoma", censusOutTxtAndRadioButton.getFont().getStyle(), censusOutTxtAndRadioButton.getFont().getSize()));
         censusOutTxtAndRadioButton.setText("Census out (.txt) and Census chro (.xml) files");
@@ -250,7 +266,7 @@ public class RoverSourcePanel implements WizardPanel {
         label2.setText("Title:");
         gbc = new GridBagConstraints();
         gbc.gridx = 0;
-        gbc.gridy = 9;
+        gbc.gridy = 10;
         gbc.anchor = GridBagConstraints.WEST;
         gbc.ipadx = 20;
         gbc.insets = new Insets(5, 5, 5, 5);
@@ -258,7 +274,7 @@ public class RoverSourcePanel implements WizardPanel {
         txtTitle = new JTextField();
         gbc = new GridBagConstraints();
         gbc.gridx = 1;
-        gbc.gridy = 9;
+        gbc.gridy = 10;
         gbc.anchor = GridBagConstraints.WEST;
         gbc.fill = GridBagConstraints.HORIZONTAL;
         gbc.insets = new Insets(5, 5, 5, 5);
@@ -269,6 +285,7 @@ public class RoverSourcePanel implements WizardPanel {
         buttonGroup.add(distillerQuantitationToolboxMsLimsRadioButton);
         buttonGroup.add(msQuantTxtFilesRadioButton);
         buttonGroup.add(maxQuantRadioButton);
+        buttonGroup.add(maxQuantMsLims);
         buttonGroup.add(censusOutTxtAndRadioButton);
     }
 

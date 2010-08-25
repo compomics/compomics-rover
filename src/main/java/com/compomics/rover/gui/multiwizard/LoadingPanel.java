@@ -1,5 +1,12 @@
 package com.compomics.rover.gui.multiwizard;
 
+import com.compomics.rover.general.quantitation.ReferenceSet;
+import com.compomics.rover.general.quantitation.sorters.QuantitativeProteinSorterByAccession;
+import com.compomics.rover.general.quantitation.sorters.QuantitativeProteinSorterByRatioGroupNumbers;
+import com.compomics.rover.general.quantitation.source.MaxQuant.MaxQuantRatio;
+import com.compomics.rover.general.quantitation.source.MaxQuant.MaxQuantRatioGroup;
+import com.compomics.rover.gui.MatchRatioWithComponent;
+import com.compomics.rover.gui.QuantitationValidationGUI;
 import org.apache.log4j.Logger;
 
 import com.compomics.rover.general.interfaces.WizardPanel;
@@ -56,8 +63,8 @@ import java.math.BigDecimal;
  * This class will create a panel that will show the status of the loaded data
  */
 public class LoadingPanel implements WizardPanel {
-	// Class specific log4j logger for LoadingPanel instances.
-	 private static Logger logger = Logger.getLogger(LoadingPanel.class);
+    // Class specific log4j logger for LoadingPanel instances.
+    private static Logger logger = Logger.getLogger(LoadingPanel.class);
 
     //gui stuff
     private JLabel lblCheckFiles;
@@ -159,7 +166,12 @@ public class LoadingPanel implements WizardPanel {
         SwingWorker lStarter = new SwingWorker() {
             public Boolean construct() {
                 Vector<RoverSource> lSources = iParent.getRoverSources();
+                iParent.setNextButtonEnabled(false);
                 for (int i = 0; i < lSources.size(); i++) {
+                    setIconOnPanel(jpanCheck, "empty.png", 3, 2);
+                    setIconOnPanel(jpanId, "empty.png", 3, 3);
+                    setIconOnPanel(jpanQuant, "empty.png", 3, 4);
+                    setIconOnPanel(jpanMatch, "empty.png", 3, 5);
                     lblSet.setText(" Analyzing data set: " + iParent.getTitle(i) + " ");
                     if (lSources.get(i) == RoverSource.DISTILLER_QUANT_TOOLBOX_ROV) {
                         startFileRov(i);
@@ -179,6 +191,8 @@ public class LoadingPanel implements WizardPanel {
                         startCensus(i);
                     } else if (lSources.get(i) == RoverSource.TMT_DAT) {
                         startFileDat(i);
+                    } else if (lSources.get(i) == RoverSource.MAX_QUANT_MS_LIMS) {
+                        startMs_limsMaxQuant(i);
                     }
                 }
 
@@ -193,7 +207,8 @@ public class LoadingPanel implements WizardPanel {
                     iCollection.get(i).setRoverSource(iParent.getRoverSource(iCollectionIndexes.get(i)));
                 }
                 iParent.setNextButtonEnabled(true);
-                progressBar.setEnabled(false);
+                progressBar.setIndeterminate(false);
+                progressBar.setString("Click next");
                 iParent.clickNextButton();
 
 
@@ -238,6 +253,314 @@ public class LoadingPanel implements WizardPanel {
         jpanContent.validate();
         jpanContent.updateUI();
         jpanContent.repaint();
+    }
+
+
+    /**
+     * This method start the data acquisition process for a maxquant ms_lims project
+     */
+    public void startMs_limsMaxQuant(int aIndex) {
+
+        final int iIndex = aIndex;
+        //create a new swing worker
+        final Flamable lFlamable = iParent;
+
+        try {
+
+            QuantitativeValidationSingelton iQuantitativeValidationSingelton = QuantitativeValidationSingelton.getInstance();
+            iQuantitativeValidationSingelton.setUseOnlyValidRatioForProteinMean(true);
+
+            //update progress bar
+            progressBar.setIndeterminate(true);
+            //set id loading
+            lblId.setEnabled(true);
+            setIconOnPanel(jpanId, "clock.png", 3, 3);
+
+            //1. get IdentificationExtension for a specific project
+            IdentificationExtension[] lQuantPeptides;
+            lQuantPeptides = IdentificationExtension.getIdentificationExtensionsforProject(iParent.getMs_limsConnection(), iParent.getProject(iIndex).getProjectid(), null);
+            if (lQuantPeptides.length == 0) {
+                lFlamable.passHotPotato(new Throwable("No identifications found for this project!"));
+                return;
+            }
+            //create a string with the identificationsids seperated by ","
+            String lIdentificationsIds = "";
+            for (int i = 0; i < lQuantPeptides.length; i++) {
+                lIdentificationsIds = lIdentificationsIds + lQuantPeptides[i].getIdentificationid() + " , ";
+            }
+            lIdentificationsIds = lIdentificationsIds.substring(0, lIdentificationsIds.lastIndexOf(","));
+
+            //2. get all the quantitation linkers (identification_to_quantitation)
+            Identification_to_quantitation[] lQuantLinkers = Identification_to_quantitation.getIdentification_to_quantitationForIdentificationIds(iParent.getMs_limsConnection(), lIdentificationsIds);
+            //now add them to the correct quantitative peptide
+            for (int i = 0; i < lQuantLinkers.length; i++) {
+                for (int j = 0; j < lQuantPeptides.length; j++) {
+                    if (lQuantPeptides[j].getIdentificationid() == lQuantLinkers[i].getL_identificationid()) {
+                        lQuantPeptides[j].addIdentification_to_quantitation(lQuantLinkers[i]);
+                    }
+                }
+            }
+            if (lQuantLinkers.length == 0) {
+                lFlamable.passHotPotato(new Throwable("No quantitations found for this project!"));
+                return;
+            }
+            //Show in the gui that we found all the identifications
+            setIconOnPanel(jpanId, "apply.png", 3, 3);
+            //set quant  loading
+            lblQuant.setEnabled(true);
+            setIconOnPanel(jpanQuant, "clock.png", 3, 4);
+
+            //3.get for all the QuantPeptides the original  file name
+            ArrayList<Long> lMaxQuantFilesIds = new ArrayList<Long>();
+            String sql;
+            if (iQuantitativeValidationSingelton.getMsLimsPre7_2()) {
+                sql = "select i.identificationid, f.filename, f.quantitation_fileid from identification as i, identification_to_quantitation as t, quantitation_file as f, quantitation as q where i.identificationid in (" + lIdentificationsIds + ") and i.identificationid = t.l_identificationid and t.quantitation_link = q.quantitation_link and q.l_quantitation_fileid  = f.quantitation_fileid";
+            } else {
+                sql = "select i.identificationid, f.filename, f.quantitation_fileid from identification as i, identification_to_quantitation as t, quantitation_file as f, quantitation_group as g where i.identificationid in (" + lIdentificationsIds + ") and i.identificationid = t.l_identificationid and t.l_quantitation_groupid = g.quantitation_groupid and g.L_quantitation_fileid  = f.quantitation_fileid";
+            }
+            PreparedStatement ps = iParent.getMs_limsConnection().prepareStatement(sql);
+            ResultSet rs = ps.executeQuery();
+            while (rs.next()) {
+                long lId = rs.getLong(1);
+                String lMaxQuantName = rs.getString(2);
+                long lMaxQuantFilesId = rs.getLong(3);
+                //get a list of all the rov files
+                boolean lMaxQuantFile = true;
+                for (int r = 0; r < lMaxQuantFilesIds.size(); r++) {
+                    if (lMaxQuantFilesId == lMaxQuantFilesIds.get(r)) {
+                        lMaxQuantFile = false;
+                    }
+                }
+                if (lMaxQuantFile) {
+                    lMaxQuantFilesIds.add(lMaxQuantFilesId);
+                }
+                //attach the file name to the quant peptides
+                for (int j = 0; j < lQuantPeptides.length; j++) {
+                    if (lQuantPeptides[j].getIdentificationid() == lId) {
+                        lQuantPeptides[j].setQuantitationFileName(lMaxQuantName);
+                    }
+                }
+            }
+            rs.close();
+            ps.close();
+
+            //update progress bar
+            progressBar.setIndeterminate(false);
+            progressBar.setMaximum(lMaxQuantFilesIds.size() + 1);
+            progressBar.setValue(0);
+            progressBar.setStringPainted(true);
+
+            //4.store all the rov files used for this project in the temp folder
+            //4.1 create the temp/ms_lims folder
+            File lTempfolder = File.createTempFile("temp", "temp").getParentFile();
+            File lTempRoverFolder = new File(lTempfolder, "rover");
+            lTempRoverFolder.deleteOnExit();
+            if (lTempRoverFolder.exists() == false) {
+                lTempRoverFolder.mkdir();
+            }
+            File lMQfolder = new File(lTempRoverFolder.getPath() + "/maxquant");
+            if (lMQfolder.exists()) {
+                com.compomics.rover.gui.wizard.WizardFrameHolder.deleteDir(lMQfolder);
+            }
+            //4.2 get all the rov files
+            RatioGroupCollection lRatioGroupCollection = null;
+
+            //update progress bar
+            progressBar.setValue(progressBar.getValue() + 1);
+            progressBar.setString("Reading quantitative information");
+
+            Quantitation_file lQuantFile = Quantitation_file.getQuantitation_fileForId(iParent.getMs_limsConnection(), lMaxQuantFilesIds.get(0));
+
+            //store the file
+            // Start the unzipping!
+            ZipInputStream zis = new ZipInputStream(new ByteArrayInputStream(lQuantFile.getFile()));
+            ZipEntry ze = null;
+            // Cycle the zip entries.
+            while ((ze = zis.getNextEntry()) != null) {
+                // Unzip each.
+                QuantitativeValidationSingelton.unzipEntry(lTempRoverFolder, ze, zis);
+            }
+            zis.close();
+
+
+            //create an xml reader
+            lRatioGroupCollection = (new MaxQuantEvidenceFile(new File(lTempRoverFolder.getPath() + "/maxquant/evidence.txt"), new File(lTempRoverFolder.getPath() + "/maxquant/msms.txt"), lFlamable)).getRatioGroupCollection();
+            lRatioGroupCollection.setRoverSource(iParent.getRoverSource(iIndex));
+
+            iCollection.add(lRatioGroupCollection);
+            iCollectionIndexes.add(iIndex);
+
+            //_____Do garbage collection______
+            System.gc();
+
+            //update progress bar
+            progressBar.setString("");
+            progressBar.setIndeterminate(true);
+
+            //Show in the gui that we found all the rov files
+            setIconOnPanel(jpanQuant, "apply.png", 3, 4);
+
+            //set match  loading
+            lblMatch.setEnabled(true);
+            setIconOnPanel(jpanMatch, "clock.png", 3, 5);
+
+            //5. couple the quantitative peptides to the distiller ratio groups
+            //get all the quantitations from the db
+            //these will be used to link to the DistillerRatios
+
+            //update progress bar
+            progressBar.setString("Getting quantitations from the db!");
+            progressBar.setStringPainted(true);
+
+            Vector<QuantitationExtension> lQuantitations = QuantitationExtension.getQuantitationForIdentifications(lIdentificationsIds, iParent.getMs_limsConnection());
+
+            //update progress bar
+            progressBar.setString("");
+            progressBar.setIndeterminate(false);
+            progressBar.setMaximum(lMaxQuantFilesIds.size() + 1);
+            progressBar.setValue(0);
+            progressBar.setStringPainted(true);
+
+            iQuantitativeValidationSingelton.setRatioTypes(lRatioGroupCollection.getRatioTypes());
+            iQuantitativeValidationSingelton.setComponentTypes(lRatioGroupCollection.getComponentTypes());
+            //update progress bar
+            progressBar.setValue(progressBar.getValue() + 1);
+            progressBar.setString("Matching identifications and ratios ");
+
+            //now match the identifications found for this rov file to the ratio groups
+            //we will clone it, because if we don't find quantitation from the db to link to the ratio group we will delete this ratiogroup
+            RatioGroupCollection lClonedCollection = (RatioGroupCollection) lRatioGroupCollection.clone();
+            //get the identificationids and the file_refs from the db
+            PreparedStatement ps2 = iParent.getMs_limsConnection().prepareStatement("SELECT i.identificationid, g.file_ref FROM identification_to_quantitation as t, quantitation_group as g, identification as i , spectrum as s where s.l_projectid = ? and s.spectrumid = i.l_spectrumid and i.identificationid = t.l_identificationid and t.l_quantitation_groupid = g.quantitation_groupid");
+            ps2.setLong(1, iParent.getProject(iIndex).getProjectid());
+            ResultSet rs2 = ps2.executeQuery();
+            HashMap lIdRefMap = new HashMap();
+            while (rs2.next()) {
+                lIdRefMap.put(rs2.getLong(1), rs2.getLong(2));
+            }
+            rs2.close();
+            ps2.close();
+
+            for (int q = 0; q < lQuantPeptides.length; q++) {
+                lQuantPeptides[q].setFileRef((Long) lIdRefMap.get(lQuantPeptides[q].getIdentificationid()));
+            }
+
+            for (int j = 0; j < lClonedCollection.size(); j++) {
+                MaxQuantRatioGroup lRatioGroup = (MaxQuantRatioGroup) lClonedCollection.get(j);
+                lRatioGroup.linkIdentificationsAndQueries(lQuantPeptides);
+
+                //match the quantitation with the ratios
+                boolean lRatioGroupLinkFound = false;
+                for (int k = 0; k < lRatioGroup.getNumberOfRatios(); k++) {
+                    MaxQuantRatio lRatio = (MaxQuantRatio) lRatioGroup.getRatio(k);
+                    BigDecimal lRatioValue = new BigDecimal(lRatio.getRatio(false));
+                    lRatioValue = lRatioValue.setScale(5, BigDecimal.ROUND_HALF_DOWN);
+
+                    boolean lLinkFound = false;
+
+                    for (int l = 0; l < lQuantitations.size(); l++) {
+                        QuantitationExtension lQuant = lQuantitations.get(l);
+
+
+                        //check if the filename, the hitnumber, the ratio and the ratio type is the same
+                        String lQuantFileName = lQuant.getQuantitationFileName().substring(lQuant.getQuantitationFileName().lastIndexOf("\\") + 1);
+
+                        if (lRatioValue.doubleValue() == lQuant.getRatio() && lRatio.getType().equalsIgnoreCase(lQuant.getType()) && lQuant.getFile_ref().equalsIgnoreCase(String.valueOf(lRatioGroup.getId()))) {
+                            lRatio.setQuantitationStoredInDb(lQuant);
+                            //set the valid status from the database and not from the original rov file
+                            lRatio.setValid(lQuant.getValid());
+                            lQuantitations.remove(lQuant);
+                            l = lQuantitations.size();
+                            lLinkFound = true;
+                            lRatioGroupLinkFound = true;
+                        }
+                    }
+                    if (!lLinkFound) {
+                        //no quantitation extension could be linked to a ratio, therefor we will delete the ratio
+                        lRatioGroup.deleteRatio(lRatio);
+                    }
+
+                }
+
+                if (!lRatioGroupLinkFound) {
+                    //no quantitation extension could be linked to one of the ratios in the ratio group, therefor we will delete the ratiogroup
+                    lRatioGroupCollection.remove(lRatioGroup);
+                }
+            }
+
+            //_____Do garbage collection______
+            System.gc();
+
+            //update progress bar
+            progressBar.setIndeterminate(true);
+            progressBar.setStringPainted(false);
+            progressBar.setString("");
+
+            //_____Do garbage collection______
+            System.gc();
+
+            //Show in the gui that the matching is done
+            setIconOnPanel(jpanMatch, "apply.png", 3, 4);
+
+            //6. get all the protein accessions from the identifications
+            for (int j = 0; j < lRatioGroupCollection.size(); j++) {
+                RatioGroup lRatioGroup = lRatioGroupCollection.get(j);
+
+                if (lRatioGroup.getNumberOfIdentifications() != 0) {
+                    String[] lAccessionsForRatioGroup = lRatioGroup.getProteinAccessions();
+                    for (int k = 0; k < lAccessionsForRatioGroup.length; k++) {
+                        //check if it's a new accession
+                        boolean lNewAccession = true;
+                        for (int l = 0; l < iProteinAccession.size(); l++) {
+                            if (iProteinAccession.get(l).equalsIgnoreCase(lAccessionsForRatioGroup[k])) {
+                                lNewAccession = false;
+                            }
+                        }
+                        if (lNewAccession) {
+                            iProteinAccession.add(lAccessionsForRatioGroup[k]);
+                        }
+
+                    }
+                } else {
+                    //System.out.println("No identification found");
+                }
+            }
+
+            
+
+            if (lRatioGroupCollection == null) {
+                //show gui
+                JOptionPane.showMessageDialog(iParent, "No quantitative data could be found!\n The program will close.", "INFO", JOptionPane.INFORMATION_MESSAGE);
+                iParent.close();
+            }
+
+            //7.A get the types of the ratios from the first distiller ratio collecion
+            Vector<String> lRatioList = lRatioGroupCollection.getRatioTypes();
+            String[] lRatioTypes = new String[lRatioList.size()];
+            lRatioList.toArray(lRatioTypes);
+            iCollectionRatios.add(lRatioTypes);
+
+            //7.B get the types of the ratios from the first distiller ratio collecion
+            Vector<String> lComponentList = lRatioGroupCollection.getComponentTypes();
+            String[] lComponentTypes = new String[lComponentList.size()];
+            lComponentList.toArray(lComponentTypes);
+            iCollectionComponents.add(lComponentTypes);
+
+
+            //update progress bar
+            progressBar.setIndeterminate(false);
+
+
+            //_____Do garbage collection______
+            System.gc();
+
+
+        } catch (SQLException e) {
+            logger.error(e.getMessage(), e);
+        } catch (IOException e) {
+            logger.error(e.getMessage(), e);
+        }
+
     }
 
 
@@ -564,299 +887,294 @@ public class LoadingPanel implements WizardPanel {
         final int iIndex = aIndex;
         //create a new swing worker
         final Flamable lFlamable = iParent;
-        SwingWorker lStarter = new SwingWorker() {
-            public Boolean construct() {
-                try {
 
-                    QuantitativeValidationSingelton iQuantitativeValidationSingelton = QuantitativeValidationSingelton.getInstance();
-                    iQuantitativeValidationSingelton.setUseOnlyValidRatioForProteinMean(true);
+        try {
 
-                    //update progress bar
-                    progressBar.setIndeterminate(true);
-                    //set id loading
-                    lblId.setEnabled(true);
-                    setIconOnPanel(jpanId, "clock.png", 3, 3);
+            QuantitativeValidationSingelton iQuantitativeValidationSingelton = QuantitativeValidationSingelton.getInstance();
+            iQuantitativeValidationSingelton.setUseOnlyValidRatioForProteinMean(true);
 
-                    //1. get IdentificationExtension for a specific project
-                    IdentificationExtension[] lQuantPeptides;
-                    lQuantPeptides = IdentificationExtension.getIdentificationExtensionsforProject(iParent.getMs_limsConnection(), iParent.getProject(iIndex).getProjectid(), null);
-                    if (lQuantPeptides.length == 0) {
-                        lFlamable.passHotPotato(new Throwable("No identifications found for this project!"));
-                        return false;
+            //update progress bar
+            progressBar.setIndeterminate(true);
+            //set id loading
+            lblId.setEnabled(true);
+            setIconOnPanel(jpanId, "clock.png", 3, 3);
+
+            //1. get IdentificationExtension for a specific project
+            IdentificationExtension[] lQuantPeptides;
+            lQuantPeptides = IdentificationExtension.getIdentificationExtensionsforProject(iParent.getMs_limsConnection(), iParent.getProject(iIndex).getProjectid(), null);
+            if (lQuantPeptides.length == 0) {
+                lFlamable.passHotPotato(new Throwable("No identifications found for this project!"));
+                return;
+            }
+            //create a string with the identificationsids seperated by ","
+            String lIdentificationsIds = "";
+            for (int i = 0; i < lQuantPeptides.length; i++) {
+                lIdentificationsIds = lIdentificationsIds + lQuantPeptides[i].getIdentificationid() + " , ";
+            }
+            lIdentificationsIds = lIdentificationsIds.substring(0, lIdentificationsIds.lastIndexOf(","));
+
+            //2. get all the quantitation linkers (identification_to_quantitation)
+            Identification_to_quantitation[] lQuantLinkers = Identification_to_quantitation.getIdentification_to_quantitationForIdentificationIds(iParent.getMs_limsConnection(), lIdentificationsIds);
+            //now add them to the correct quantitative peptide
+            for (int i = 0; i < lQuantLinkers.length; i++) {
+                for (int j = 0; j < lQuantPeptides.length; j++) {
+                    if (lQuantPeptides[j].getIdentificationid() == lQuantLinkers[i].getL_identificationid()) {
+                        lQuantPeptides[j].addIdentification_to_quantitation(lQuantLinkers[i]);
                     }
-                    //create a string with the identificationsids seperated by ","
-                    String lIdentificationsIds = "";
-                    for (int i = 0; i < lQuantPeptides.length; i++) {
-                        lIdentificationsIds = lIdentificationsIds + lQuantPeptides[i].getIdentificationid() + " , ";
-                    }
-                    lIdentificationsIds = lIdentificationsIds.substring(0, lIdentificationsIds.lastIndexOf(","));
-
-                    //2. get all the quantitation linkers (identification_to_quantitation)
-                    Identification_to_quantitation[] lQuantLinkers = Identification_to_quantitation.getIdentification_to_quantitationForIdentificationIds(iParent.getMs_limsConnection(), lIdentificationsIds);
-                    //now add them to the correct quantitative peptide
-                    for (int i = 0; i < lQuantLinkers.length; i++) {
-                        for (int j = 0; j < lQuantPeptides.length; j++) {
-                            if (lQuantPeptides[j].getIdentificationid() == lQuantLinkers[i].getL_identificationid()) {
-                                lQuantPeptides[j].addIdentification_to_quantitation(lQuantLinkers[i]);
-                            }
-                        }
-                    }
-                    if (lQuantLinkers.length == 0) {
-                        lFlamable.passHotPotato(new Throwable("No quantitations found for this project!"));
-                        return false;
-                    }
-                    //Show in the gui that we found all the identifications
-                    setIconOnPanel(jpanId, "apply.png", 3, 3);
-                    //set quant  loading
-                    lblQuant.setEnabled(true);
-                    setIconOnPanel(jpanQuant, "clock.png", 3, 4);
-
-                    //3.get for all the QuantPeptides the original rov file name
-                    ArrayList<Long> lRovFileIds = new ArrayList<Long>();
-                    String query = "select i.identificationid, f.filename, f.quantitation_fileid from identification as i, identification_to_quantitation as t, quantitation as q, quantitation_file as f where i.identificationid in (" + lIdentificationsIds + ") and i.identificationid = t.l_identificationid and t.quantitation_link = q.quantitation_link and q.L_quantitation_fileid  = f.quantitation_fileid";
-                    PreparedStatement ps = iParent.getMs_limsConnection().prepareStatement(query);
-                    ResultSet rs = ps.executeQuery();
-                    while (rs.next()) {
-                        long lId = rs.getLong(1);
-                        String lRovFileName = rs.getString(2);
-                        long lRovFileId = rs.getLong(3);
-                        //get a list of all the rov files
-                        boolean lNewRovFile = true;
-                        for (int r = 0; r < lRovFileIds.size(); r++) {
-                            if (lRovFileId == lRovFileIds.get(r)) {
-                                lNewRovFile = false;
-                            }
-                        }
-                        if (lNewRovFile) {
-                            lRovFileIds.add(lRovFileId);
-                        }
-                        //attach the rov file name to the quant peptides
-                        for (int j = 0; j < lQuantPeptides.length; j++) {
-                            if (lQuantPeptides[j].getIdentificationid() == lId) {
-                                lQuantPeptides[j].setQuantitationFileName(lRovFileName);
-                            }
-                        }
-                    }
-                    rs.close();
-                    ps.close();
-
-                    //update progress bar
-                    progressBar.setIndeterminate(false);
-                    progressBar.setMaximum(lRovFileIds.size() + 1);
-                    progressBar.setValue(0);
-                    progressBar.setStringPainted(true);
-
-                    //4.store all the rov files used for this project in the temp folder
-                    //4.1 create the temp/rover folder
-                    File lTempfolder = File.createTempFile("temp", "temp").getParentFile();
-                    File lTempRovFolder = new File(lTempfolder, "rover");
-                    lTempRovFolder.deleteOnExit();
-                    if (lTempRovFolder.exists() == false) {
-                        lTempRovFolder.mkdir();
-                    }
-                    //4.2 get all the rov files
-                    RatioGroupCollection[] lRatioGroupCollection = new RatioGroupCollection[lRovFileIds.size()];
-                    for (int i = 0; i < lRovFileIds.size(); i++) {
-
-                        //update progress bar
-                        progressBar.setValue(progressBar.getValue() + 1);
-                        progressBar.setString("Reading quantitative information from file " + (i + 1) + " of " + lRovFileIds.size() + " distiller quantitation xml files");
-
-                        Quantitation_file lQuantFile = Quantitation_file.getQuantitation_fileForId(iParent.getMs_limsConnection(), lRovFileIds.get(i));
-                        //store the file
-                        byte[] lXmlBytes = lQuantFile.getUnzippedFile();
-                        PrintWriter out = new PrintWriter(new FileWriter(lTempRovFolder.getPath() + "/" + lQuantFile.getFilename()));
-                        out.write(new String(lXmlBytes));
-                        out.flush();
-                        out.close();
-                        //create an xml reader
-                        lRatioGroupCollection[i] = (new QuantitationXmlReader(new File(lTempRovFolder.getPath() + "/" + lQuantFile.getFilename()), lFlamable, lQuantFile.getFilename())).getRatioGroupCollection();
-
-
-                        //_____Do garbage collection______
-                        System.gc();
-                    }
-
-                    //_____Do garbage collection______
-                    System.gc();
-
-                    //update progress bar
-                    progressBar.setString("");
-                    progressBar.setIndeterminate(true);
-
-                    //Show in the gui that we found all the rov files
-                    setIconOnPanel(jpanQuant, "apply.png", 3, 4);
-
-                    //set match  loading
-                    lblMatch.setEnabled(true);
-                    setIconOnPanel(jpanMatch, "clock.png", 3, 5);
-
-                    //5. couple the quantitative peptides to the distiller ratio groups
-                    //get all the quantitations from the db
-                    //these will be used to link to the DistillerRatios
-
-                    //update progress bar
-                    progressBar.setString("Getting quantitations from the db!");
-                    progressBar.setStringPainted(true);
-
-                    Vector<QuantitationExtension> lQuantitations = QuantitationExtension.getQuantitationForIdentifications(lIdentificationsIds, iParent.getMs_limsConnection());
-
-                    //update progress bar
-                    progressBar.setString("");
-                    progressBar.setIndeterminate(false);
-                    progressBar.setMaximum(lRovFileIds.size() + 1);
-                    progressBar.setValue(0);
-                    progressBar.setStringPainted(true);
-
-                    for (int i = 0; i < lRatioGroupCollection.length; i++) {
-
-                        //update progress bar
-                        progressBar.setValue(progressBar.getValue() + 1);
-                        progressBar.setString("Matching identifications and ratios to .rov file number " + (i + 1) + " of " + lRovFileIds.size() + " distiller quantitation xml files");
-
-                        //only give the IdentificationExtension for a specific rovFile
-                        Vector<IdentificationExtension> lQuantPeptideForRovFileVector = new Vector<IdentificationExtension>();
-                        for (int j = 0; j < lQuantPeptides.length; j++) {
-                            String lPeptideRovFileName = lQuantPeptides[j].getQuantitationFileName();
-                            String lCollectionRovFileName = ((String) lRatioGroupCollection[i].getMetaData(QuantitationMetaType.FILENAME)).substring(((String) lRatioGroupCollection[i].getMetaData(QuantitationMetaType.FILENAME)).lastIndexOf("\\") + 1);
-                            if (lPeptideRovFileName != null) {
-                                if (lPeptideRovFileName.equalsIgnoreCase(lCollectionRovFileName)) {
-                                    lQuantPeptideForRovFileVector.add(lQuantPeptides[j]);
-                                }
-                            }
-                        }
-
-                        IdentificationExtension[] lQuantPeptideForRovFile = new IdentificationExtension[lQuantPeptideForRovFileVector.size()];
-                        lQuantPeptideForRovFileVector.toArray(lQuantPeptideForRovFile);
-
-                        //now match the identifications found for this rov file to the ratio groups
-                        //we will clone it, because if we don't find quantitation from the db to link to the ratio group we will delete this ratiogroup
-                        RatioGroupCollection lClonedCollection = (RatioGroupCollection) lRatioGroupCollection[i].clone();
-                        for (int j = 0; j < lClonedCollection.size(); j++) {
-                            DistillerRatioGroup lRatioGroup = (DistillerRatioGroup) lClonedCollection.get(j);
-                            lRatioGroup.linkIdentificationsAndQueries(lQuantPeptideForRovFile);
-
-                            //match the quantitation with the ratios
-                            boolean lRatioGroupLinkFound = false;
-                            for (int k = 0; k < lRatioGroup.getNumberOfRatios(); k++) {
-                                DistillerRatio lRatio = (DistillerRatio) lRatioGroup.getRatio(k);
-                                BigDecimal lRatioValue = new BigDecimal(lRatio.getRatio(false));
-                                lRatioValue = lRatioValue.setScale(5, BigDecimal.ROUND_HALF_DOWN);
-
-                                boolean lLinkFound = false;
-
-                                for (int l = 0; l < lQuantitations.size(); l++) {
-                                    QuantitationExtension lQuant = lQuantitations.get(l);
-
-
-                                    //check if the filename, the hitnumber, the ratio and the ratio type is the same
-                                    String lQuantFileName = lQuant.getQuantitationFileName().substring(lQuant.getQuantitationFileName().lastIndexOf("\\") + 1);
-
-                                    if (lRatioValue.doubleValue() == lQuant.getRatio() && lRatio.getType().equalsIgnoreCase(lQuant.getType()) && lQuant.getFile_ref().equalsIgnoreCase(String.valueOf(lRatioGroup.getReferenceOfParentHit())) && lQuantFileName.equalsIgnoreCase((String) lClonedCollection.getMetaData(QuantitationMetaType.FILENAME))) {
-                                        lRatio.setQuantitationStoredInDb(lQuant);
-                                        //set the valid status from the database and not from the original rov file
-                                        lRatio.setValid(lQuant.getValid());
-                                        lQuantitations.remove(lQuant);
-                                        l = lQuantitations.size();
-                                        lLinkFound = true;
-                                        lRatioGroupLinkFound = true;
-                                    }
-                                }
-                                if (!lLinkFound) {
-                                    //no quantitation extension could be linked to a ratio, therefor we will delete the ratio
-                                    lRatioGroup.deleteRatio(lRatio);
-                                }
-
-                            }
-
-                            if (!lRatioGroupLinkFound) {
-                                //no quantitation extension could be linked to one of the ratios in the ratio group, therefor we will delete the ratiogroup
-                                lRatioGroupCollection[i].remove(lRatioGroup);
-                            }
-                        }
-
-                        //_____Do garbage collection______
-                        System.gc();
-                    }
-
-                    /*if (lQuantitations.size() > 0) {
-                        System.out.println(lQuantitations.size());
-                    } */
-
-                    //update progress bar
-                    progressBar.setIndeterminate(true);
-                    progressBar.setStringPainted(false);
-                    progressBar.setString("");
-
-                    //_____Do garbage collection______
-                    System.gc();
-
-
-                    //6. get all the protein accessions from the identifications
-                    for (int i = 0; i < lRatioGroupCollection.length; i++) {
-                        iCollection.add(lRatioGroupCollection[i]);
-                        iCollectionIndexes.add(iIndex);
-                        for (int j = 0; j < lRatioGroupCollection[i].size(); j++) {
-                            DistillerRatioGroup lRatioGroup = (DistillerRatioGroup) lRatioGroupCollection[i].get(j);
-
-                            if (lRatioGroup.getNumberOfIdentifications() != 0) {
-                                String[] lAccessionsForRatioGroup = lRatioGroup.getProteinAccessions();
-                                for (int k = 0; k < lAccessionsForRatioGroup.length; k++) {
-                                    //check if it's a new accession
-                                    boolean lNewAccession = true;
-                                    for (int l = 0; l < iProteinAccession.size(); l++) {
-                                        if (iProteinAccession.get(l).equalsIgnoreCase(lAccessionsForRatioGroup[k])) {
-                                            lNewAccession = false;
-                                        }
-                                    }
-                                    if (lNewAccession) {
-                                        iProteinAccession.add(lAccessionsForRatioGroup[k]);
-                                    }
-
-                                }
-                            } else {
-                                //System.out.println("No identification found");
-                            }
-                        }
-                    }
-
-                    if (lRatioGroupCollection.length == 0) {
-                        //show gui
-                        JOptionPane.showMessageDialog(iParent, "No quantitative data could be found!\n The program will close.", "INFO", JOptionPane.INFORMATION_MESSAGE);
-                        iParent.close();
-                    }
-
-                    //7.A get the types of the ratios from the first distiller ratio collecion
-                    Vector<String> lRatioList = lRatioGroupCollection[0].getRatioTypes();
-                    String[] lRatioTypes = new String[lRatioList.size()];
-                    lRatioList.toArray(lRatioTypes);
-                    iCollectionRatios.add(lRatioTypes);
-
-                    //7.B get the types of the ratios from the first distiller ratio collecion
-                    Vector<String> lComponentList = lRatioGroupCollection[0].getComponentTypes();
-                    String[] lComponentTypes = new String[lComponentList.size()];
-                    lComponentList.toArray(lComponentTypes);
-                    iCollectionComponents.add(lComponentTypes);
-
-                    //Show in the gui that the matching is done
-                    setIconOnPanel(jpanMatch, "apply.png", 3, 5);
-
-
-                } catch (SQLException e) {
-                    logger.error(e.getMessage(), e);
-                } catch (IOException e) {
-                    logger.error(e.getMessage(), e);
                 }
-                // step 7.2 dispose the iText components.
-                return true;
+            }
+            if (lQuantLinkers.length == 0) {
+                lFlamable.passHotPotato(new Throwable("No quantitations found for this project!"));
+                return;
+            }
+            //Show in the gui that we found all the identifications
+            setIconOnPanel(jpanId, "apply.png", 3, 3);
+            //set quant  loading
+            lblQuant.setEnabled(true);
+            setIconOnPanel(jpanQuant, "clock.png", 3, 4);
+
+            //3.get for all the QuantPeptides the original rov file name
+            ArrayList<Long> lRovFileIds = new ArrayList<Long>();
+            String query = "";
+            if (iQuantitativeValidationSingelton.getMsLimsPre7_2()) {
+                query = "select i.identificationid, f.filename, f.quantitation_fileid from identification as i, identification_to_quantitation as t, quantitation as q, quantitation_file as f where i.identificationid in (" + lIdentificationsIds + ") and i.identificationid = t.l_identificationid and t.quantitation_link = q.quantitation_link and q.L_quantitation_fileid  = f.quantitation_fileid";
+            } else {
+                query = "select i.identificationid, f.filename, f.quantitation_fileid from identification as i, identification_to_quantitation as t, quantitation_group as g, quantitation_file as f where i.identificationid in (" + lIdentificationsIds + ") and i.identificationid = t.l_identificationid and t.l_quantitation_groupid = g.quantitation_groupid and g.l_quantitation_fileid  = f.quantitation_fileid";
+            }
+            PreparedStatement ps = iParent.getMs_limsConnection().prepareStatement(query);
+            ResultSet rs = ps.executeQuery();
+            while (rs.next()) {
+                long lId = rs.getLong(1);
+                String lRovFileName = rs.getString(2);
+                long lRovFileId = rs.getLong(3);
+                //get a list of all the rov files
+                boolean lNewRovFile = true;
+                for (int r = 0; r < lRovFileIds.size(); r++) {
+                    if (lRovFileId == lRovFileIds.get(r)) {
+                        lNewRovFile = false;
+                    }
+                }
+                if (lNewRovFile) {
+                    lRovFileIds.add(lRovFileId);
+                }
+                //attach the rov file name to the quant peptides
+                for (int j = 0; j < lQuantPeptides.length; j++) {
+                    if (lQuantPeptides[j].getIdentificationid() == lId) {
+                        lQuantPeptides[j].setQuantitationFileName(lRovFileName);
+                    }
+                }
+            }
+            rs.close();
+            ps.close();
+
+            //update progress bar
+            progressBar.setIndeterminate(false);
+            progressBar.setMaximum(lRovFileIds.size() + 1);
+            progressBar.setValue(0);
+            progressBar.setStringPainted(true);
+
+            //4.store all the rov files used for this project in the temp folder
+            //4.1 create the temp/rover folder
+            File lTempfolder = File.createTempFile("temp", "temp").getParentFile();
+            File lTempRovFolder = new File(lTempfolder, "rover");
+            lTempRovFolder.deleteOnExit();
+            if (lTempRovFolder.exists() == false) {
+                lTempRovFolder.mkdir();
+            }
+            //4.2 get all the rov files
+            RatioGroupCollection[] lRatioGroupCollection = new RatioGroupCollection[lRovFileIds.size()];
+            for (int i = 0; i < lRovFileIds.size(); i++) {
+
+                //update progress bar
+                progressBar.setValue(progressBar.getValue() + 1);
+                progressBar.setString("Reading quantitative information from file " + (i + 1) + " of " + lRovFileIds.size() + " distiller quantitation xml files");
+
+                Quantitation_file lQuantFile = Quantitation_file.getQuantitation_fileForId(iParent.getMs_limsConnection(), lRovFileIds.get(i));
+                //store the file
+                byte[] lXmlBytes = lQuantFile.getUnzippedFile();
+                PrintWriter out = new PrintWriter(new FileWriter(lTempRovFolder.getPath() + "/" + lQuantFile.getFilename()));
+                out.write(new String(lXmlBytes));
+                out.flush();
+                out.close();
+                //create an xml reader
+                lRatioGroupCollection[i] = (new QuantitationXmlReader(new File(lTempRovFolder.getPath() + "/" + lQuantFile.getFilename()), lFlamable, lQuantFile.getFilename())).getRatioGroupCollection();
+
+
+                //_____Do garbage collection______
+                System.gc();
             }
 
-            public void finished() {
-                //
+            //_____Do garbage collection______
+            System.gc();
+
+            //update progress bar
+            progressBar.setString("");
+            progressBar.setIndeterminate(true);
+
+            //Show in the gui that we found all the rov files
+            setIconOnPanel(jpanQuant, "apply.png", 3, 4);
+
+            //set match  loading
+            lblMatch.setEnabled(true);
+            setIconOnPanel(jpanMatch, "clock.png", 3, 5);
+
+            //5. couple the quantitative peptides to the distiller ratio groups
+            //get all the quantitations from the db
+            //these will be used to link to the DistillerRatios
+
+            //update progress bar
+            progressBar.setString("Getting quantitations from the db!");
+            progressBar.setStringPainted(true);
+
+            Vector<QuantitationExtension> lQuantitations = QuantitationExtension.getQuantitationForIdentifications(lIdentificationsIds, iParent.getMs_limsConnection());
+
+            //update progress bar
+            progressBar.setString("");
+            progressBar.setIndeterminate(false);
+            progressBar.setMaximum(lRovFileIds.size() + 1);
+            progressBar.setValue(0);
+            progressBar.setStringPainted(true);
+
+            for (int i = 0; i < lRatioGroupCollection.length; i++) {
+
+                //update progress bar
+                progressBar.setValue(progressBar.getValue() + 1);
+                progressBar.setString("Matching identifications and ratios to .rov file number " + (i + 1) + " of " + lRovFileIds.size() + " distiller quantitation xml files");
+
+                //only give the IdentificationExtension for a specific rovFile
+                Vector<IdentificationExtension> lQuantPeptideForRovFileVector = new Vector<IdentificationExtension>();
+                for (int j = 0; j < lQuantPeptides.length; j++) {
+                    String lPeptideRovFileName = lQuantPeptides[j].getQuantitationFileName();
+                    String lCollectionRovFileName = ((String) lRatioGroupCollection[i].getMetaData(QuantitationMetaType.FILENAME)).substring(((String) lRatioGroupCollection[i].getMetaData(QuantitationMetaType.FILENAME)).lastIndexOf("\\") + 1);
+                    if (lPeptideRovFileName != null) {
+                        if (lPeptideRovFileName.equalsIgnoreCase(lCollectionRovFileName)) {
+                            lQuantPeptideForRovFileVector.add(lQuantPeptides[j]);
+                        }
+                    }
+                }
+
+                IdentificationExtension[] lQuantPeptideForRovFile = new IdentificationExtension[lQuantPeptideForRovFileVector.size()];
+                lQuantPeptideForRovFileVector.toArray(lQuantPeptideForRovFile);
+
+                //now match the identifications found for this rov file to the ratio groups
+                //we will clone it, because if we don't find quantitation from the db to link to the ratio group we will delete this ratiogroup
+                RatioGroupCollection lClonedCollection = (RatioGroupCollection) lRatioGroupCollection[i].clone();
+                for (int j = 0; j < lClonedCollection.size(); j++) {
+                    DistillerRatioGroup lRatioGroup = (DistillerRatioGroup) lClonedCollection.get(j);
+                    lRatioGroup.linkIdentificationsAndQueries(lQuantPeptideForRovFile);
+
+                    //match the quantitation with the ratios
+                    boolean lRatioGroupLinkFound = false;
+                    for (int k = 0; k < lRatioGroup.getNumberOfRatios(); k++) {
+                        DistillerRatio lRatio = (DistillerRatio) lRatioGroup.getRatio(k);
+                        BigDecimal lRatioValue = new BigDecimal(lRatio.getRatio(false));
+                        lRatioValue = lRatioValue.setScale(5, BigDecimal.ROUND_HALF_DOWN);
+
+                        boolean lLinkFound = false;
+
+                        for (int l = 0; l < lQuantitations.size(); l++) {
+                            QuantitationExtension lQuant = lQuantitations.get(l);
+
+
+                            //check if the filename, the hitnumber, the ratio and the ratio type is the same
+                            String lQuantFileName = lQuant.getQuantitationFileName().substring(lQuant.getQuantitationFileName().lastIndexOf("\\") + 1);
+
+                            if (lRatioValue.doubleValue() == lQuant.getRatio() && lRatio.getType().equalsIgnoreCase(lQuant.getType()) && lQuant.getFile_ref().equalsIgnoreCase(String.valueOf(lRatioGroup.getReferenceOfParentHit())) && lQuantFileName.equalsIgnoreCase((String) lClonedCollection.getMetaData(QuantitationMetaType.FILENAME))) {
+                                lRatio.setQuantitationStoredInDb(lQuant);
+                                //set the valid status from the database and not from the original rov file
+                                lRatio.setValid(lQuant.getValid());
+                                lQuantitations.remove(lQuant);
+                                l = lQuantitations.size();
+                                lLinkFound = true;
+                                lRatioGroupLinkFound = true;
+                            }
+                        }
+                        if (!lLinkFound) {
+                            //no quantitation extension could be linked to a ratio, therefor we will delete the ratio
+                            lRatioGroup.deleteRatio(lRatio);
+                        }
+
+                    }
+
+                    if (!lRatioGroupLinkFound) {
+                        //no quantitation extension could be linked to one of the ratios in the ratio group, therefor we will delete the ratiogroup
+                        lRatioGroupCollection[i].remove(lRatioGroup);
+                    }
+                }
+
+                //_____Do garbage collection______
+                System.gc();
             }
 
-        };
-        lStarter.start();
+            /*if (lQuantitations.size() > 0) {
+               System.out.println(lQuantitations.size());
+           } */
+
+            //update progress bar
+            progressBar.setIndeterminate(true);
+            progressBar.setStringPainted(false);
+            progressBar.setString("");
+
+            //_____Do garbage collection______
+            System.gc();
+
+
+            //6. get all the protein accessions from the identifications
+            for (int i = 0; i < lRatioGroupCollection.length; i++) {
+                iCollection.add(lRatioGroupCollection[i]);
+                iCollectionIndexes.add(iIndex);
+                for (int j = 0; j < lRatioGroupCollection[i].size(); j++) {
+                    DistillerRatioGroup lRatioGroup = (DistillerRatioGroup) lRatioGroupCollection[i].get(j);
+
+                    if (lRatioGroup.getNumberOfIdentifications() != 0) {
+                        String[] lAccessionsForRatioGroup = lRatioGroup.getProteinAccessions();
+                        for (int k = 0; k < lAccessionsForRatioGroup.length; k++) {
+                            //check if it's a new accession
+                            boolean lNewAccession = true;
+                            for (int l = 0; l < iProteinAccession.size(); l++) {
+                                if (iProteinAccession.get(l).equalsIgnoreCase(lAccessionsForRatioGroup[k])) {
+                                    lNewAccession = false;
+                                }
+                            }
+                            if (lNewAccession) {
+                                iProteinAccession.add(lAccessionsForRatioGroup[k]);
+                            }
+
+                        }
+                    } else {
+                        //System.out.println("No identification found");
+                    }
+                }
+            }
+
+            if (lRatioGroupCollection.length == 0) {
+                //show gui
+                JOptionPane.showMessageDialog(iParent, "No quantitative data could be found!\n The program will close.", "INFO", JOptionPane.INFORMATION_MESSAGE);
+                iParent.close();
+            }
+
+            //7.A get the types of the ratios from the first distiller ratio collecion
+            Vector<String> lRatioList = lRatioGroupCollection[0].getRatioTypes();
+            String[] lRatioTypes = new String[lRatioList.size()];
+            lRatioList.toArray(lRatioTypes);
+            iCollectionRatios.add(lRatioTypes);
+
+            //7.B get the types of the ratios from the first distiller ratio collecion
+            Vector<String> lComponentList = lRatioGroupCollection[0].getComponentTypes();
+            String[] lComponentTypes = new String[lComponentList.size()];
+            lComponentList.toArray(lComponentTypes);
+            iCollectionComponents.add(lComponentTypes);
+
+            //Show in the gui that the matching is done
+            setIconOnPanel(jpanMatch, "apply.png", 3, 5);
+
+
+        } catch (SQLException e) {
+            logger.error(e.getMessage(), e);
+        } catch (IOException e) {
+            logger.error(e.getMessage(), e);
+        }
+
     }
 
     /**
@@ -988,7 +1306,6 @@ public class LoadingPanel implements WizardPanel {
 
 
         //6. get all the protein accessions from the identifications
-
 
 
         for (int i = 0; i < lRovFiles.size(); i++) {
@@ -1124,7 +1441,6 @@ public class LoadingPanel implements WizardPanel {
         progressBar.setIndeterminate(true);
 
 
-
         //6. get all the protein accessions from the identifications
         for (int i = 0; i < lRatioGroupCollection.size(); i++) {
 
@@ -1255,7 +1571,6 @@ public class LoadingPanel implements WizardPanel {
         progressBar.setIndeterminate(true);
 
 
-
         //6. get all the protein accessions from the identifications
         for (int i = 0; i < lRatioGroupCollection.size(); i++) {
 
@@ -1381,7 +1696,6 @@ public class LoadingPanel implements WizardPanel {
         progressBar.setString("");
 
 
-
         //6. get all the protein accessions from the identifications
         for (int i = 0; i < lRatioGroupCollection.size(); i++) {
 
@@ -1505,7 +1819,6 @@ public class LoadingPanel implements WizardPanel {
 
         //update progress bar
         progressBar.setString("");
-
 
 
         //6. get all the protein accessions from the identifications
@@ -1739,7 +2052,6 @@ public class LoadingPanel implements WizardPanel {
         progressBar.setIndeterminate(true);
 
 
-
         //6. get all the protein accessions from the identifications
         for (int i = 0; i < lRatioGroupCollection.size(); i++) {
 
@@ -1785,7 +2097,6 @@ public class LoadingPanel implements WizardPanel {
 
 
     }
-
 
 
     private void createUIComponents() {

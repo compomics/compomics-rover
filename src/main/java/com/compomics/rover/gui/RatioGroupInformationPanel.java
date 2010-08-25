@@ -1,5 +1,6 @@
 package com.compomics.rover.gui;
 
+import com.compomics.rover.general.quantitation.source.MaxQuant.MaxQuantRatio;
 import org.apache.log4j.Logger;
 
 import com.compomics.rover.general.singelton.QuantitativeValidationSingelton;
@@ -152,16 +153,31 @@ public class RatioGroupInformationPanel extends JFrame {
                                 //update the db in an other thread
                                 com.compomics.util.sun.SwingWorker lUpdateDbThread = new com.compomics.util.sun.SwingWorker() {
                                     public Boolean construct() {
-                                        DistillerRatio lDistRatio = (DistillerRatio) lRatio;
-                                        QuantitationExtension lQuant = lDistRatio.getQuantitationStoredInDb();
-                                        lQuant.setValid(false);
-                                        lQuant.setComment((String) lCmbComments.getSelectedItem());
-                                        lRatio.setComment((String) lCmbComments.getSelectedItem());
-                                        try {
-                                            lQuant.updateLowPriority(iConnMsLims);
-                                        } catch (SQLException e) {
-                                            JOptionPane.showMessageDialog(new JFrame(), new String[]{"An error occurred will changing the valid status: ", e.getMessage()}, "ERROR!", JOptionPane.ERROR_MESSAGE);
-                                            logger.error(e.getMessage(), e);
+
+                                        if(iRatioGroup.getParentCollection().getRoverSource() == RoverSource.DISTILLER_QUANT_TOOLBOX_MS_LIMS){
+                                            DistillerRatio lDistRatio = (DistillerRatio) lRatio;
+                                            QuantitationExtension lQuant = lDistRatio.getQuantitationStoredInDb();
+                                            lQuant.setValid(false);
+                                            lQuant.setComment((String) lCmbComments.getSelectedItem());
+                                            lRatio.setComment((String) lCmbComments.getSelectedItem());
+                                            try {
+                                                lQuant.updateLowPriority(iConnMsLims);
+                                            } catch (SQLException e) {
+                                                JOptionPane.showMessageDialog(new JFrame(), new String[]{"An error occurred will changing the valid status: ", e.getMessage()}, "ERROR!", JOptionPane.ERROR_MESSAGE);
+                                                logger.error(e.getMessage(), e);
+                                            }
+                                        } else {
+                                            MaxQuantRatio lDistRatio = (MaxQuantRatio) lRatio;
+                                            QuantitationExtension lQuant = lDistRatio.getQuantitationStoredInDb();
+                                            lQuant.setValid(false);
+                                            lQuant.setComment((String) lCmbComments.getSelectedItem());
+                                            lRatio.setComment((String) lCmbComments.getSelectedItem());
+                                            try {
+                                                lQuant.updateLowPriority(iConnMsLims);
+                                            } catch (SQLException e) {
+                                                JOptionPane.showMessageDialog(new JFrame(), new String[]{"An error occurred will changing the valid status: ", e.getMessage()}, "ERROR!", JOptionPane.ERROR_MESSAGE);
+                                                logger.error(e.getMessage(), e);
+                                            }
                                         }
                                         return true;
                                     }
@@ -190,15 +206,28 @@ public class RatioGroupInformationPanel extends JFrame {
                                 //update the db in an other thread
                                 com.compomics.util.sun.SwingWorker lUpdateDbThread = new com.compomics.util.sun.SwingWorker() {
                                     public Boolean construct() {
-                                        DistillerRatio lDistRatio = (DistillerRatio) lRatio;
-                                        QuantitationExtension lQuant = lDistRatio.getQuantitationStoredInDb();
-                                        lQuant.setComment((String) lCmbComments.getSelectedItem());
-                                        lRatio.setComment((String) lCmbComments.getSelectedItem());
-                                        try {
-                                            lQuant.updateLowPriority(iConnMsLims);
-                                        } catch (SQLException e) {
-                                            JOptionPane.showMessageDialog(new JFrame(), new String[]{"An error occurred will changing the valid status: ", e.getMessage()}, "ERROR!", JOptionPane.ERROR_MESSAGE);
-                                            logger.error(e.getMessage(), e);
+                                        if(iRatioGroup.getParentCollection().getRoverSource() == RoverSource.DISTILLER_QUANT_TOOLBOX_MS_LIMS){
+                                            DistillerRatio lDistRatio = (DistillerRatio) lRatio;
+                                            QuantitationExtension lQuant = lDistRatio.getQuantitationStoredInDb();
+                                            lQuant.setComment((String) lCmbComments.getSelectedItem());
+                                            lRatio.setComment((String) lCmbComments.getSelectedItem());
+                                            try {
+                                                lQuant.updateLowPriority(iConnMsLims);
+                                            } catch (SQLException e) {
+                                                JOptionPane.showMessageDialog(new JFrame(), new String[]{"An error occurred will changing the valid status: ", e.getMessage()}, "ERROR!", JOptionPane.ERROR_MESSAGE);
+                                                logger.error(e.getMessage(), e);
+                                            }
+                                        } else {
+                                            MaxQuantRatio lDistRatio = (MaxQuantRatio) lRatio;
+                                            QuantitationExtension lQuant = lDistRatio.getQuantitationStoredInDb();
+                                            lQuant.setComment((String) lCmbComments.getSelectedItem());
+                                            lRatio.setComment((String) lCmbComments.getSelectedItem());
+                                            try {
+                                                lQuant.updateLowPriority(iConnMsLims);
+                                            } catch (SQLException e) {
+                                                JOptionPane.showMessageDialog(new JFrame(), new String[]{"An error occurred will changing the valid status: ", e.getMessage()}, "ERROR!", JOptionPane.ERROR_MESSAGE);
+                                                logger.error(e.getMessage(), e);
+                                            }
                                         }
                                         return true;
                                     }
@@ -259,16 +288,30 @@ public class RatioGroupInformationPanel extends JFrame {
                                 //update the db in an other thread
                                 com.compomics.util.sun.SwingWorker lUpdateDbThread = new com.compomics.util.sun.SwingWorker() {
                                     public Boolean construct() {
-                                        DistillerRatio lDistRatio = (DistillerRatio) lRatio;
-                                        QuantitationExtension lQuant = lDistRatio.getQuantitationStoredInDb();
-                                        lQuant.setValid(true);
-                                        lQuant.setComment((String) lCmbComments.getSelectedItem());
-                                        lRatio.setComment((String) lCmbComments.getSelectedItem());
-                                        try {
-                                            lQuant.updateLowPriority(iConnMsLims);
-                                        } catch (SQLException e) {
-                                            JOptionPane.showMessageDialog(new JFrame(), new String[]{"An error occurred will changing the valid status: ", e.getMessage()}, "ERROR!", JOptionPane.ERROR_MESSAGE);
-                                            logger.error(e.getMessage(), e);
+                                        if(iRatioGroup.getParentCollection().getRoverSource() == RoverSource.DISTILLER_QUANT_TOOLBOX_MS_LIMS){
+                                            DistillerRatio lDistRatio = (DistillerRatio) lRatio;
+                                            QuantitationExtension lQuant = lDistRatio.getQuantitationStoredInDb();
+                                            lQuant.setValid(true);
+                                            lQuant.setComment((String) lCmbComments.getSelectedItem());
+                                            lRatio.setComment((String) lCmbComments.getSelectedItem());
+                                            try {
+                                                lQuant.updateLowPriority(iConnMsLims);
+                                            } catch (SQLException e) {
+                                                JOptionPane.showMessageDialog(new JFrame(), new String[]{"An error occurred will changing the valid status: ", e.getMessage()}, "ERROR!", JOptionPane.ERROR_MESSAGE);
+                                                logger.error(e.getMessage(), e);
+                                            }
+                                        } else {
+                                            MaxQuantRatio lDistRatio = (MaxQuantRatio) lRatio;
+                                            QuantitationExtension lQuant = lDistRatio.getQuantitationStoredInDb();
+                                            lQuant.setValid(true);
+                                            lQuant.setComment((String) lCmbComments.getSelectedItem());
+                                            lRatio.setComment((String) lCmbComments.getSelectedItem());
+                                            try {
+                                                lQuant.updateLowPriority(iConnMsLims);
+                                            } catch (SQLException e) {
+                                                JOptionPane.showMessageDialog(new JFrame(), new String[]{"An error occurred will changing the valid status: ", e.getMessage()}, "ERROR!", JOptionPane.ERROR_MESSAGE);
+                                                logger.error(e.getMessage(), e);
+                                            }
                                         }
                                         return true;
                                     }
@@ -294,15 +337,28 @@ public class RatioGroupInformationPanel extends JFrame {
                             if (iQuantitativeValidationSingelton.isDatabaseMode()) {
                                 com.compomics.util.sun.SwingWorker lUpdateDbThread = new com.compomics.util.sun.SwingWorker() {
                                     public Boolean construct() {
-                                        DistillerRatio lDistRatio = (DistillerRatio) lRatio;
-                                        QuantitationExtension lQuant = lDistRatio.getQuantitationStoredInDb();
-                                        lQuant.setComment((String) lCmbComments.getSelectedItem());
-                                        lRatio.setComment((String) lCmbComments.getSelectedItem());
-                                        try {
-                                            lQuant.updateLowPriority(iConnMsLims);
-                                        } catch (SQLException e) {
-                                            JOptionPane.showMessageDialog(new JFrame(), new String[]{"An error occurred will changing the valid status: ", e.getMessage()}, "ERROR!", JOptionPane.ERROR_MESSAGE);
-                                            logger.error(e.getMessage(), e);
+                                        if(iRatioGroup.getParentCollection().getRoverSource() == RoverSource.DISTILLER_QUANT_TOOLBOX_MS_LIMS){
+                                            DistillerRatio lDistRatio = (DistillerRatio) lRatio;
+                                            QuantitationExtension lQuant = lDistRatio.getQuantitationStoredInDb();
+                                            lQuant.setComment((String) lCmbComments.getSelectedItem());
+                                            lRatio.setComment((String) lCmbComments.getSelectedItem());
+                                            try {
+                                                lQuant.updateLowPriority(iConnMsLims);
+                                            } catch (SQLException e) {
+                                                JOptionPane.showMessageDialog(new JFrame(), new String[]{"An error occurred will changing the valid status: ", e.getMessage()}, "ERROR!", JOptionPane.ERROR_MESSAGE);
+                                                logger.error(e.getMessage(), e);
+                                            }
+                                        } else {
+                                            MaxQuantRatio lDistRatio = (MaxQuantRatio) lRatio;
+                                            QuantitationExtension lQuant = lDistRatio.getQuantitationStoredInDb();
+                                            lQuant.setComment((String) lCmbComments.getSelectedItem());
+                                            lRatio.setComment((String) lCmbComments.getSelectedItem());
+                                            try {
+                                                lQuant.updateLowPriority(iConnMsLims);
+                                            } catch (SQLException e) {
+                                                JOptionPane.showMessageDialog(new JFrame(), new String[]{"An error occurred will changing the valid status: ", e.getMessage()}, "ERROR!", JOptionPane.ERROR_MESSAGE);
+                                                logger.error(e.getMessage(), e);
+                                            }
                                         }
                                         return true;
                                     }
@@ -432,7 +488,7 @@ public class RatioGroupInformationPanel extends JFrame {
                         jpanExtra.add(Box.createVerticalStrut(5));
                     }
                 }
-            } else if(iRatioGroup.getParentCollection().getRoverSource() == RoverSource.MAX_QUANT || iRatioGroup.getParentCollection().getRoverSource() == RoverSource.MAX_QUANT_NO_SIGN  ) {
+            } else if(iRatioGroup.getParentCollection().getRoverSource() == RoverSource.MAX_QUANT || iRatioGroup.getParentCollection().getRoverSource() == RoverSource.MAX_QUANT_MS_LIMS || iRatioGroup.getParentCollection().getRoverSource() == RoverSource.MAX_QUANT_NO_SIGN  ) {
                 //it's Max_quant data
                 for (int i = 0; i < iRatioGroup.getParentCollection().getComponentTypes().size(); i++) {
                     DefaultPeptideIdentification lIdentification = (DefaultPeptideIdentification) iRatioGroup.getIdentificationForType(iRatioGroup.getParentCollection().getComponentTypes().get(i));
@@ -542,7 +598,7 @@ public class RatioGroupInformationPanel extends JFrame {
                 jpanGraphs.add(lInt);
                 jpanGraphs.add(Box.createVerticalStrut(5));
                 jpanGraphs.setBackground(Color.white);
-            } else if(iRatioGroup.getParentCollection().getRoverSource() == RoverSource.MAX_QUANT || iRatioGroup.getParentCollection().getRoverSource() == RoverSource.MAX_QUANT_NO_SIGN ){
+            } else if(iRatioGroup.getParentCollection().getRoverSource() == RoverSource.MAX_QUANT || iRatioGroup.getParentCollection().getRoverSource() == RoverSource.MAX_QUANT_MS_LIMS || iRatioGroup.getParentCollection().getRoverSource() == RoverSource.MAX_QUANT_NO_SIGN ){
                 MaxQuantRatioGroup lRatioGroup = (MaxQuantRatioGroup) iRatioGroup;
                 ChartPanel lInt = new ChartPanel(lRatioGroup.getIntensityChart());
                 //add the absolute intensity panel

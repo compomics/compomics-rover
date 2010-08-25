@@ -36,6 +36,7 @@ public class RoverSourcePanel implements WizardPanel {
     private JRadioButton maxQuantRadioButton;
     private JRadioButton censusOutTxtAndRadioButton;
     private JRadioButton TMTQuantitationFromMascotRadioButton;
+    private JRadioButton maxQuantMsLims;
 
     /**
      * The wizard frame holder parent
@@ -72,6 +73,7 @@ public class RoverSourcePanel implements WizardPanel {
         msQuantTxtFilesRadioButton.addActionListener(listener);
         maxQuantRadioButton.addActionListener(listener);
         censusOutTxtAndRadioButton.addActionListener(listener);
+        maxQuantMsLims.addActionListener(listener);
     }
 
 
@@ -117,6 +119,8 @@ public class RoverSourcePanel implements WizardPanel {
             lSource = RoverSource.MAX_QUANT;
         } else if (censusOutTxtAndRadioButton.isSelected()) {
             lSource = RoverSource.CENSUS;
+        } else if (maxQuantMsLims.isSelected()) {
+            lSource = RoverSource.MAX_QUANT_MS_LIMS;
         }
 
         //check if anything was selected
@@ -172,6 +176,8 @@ public class RoverSourcePanel implements WizardPanel {
             iParent.setNextButtonEnabled(true);
         } else if (TMTQuantitationFromMascotRadioButton.isSelected()) {
             iParent.setNextButtonEnabled(true);
+        } else if (maxQuantMsLims.isSelected()) {
+            iParent.setNextButtonEnabled(true);
         }
     }
 
@@ -220,7 +226,7 @@ public class RoverSourcePanel implements WizardPanel {
         distillerQuantitationToolboxRovRadioButton.setText("Mascot distiller quantitation toolbox (.rov) files");
         gbc = new GridBagConstraints();
         gbc.gridx = 1;
-        gbc.gridy = 8;
+        gbc.gridy = 9;
         gbc.anchor = GridBagConstraints.WEST;
         gbc.insets = new Insets(5, 5, 5, 5);
         jpanContent.add(distillerQuantitationToolboxRovRadioButton, gbc);
@@ -229,7 +235,7 @@ public class RoverSourcePanel implements WizardPanel {
         distillerQuantitationToolboxMsLimsRadioButton.setText("Mascot distiller quantitation toolbox quantitation from ms_lims");
         gbc = new GridBagConstraints();
         gbc.gridx = 1;
-        gbc.gridy = 9;
+        gbc.gridy = 10;
         gbc.anchor = GridBagConstraints.WEST;
         gbc.insets = new Insets(5, 5, 5, 5);
         jpanContent.add(distillerQuantitationToolboxMsLimsRadioButton, gbc);
@@ -240,7 +246,7 @@ public class RoverSourcePanel implements WizardPanel {
         gbc = new GridBagConstraints();
         gbc.gridx = 0;
         gbc.gridy = 1;
-        gbc.gridheight = 9;
+        gbc.gridheight = 10;
         gbc.weightx = 1.0;
         gbc.anchor = GridBagConstraints.WEST;
         gbc.ipadx = 20;
@@ -264,6 +270,15 @@ public class RoverSourcePanel implements WizardPanel {
         gbc.anchor = GridBagConstraints.WEST;
         gbc.insets = new Insets(5, 5, 5, 5);
         jpanContent.add(maxQuantRadioButton, gbc);
+        maxQuantMsLims = new JRadioButton();
+        maxQuantMsLims.setFont(new Font("Tahoma", maxQuantMsLims.getFont().getStyle(), maxQuantMsLims.getFont().getSize()));
+        maxQuantMsLims.setText("MaxQuant quantifications from ms_lims");
+        gbc = new GridBagConstraints();
+        gbc.gridx = 1;
+        gbc.gridy = 8;
+        gbc.anchor = GridBagConstraints.WEST;
+        gbc.insets = new Insets(5, 5, 5, 5);
+        jpanContent.add(maxQuantMsLims, gbc);
         censusOutTxtAndRadioButton = new JRadioButton();
         censusOutTxtAndRadioButton.setFont(new Font("Tahoma", censusOutTxtAndRadioButton.getFont().getStyle(), censusOutTxtAndRadioButton.getFont().getSize()));
         censusOutTxtAndRadioButton.setText("Census out (.txt) and Census chro (.xml) files");
@@ -291,6 +306,7 @@ public class RoverSourcePanel implements WizardPanel {
         buttonGroup.add(distillerQuantitationToolboxMsLimsRadioButton);
         buttonGroup.add(msQuantTxtFilesRadioButton);
         buttonGroup.add(maxQuantRadioButton);
+        buttonGroup.add(maxQuantMsLims);
         buttonGroup.add(censusOutTxtAndRadioButton);
         buttonGroup.add(TMTQuantitationFromMascotRadioButton);
     }

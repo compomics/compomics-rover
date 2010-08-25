@@ -257,8 +257,8 @@ public class QuantitationValidationGUI extends JFrame {
             tabbedPane.remove(1);
         }
 
-        //show the reconstruct checkbox if needed, and the showRovButton
-        if (!iQuantitativeValidationSingelton.isMultipleSources()) {
+        //don't show the showRovButton
+        if (iQuantitativeValidationSingelton.isMultipleSources()) {
             //we've got a multi project
             //some features will not be here
             showRovButton.setVisible(false);

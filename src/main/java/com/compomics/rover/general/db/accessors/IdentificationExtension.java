@@ -47,6 +47,8 @@ public class IdentificationExtension extends Identification implements PeptideId
      */
     private String iSpectrumFileName;
 
+    private long iFileRef;
+
     /**
      * Default constructor.
      */
@@ -237,5 +239,13 @@ public class IdentificationExtension extends Identification implements PeptideId
      */
     public void setSpectrumFileName(String aFileName) {
         this.iSpectrumFileName = aFileName;
+    }
+
+    public long getFileRef() {
+        return iFileRef;
+    }
+
+    public void setFileRef(long iFileRef) {
+        this.iFileRef = iFileRef;
     }
 }

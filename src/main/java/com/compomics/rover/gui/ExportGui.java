@@ -1,5 +1,6 @@
 package com.compomics.rover.gui;
 
+import com.compomics.rover.general.PeptideIdentification.DefaultPeptideIdentification;
 import org.apache.log4j.Logger;
 
 import com.compomics.rover.general.sequenceretriever.TairSequenceRetriever;
@@ -316,7 +317,7 @@ public class ExportGui extends JFrame {
                                             }
                                         }
 
-                                    } else if (lRatioGroup.getParentCollection().getRoverSource() == RoverSource.MAX_QUANT || lRatioGroup.getParentCollection().getRoverSource() == RoverSource.MAX_QUANT_NO_SIGN) {
+                                    } else if (lRatioGroup.getParentCollection().getRoverSource() == RoverSource.MAX_QUANT || lRatioGroup.getParentCollection().getRoverSource() == RoverSource.MAX_QUANT_NO_SIGN || lRatioGroup.getParentCollection().getRoverSource() == RoverSource.MAX_QUANT_MS_LIMS) {
                                         MaxQuantRatio lRatio = (MaxQuantRatio) lRatioGroup.getRatio(l);
                                         HashMap lStatMeas = iQuantitativeValidationSingelton.getReferenceSet().getStatisticalMeasermentForRatio(lRatio.getType(), lRatio);
 
@@ -459,7 +460,7 @@ public class ExportGui extends JFrame {
                     for (int p = 0; p < iQuantitativeValidationSingelton.getRoverSources().size(); p++) {
                         if (iQuantitativeValidationSingelton.getRoverSources().get(p) == RoverSource.DISTILLER_QUANT_TOOLBOX_ROV || iQuantitativeValidationSingelton.getRoverSources().get(p) == RoverSource.DISTILLER_QUANT_TOOLBOX_MS_LIMS) {
                             hasDistiller = true;
-                        } else if (iQuantitativeValidationSingelton.getRoverSources().get(p) == RoverSource.MAX_QUANT || iQuantitativeValidationSingelton.getRoverSources().get(p) == RoverSource.MAX_QUANT_NO_SIGN) {
+                        } else if (iQuantitativeValidationSingelton.getRoverSources().get(p) == RoverSource.MAX_QUANT || iQuantitativeValidationSingelton.getRoverSources().get(p) == RoverSource.MAX_QUANT_NO_SIGN || iQuantitativeValidationSingelton.getRoverSources().get(p) == RoverSource.MAX_QUANT_MS_LIMS) {
                             hasMaxQuant = true;
                         } else {
                             hasMsQuantCensus = true;
@@ -567,7 +568,7 @@ public class ExportGui extends JFrame {
                                 //write protein information
                                 lResult = lResult + lProtein.getAccession() + lSeparator + lProtein.getProteinComment() + lSeparator + lProtein.getSelected() + lSeparator + lProtein.getValidated() + lSeparator + lRatioGroup.getPeptideSequence() + lSeparator + lStart + lSeparator + lEnd + lSeparator + lColor;
                                 if (hasMaxQuant) {
-                                    if (lRatioGroup.getParentCollection().getRoverSource() == RoverSource.MAX_QUANT || lRatioGroup.getParentCollection().getRoverSource() == RoverSource.MAX_QUANT_NO_SIGN) {
+                                    if (lRatioGroup.getParentCollection().getRoverSource() == RoverSource.MAX_QUANT || lRatioGroup.getParentCollection().getRoverSource() == RoverSource.MAX_QUANT_NO_SIGN || lRatioGroup.getParentCollection().getRoverSource() == RoverSource.MAX_QUANT_MS_LIMS) {
                                         MaxQuantRatioGroup lMQGroup = (MaxQuantRatioGroup) lRatioGroup;
                                         lResult = lResult + lSeparator + lMQGroup.getPEP();
                                     } else {
@@ -628,8 +629,13 @@ public class ExportGui extends JFrame {
                                     PeptideIdentification lIdentification = lRatioGroup.getIdentificationForType(lComponents[k]);
                                     if (lIdentification != null) {
                                         if (iQuantitativeValidationSingelton.isDatabaseMode()) {
-                                            IdentificationExtension lIdEx = (IdentificationExtension) lIdentification;
-                                            lResult = lResult + lSeparator + lIdEx.getIdentificationid();
+                                            if (lRatioGroup.getParentCollection().getRoverSource() == RoverSource.MAX_QUANT_MS_LIMS) {
+                                                DefaultPeptideIdentification lIdEx = (DefaultPeptideIdentification) lIdentification;
+                                                lResult = lResult + lSeparator + lIdEx.getId();
+                                            } else {
+                                                IdentificationExtension lIdEx = (IdentificationExtension) lIdentification;
+                                                lResult = lResult + lSeparator + lIdEx.getIdentificationid();
+                                            }
                                         } else {
                                             if (lRatioGroup.getParentCollection().getRoverSource() == RoverSource.CENSUS) {
                                                 lResult = lResult + lSeparator + "Y";
@@ -652,7 +658,7 @@ public class ExportGui extends JFrame {
                                         lResult = lResult + lSeparator + lRatioGroup.getParentCollection().getMetaData(QuantitationMetaType.FILENAME);
                                     } else {
                                         lResult = lResult + lSeparator + lSeparator;
-                                        if (lRatioGroup.getParentCollection().getRoverSource() == RoverSource.MAX_QUANT_NO_SIGN || lRatioGroup.getParentCollection().getRoverSource() == RoverSource.MAX_QUANT) {
+                                        if (lRatioGroup.getParentCollection().getRoverSource() == RoverSource.MAX_QUANT_NO_SIGN || lRatioGroup.getParentCollection().getRoverSource() == RoverSource.MAX_QUANT || lRatioGroup.getParentCollection().getRoverSource() == RoverSource.MAX_QUANT_MS_LIMS) {
                                             lResult = lResult + lSeparator;
                                             for (int k = 0; k < lComponents.length; k++) {
                                                 MaxQuantRatioGroup lMaxQuantRatioGroup = (MaxQuantRatioGroup) lRatioGroup;
@@ -674,7 +680,7 @@ public class ExportGui extends JFrame {
 
                                 } else {
                                     if (hasMaxQuant) {
-                                        if (lRatioGroup.getParentCollection().getRoverSource() == RoverSource.MAX_QUANT_NO_SIGN || lRatioGroup.getParentCollection().getRoverSource() == RoverSource.MAX_QUANT) {
+                                        if (lRatioGroup.getParentCollection().getRoverSource() == RoverSource.MAX_QUANT_NO_SIGN || lRatioGroup.getParentCollection().getRoverSource() == RoverSource.MAX_QUANT || lRatioGroup.getParentCollection().getRoverSource() == RoverSource.MAX_QUANT_MS_LIMS) {
                                             for (int k = 0; k < lComponents.length; k++) {
                                                 MaxQuantRatioGroup lMaxQuantRatioGroup = (MaxQuantRatioGroup) lRatioGroup;
                                                 lResult = lResult + lSeparator + lMaxQuantRatioGroup.getAbsoluteIntensities()[k];
