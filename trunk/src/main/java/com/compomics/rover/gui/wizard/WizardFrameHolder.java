@@ -48,6 +48,7 @@ public class WizardFrameHolder extends JFrame implements Flamable {
     private JPanel jpanContent;
     private JPanel wizardPanel;
     private JButton btnOpenMulti;
+    private JLabel lblMemory;
 
     /**
      * The index of the wizard
@@ -246,7 +247,8 @@ public class WizardFrameHolder extends JFrame implements Flamable {
         this.setLocation(150, 150);
         this.setVisible(true);
         this.setIconImage(new ImageIcon(getClass().getResource("/rover.png")).getImage());
-
+        this.lblMemory.setText(String.valueOf((Runtime.getRuntime().maxMemory()/1024.0)/1024.0));
+        lblMemory.setVisible(false);
         update(getGraphics());
 
     }
@@ -535,7 +537,7 @@ public class WizardFrameHolder extends JFrame implements Flamable {
         label2.setText("Start the analysis or combine quantitative data from different sources");
         gbc = new GridBagConstraints();
         gbc.gridx = 0;
-        gbc.gridy = 3;
+        gbc.gridy = 4;
         gbc.anchor = GridBagConstraints.WEST;
         gbc.insets = new Insets(5, 5, 5, 5);
         wizardPanel.add(label2, gbc);
@@ -562,9 +564,16 @@ public class WizardFrameHolder extends JFrame implements Flamable {
         btnOpenMulti.setToolTipText("next");
         gbc = new GridBagConstraints();
         gbc.gridx = 1;
-        gbc.gridy = 3;
+        gbc.gridy = 4;
         gbc.insets = new Insets(5, 5, 5, 5);
         wizardPanel.add(btnOpenMulti, gbc);
+        lblMemory = new JLabel();
+        lblMemory.setText("Label");
+        gbc = new GridBagConstraints();
+        gbc.gridx = 0;
+        gbc.gridy = 3;
+        gbc.anchor = GridBagConstraints.WEST;
+        wizardPanel.add(lblMemory, gbc);
         exitButton = new JButton();
         exitButton.setContentAreaFilled(false);
         exitButton.setFocusPainted(false);
