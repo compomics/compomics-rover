@@ -45,8 +45,8 @@ import java.util.Collections;
  * This is the main frame of Rover
  */
 public class QuantitationValidationGUI extends JFrame {
-	// Class specific log4j logger for QuantitationValidationGUI instances.
-	 private static Logger logger = Logger.getLogger(QuantitationValidationGUI.class);
+    // Class specific log4j logger for QuantitationValidationGUI instances.
+    private static Logger logger = Logger.getLogger(QuantitationValidationGUI.class);
 
     //gui components
     private JTabbedPane tabbedPane;
@@ -1818,7 +1818,7 @@ public class QuantitationValidationGUI extends JFrame {
         exportButton.setText("");
         exportButton.setToolTipText("Export proteins");
         gbc = new GridBagConstraints();
-        gbc.gridx = 10;
+        gbc.gridx = 11;
         gbc.gridy = 0;
         gbc.gridheight = 44;
         gbc.fill = GridBagConstraints.HORIZONTAL;
@@ -1832,7 +1832,7 @@ public class QuantitationValidationGUI extends JFrame {
         loadRoverFileButton.setText("");
         loadRoverFileButton.setToolTipText("Import a .rover file");
         gbc = new GridBagConstraints();
-        gbc.gridx = 12;
+        gbc.gridx = 13;
         gbc.gridy = 0;
         gbc.gridheight = 44;
         gbc.fill = GridBagConstraints.HORIZONTAL;
@@ -1844,7 +1844,7 @@ public class QuantitationValidationGUI extends JFrame {
         reconstructButton.setText("");
         reconstructButton.setToolTipText("Reconstruct protein from different sources");
         gbc = new GridBagConstraints();
-        gbc.gridx = 11;
+        gbc.gridx = 12;
         gbc.gridy = 0;
         gbc.gridheight = 44;
         gbc.fill = GridBagConstraints.HORIZONTAL;
@@ -1858,6 +1858,15 @@ public class QuantitationValidationGUI extends JFrame {
         gbc.fill = GridBagConstraints.HORIZONTAL;
         gbc.insets = new Insets(5, 5, 5, 5);
         jpanProteinMeanOptions.add(progressBar1, gbc);
+        final JPanel panel2 = new JPanel();
+        panel2.setLayout(new GridBagLayout());
+        panel2.setBackground(new Color(-1));
+        gbc = new GridBagConstraints();
+        gbc.gridx = 10;
+        gbc.gridy = 43;
+        gbc.weightx = 1.0;
+        gbc.fill = GridBagConstraints.BOTH;
+        jpanProteinMeanOptions.add(panel2, gbc);
         showPossibleIsoformsButton = new JButton();
         showPossibleIsoformsButton.setContentAreaFilled(false);
         showPossibleIsoformsButton.setFocusPainted(false);
@@ -1894,10 +1903,10 @@ public class QuantitationValidationGUI extends JFrame {
         gbc.fill = GridBagConstraints.BOTH;
         tabRov.add(splitPane4, gbc);
         splitPane4.setRightComponent(jpanRatioInRovTab);
-        final JPanel panel2 = new JPanel();
-        panel2.setLayout(new GridBagLayout());
-        panel2.setBackground(new Color(-1));
-        splitPane4.setLeftComponent(panel2);
+        final JPanel panel3 = new JPanel();
+        panel3.setLayout(new GridBagLayout());
+        panel3.setBackground(new Color(-1));
+        splitPane4.setLeftComponent(panel3);
         final JScrollPane scrollPane3 = new JScrollPane();
         gbc = new GridBagConstraints();
         gbc.gridx = 0;
@@ -1905,7 +1914,7 @@ public class QuantitationValidationGUI extends JFrame {
         gbc.weightx = 1.0;
         gbc.weighty = 1.0;
         gbc.fill = GridBagConstraints.BOTH;
-        panel2.add(scrollPane3, gbc);
+        panel3.add(scrollPane3, gbc);
         scrollPane3.setViewportView(treeRovFiles);
         chbShowOnlyNonValid = new JCheckBox();
         chbShowOnlyNonValid.setBackground(new Color(-1));
@@ -1914,7 +1923,7 @@ public class QuantitationValidationGUI extends JFrame {
         gbc.gridx = 0;
         gbc.gridy = 1;
         gbc.anchor = GridBagConstraints.WEST;
-        panel2.add(chbShowOnlyNonValid, gbc);
+        panel3.add(chbShowOnlyNonValid, gbc);
     }
 
     /**

@@ -1,5 +1,6 @@
 package com.compomics.rover.gui.multiwizard;
 
+import com.compomics.rover.general.enumeration.ReferenceSetEnum;
 import org.apache.log4j.Logger;
 
 import com.compomics.mslims.db.accessors.Project;
@@ -108,6 +109,8 @@ public class WizardFrameHolder extends JFrame implements Flamable {
     private Vector<String> iNewComponentsType;
     private Vector<String> iNewRatioTypes;
     private Vector<QuantitativeProtein> iQuantitativeProtein;
+    private int iMsfPeptideConfidence;
+    private boolean iMsfOnlyHighestScoring;
 
     /**
      * @param aStandAlone
@@ -338,7 +341,7 @@ public class WizardFrameHolder extends JFrame implements Flamable {
     public boolean getUseMs_lims() {
         boolean lDatabaseMode = false;
         RoverSource lRoverSource = iCurrentRoverSource;
-        if (lRoverSource == RoverSource.ITRAQ_MS_LIMS || lRoverSource == RoverSource.DISTILLER_QUANT_TOOLBOX_MS_LIMS || lRoverSource == RoverSource.MAX_QUANT_MS_LIMS) {
+        if (lRoverSource == RoverSource.THERMO_MSF_LIMS || lRoverSource == RoverSource.ITRAQ_MS_LIMS || lRoverSource == RoverSource.DISTILLER_QUANT_TOOLBOX_MS_LIMS || lRoverSource == RoverSource.MAX_QUANT_MS_LIMS) {
             lDatabaseMode = true;
         }
         return lDatabaseMode;
@@ -489,7 +492,11 @@ public class WizardFrameHolder extends JFrame implements Flamable {
      * @param lUseAllProteins
      */
     public void setUseAllProteinsForReferenceSet(boolean lUseAllProteins) {
-        iQuantitativeValidationSingelton.setUseAllProteinsForReferenceSet(lUseAllProteins);
+        if (lUseAllProteins) {
+            iQuantitativeValidationSingelton.setReferenceSetEnum(ReferenceSetEnum.ALL);
+        } else {
+            iQuantitativeValidationSingelton.setReferenceSetEnum(ReferenceSetEnum.MOST_ABUNDANT);
+        }
     }
 
     /**
@@ -646,8 +653,38 @@ public class WizardFrameHolder extends JFrame implements Flamable {
         iQuantitativeValidationSingelton.setFastaDatabaseLocation(text);
     }
 
+    public void setPeptizerStatus(boolean selected) {
+        iQuantitativeValidationSingelton.setExcludePeptizerUnvalid(selected);
+    }
+
     public JButton getPreviousButton() {
         return previousButton;
+    }
+
+    public boolean getMsfUsage() {
+        boolean lResult = false;
+        for (int i = 0; i < iRoverSource.size(); i++) {
+            if (iRoverSource.get(i) == RoverSource.THERMO_MSF_FILES) {
+                lResult = true;
+            }
+        }
+        return lResult;
+    }
+
+    public void setMsfPeptideConfidence(int i) {
+        this.iMsfPeptideConfidence = i;
+    }
+
+    public void setMsfOnlyHighesScoring(boolean b) {
+        this.iMsfOnlyHighestScoring = b;
+    }
+
+    public int getMsfPeptideConfidence() {
+        return iMsfPeptideConfidence;
+    }
+
+    public boolean isMsfOnlyHighestScoring() {
+        return iMsfOnlyHighestScoring;
     }
 
     /**

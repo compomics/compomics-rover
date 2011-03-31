@@ -216,6 +216,15 @@ public class DefaultRatio implements Ratio {
         iUpdates = iUpdates + 1;
     }
 
+    public void setRecalculatedRatio(double lNewRatio, boolean lLog2) {
+        if(lLog2){
+            iRatio = Math.pow(2,lNewRatio);
+        } else {
+            iRatio = lNewRatio;
+        }
+        iUpdates = iUpdates + 1;
+    }
+
     public void setOriginalRatio(double lOriginalRatio){
         iOriginalRatio = Math.pow(2,lOriginalRatio);
     }

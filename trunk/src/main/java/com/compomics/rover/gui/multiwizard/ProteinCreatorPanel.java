@@ -1,5 +1,6 @@
 package com.compomics.rover.gui.multiwizard;
 
+import com.compomics.rover.general.enumeration.ReferenceSetEnum;
 import org.apache.log4j.Logger;
 
 import com.compomics.rover.general.enumeration.RoverSource;
@@ -132,7 +133,7 @@ public class ProteinCreatorPanel implements WizardPanel {
                 Collections.sort(lQuantProtein, new QuantitativeProteinSorterByRatioGroupNumbers());
                 //get the reference set size from the singelton
                 int lReferenceSetSize = iQuantitativeValidationSingelton.getNumberOfProteinsInReferenceSet();
-                if (iQuantitativeValidationSingelton.getUseAllProteinsForReferenceSet()) {
+                if (iQuantitativeValidationSingelton.getReferenceSetEnum() == ReferenceSetEnum.ALL) {
                     lReferenceSetSize = lQuantProtein.size();
                 }
                 if (lReferenceSetSize > lQuantProtein.size()) {
@@ -208,6 +209,8 @@ public class ProteinCreatorPanel implements WizardPanel {
                         lRatioType = lRatioTypes.get(j).getType();
                     }
                 }
+
+
                 //get the ratios
                 Vector<Ratio> lValidUniqueRatiosForSource = new Vector<Ratio>();
                 Vector<Ratio> lAllRatiosForSource = new Vector<Ratio>();
@@ -442,7 +445,7 @@ public class ProteinCreatorPanel implements WizardPanel {
                     lCoefVarDiff = Math.abs(lCoefVarNew - lCoefVarOld);
 
                     
-                    //out.println("|   " + (lCycles + 1) + "   |   " + lStDevOld + "   |   " + lOldMADs.getMean() + "   |   " + lCoefVarOld + "   |   " + lStDevNew + "   |   " + lNewMADs.getMean() + "   |   " + lCoefVarNew + "   |");
+                    //System.out.println("," + (lCycles + 1) + "," + lStDevOld + "," + lOldMADs.getMean() + "," + lCoefVarOld + "," + lStDevNew + "," + lNewMADs.getMean() + "," + lCoefVarNew + "   |");
 
                     lAllCalculatedMADs.add(lTempMADs);
 

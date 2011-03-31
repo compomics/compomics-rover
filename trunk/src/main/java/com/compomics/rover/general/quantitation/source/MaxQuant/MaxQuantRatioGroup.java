@@ -1,8 +1,6 @@
 package com.compomics.rover.general.quantitation.source.MaxQuant;
 
 import com.compomics.rover.general.db.accessors.IdentificationExtension;
-import com.compomics.rover.general.interfaces.PeptideIdentification;
-import com.compomics.rover.general.quantitation.source.distiller.DistillerPeptide;
 import org.apache.log4j.Logger;
 
 import com.compomics.rover.general.quantitation.RatioGroup;
@@ -11,7 +9,6 @@ import com.compomics.rover.general.quantitation.RatioType;
 import com.compomics.rover.general.singelton.QuantitativeValidationSingelton;
 import com.compomics.rover.general.interfaces.Ratio;
 
-import java.util.ArrayList;
 import java.util.Vector;
 import java.awt.*;
 
@@ -105,7 +102,7 @@ public class MaxQuantRatioGroup  extends RatioGroup {
         // 1. Iterate over each of the given Identification instances.
         for(int i = 0; i<aIdentifications.length; i ++){
 
-            if(aIdentifications[i].getFileRef() == iId){
+            if(aIdentifications[i].getQuantitationGroupId() == iId){
                 //the file ref id is correct
                 this.addIdentification(aIdentifications[i], aIdentifications[i].getType());
             }

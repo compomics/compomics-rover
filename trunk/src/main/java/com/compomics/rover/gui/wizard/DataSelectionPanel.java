@@ -145,6 +145,8 @@ public class DataSelectionPanel implements Connectable, WizardPanel {
             lFilter = new TextFileFilter();
         } else if (RoverSource.CENSUS == iRoverSource) {
             lFilter = new CensusFilter();
+        } else if (RoverSource.THERMO_MSF_FILES == iRoverSource) {
+            lFilter = new MsfFileFilter();
         }
         if (iQuantitationSingelton.getFileLocationOpener() != null) {
             fc.setCurrentDirectory(new File(iQuantitationSingelton.getFileLocationOpener()));
@@ -298,9 +300,11 @@ public class DataSelectionPanel implements Connectable, WizardPanel {
                 } else if (RoverSource.MAX_QUANT == iRoverSource) {
                     iNotFeasableReason = "No correct (.txt) files were selected.";
                 } else if (RoverSource.CENSUS == iRoverSource) {
-                    iNotFeasableReason = "No correct .txt and .xml file were selected.";
+                    iNotFeasableReason = "No correct .txt and .xml file was selected.";
                 } else if (RoverSource.ITRAQ_DAT == iRoverSource || RoverSource.TMT_DAT == iRoverSource) {
                     iNotFeasableReason = "No correct .dat files were selected.";
+                } else if (RoverSource.THERMO_MSF_FILES == iRoverSource) {
+                    iNotFeasableReason = "No correct .msf files were selected.";
                 } else {
                     iNotFeasableReason = "No correct (.rov) files were selected.";
                 }
@@ -732,6 +736,19 @@ public class DataSelectionPanel implements Connectable, WizardPanel {
 
         public String getDescription() {
             return ".mgf or .rov files";
+        }
+    }
+
+    /**
+     * A .msf file filter
+     */
+    class MsfFileFilter extends FileFilter {
+        public boolean accept(File f) {
+            return f.isDirectory() || f.getName().toLowerCase().endsWith(".msf");
+        }
+
+        public String getDescription() {
+            return ".msf";
         }
     }
 }

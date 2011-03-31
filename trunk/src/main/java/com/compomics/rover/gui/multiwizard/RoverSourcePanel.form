@@ -11,7 +11,7 @@
     <children>
       <component id="7fe4" class="javax.swing.JRadioButton" binding="distillerQuantitationToolboxRovRadioButton">
         <constraints>
-          <grid row="8" column="1" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+          <grid row="10" column="1" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
           <gridbag top="5" left="5" bottom="5" right="5" weightx="0.0" weighty="0.0"/>
         </constraints>
         <properties>
@@ -21,7 +21,7 @@
       </component>
       <component id="a6f74" class="javax.swing.JRadioButton" binding="distillerQuantitationToolboxMsLimsRadioButton">
         <constraints>
-          <grid row="9" column="1" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+          <grid row="11" column="1" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
           <gridbag top="5" left="5" bottom="5" right="5" weightx="0.0" weighty="0.0"/>
         </constraints>
         <properties>
@@ -31,7 +31,7 @@
       </component>
       <component id="dc602" class="javax.swing.JLabel">
         <constraints>
-          <grid row="1" column="0" row-span="9" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+          <grid row="1" column="0" row-span="11" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
           <gridbag top="5" left="5" bottom="5" right="5" weightx="1.0" weighty="0.0" ipadx="20"/>
         </constraints>
         <properties>
@@ -70,6 +70,16 @@
           <text value="MaxQuant quantifications from ms_lims"/>
         </properties>
       </component>
+      <component id="faa02" class="javax.swing.JRadioButton" binding="thermoMSFFilesMsfRadioButton" default-binding="true">
+        <constraints>
+          <grid row="8" column="1" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+          <gridbag top="5" left="5" bottom="5" right="5" weightx="0.0" weighty="0.0"/>
+        </constraints>
+        <properties>
+          <font name="Tahoma"/>
+          <text value="Proteome discoverer MSF files (.msf)"/>
+        </properties>
+      </component>
       <component id="d1fbb" class="javax.swing.JRadioButton" binding="censusOutTxtAndRadioButton" default-binding="true">
         <constraints>
           <grid row="0" column="1" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
@@ -82,7 +92,7 @@
       </component>
       <component id="5f8ca" class="javax.swing.JLabel">
         <constraints>
-          <grid row="10" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+          <grid row="12" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
           <gridbag top="5" left="5" bottom="5" right="5" weightx="0.0" weighty="0.0" ipadx="20"/>
         </constraints>
         <properties>
@@ -92,12 +102,22 @@
       </component>
       <component id="8900c" class="javax.swing.JTextField" binding="txtTitle">
         <constraints>
-          <grid row="10" column="1" row-span="1" col-span="1" vsize-policy="0" hsize-policy="6" anchor="8" fill="1" indent="0" use-parent-layout="false">
+          <grid row="12" column="1" row-span="1" col-span="1" vsize-policy="0" hsize-policy="6" anchor="8" fill="1" indent="0" use-parent-layout="false">
             <preferred-size width="150" height="-1"/>
           </grid>
           <gridbag top="5" left="5" bottom="5" right="5" weightx="0.0" weighty="0.0"/>
         </constraints>
         <properties/>
+      </component>
+      <component id="8f5ce" class="javax.swing.JRadioButton" binding="proteomeDiscovererQuantificationsFromRadioButton" default-binding="true">
+        <constraints>
+          <grid row="9" column="1" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+          <gridbag top="5" left="5" bottom="5" right="5" weightx="0.0" weighty="0.0"/>
+        </constraints>
+        <properties>
+          <font name="Tahoma"/>
+          <text value="Proteome discoverer quantifications from ms_lims"/>
+        </properties>
       </component>
     </children>
   </grid>
@@ -107,12 +127,13 @@
       <member id="6e42"/>
       <member id="c4856"/>
     </group>
-    <group name="buttonGroup1">
+    <group name="buttonGroup3">
       <member id="7fe4"/>
       <member id="a6f74"/>
       <member id="609af"/>
       <member id="d4add"/>
       <member id="2307a"/>
+      <member id="faa02"/>
       <member id="d1fbb"/>
     </group>
   </buttonGroups>

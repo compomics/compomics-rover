@@ -37,6 +37,8 @@ public class RoverSourcePanel implements WizardPanel {
     private JRadioButton censusOutTxtAndRadioButton;
     private JRadioButton TMTQuantitationFromMascotRadioButton;
     private JRadioButton maxQuantMsLims;
+    private JRadioButton ThermoMsfFile;
+    private JRadioButton proteomeDiscovererQuantificationsFromRadioButton;
 
     /**
      * The wizard frame holder parent
@@ -68,6 +70,8 @@ public class RoverSourcePanel implements WizardPanel {
         iTraqDatButton.addActionListener(listener);
         iTraqRovRadioButton.addActionListener(listener);
         TMTQuantitationFromMascotRadioButton.addActionListener(listener);
+        ThermoMsfFile.addActionListener(listener);
+        proteomeDiscovererQuantificationsFromRadioButton.addActionListener(listener);
         distillerQuantitationToolboxRovRadioButton.addActionListener(listener);
         distillerQuantitationToolboxMsLimsRadioButton.addActionListener(listener);
         msQuantTxtFilesRadioButton.addActionListener(listener);
@@ -121,6 +125,10 @@ public class RoverSourcePanel implements WizardPanel {
             lSource = RoverSource.CENSUS;
         } else if (maxQuantMsLims.isSelected()) {
             lSource = RoverSource.MAX_QUANT_MS_LIMS;
+        } else if (ThermoMsfFile.isSelected()) {
+            lSource = RoverSource.THERMO_MSF_FILES;
+        } else if (proteomeDiscovererQuantificationsFromRadioButton.isSelected()) {
+            lSource = RoverSource.THERMO_MSF_LIMS;
         }
 
         //check if anything was selected
@@ -157,6 +165,7 @@ public class RoverSourcePanel implements WizardPanel {
      */
     public void construct() {
         logger.info("Single source method started");
+        maxQuantMsLims.setVisible(false);
         iParent.setNextButtonEnabled(false);
         if (iTraqDatButton.isSelected()) {
             iParent.setNextButtonEnabled(true);
@@ -175,6 +184,10 @@ public class RoverSourcePanel implements WizardPanel {
         } else if (censusOutTxtAndRadioButton.isSelected()) {
             iParent.setNextButtonEnabled(true);
         } else if (TMTQuantitationFromMascotRadioButton.isSelected()) {
+            iParent.setNextButtonEnabled(true);
+        } else if (ThermoMsfFile.isSelected()) {
+            iParent.setNextButtonEnabled(true);
+        } else if (proteomeDiscovererQuantificationsFromRadioButton.isSelected()) {
             iParent.setNextButtonEnabled(true);
         } else if (maxQuantMsLims.isSelected()) {
             iParent.setNextButtonEnabled(true);
@@ -226,7 +239,7 @@ public class RoverSourcePanel implements WizardPanel {
         distillerQuantitationToolboxRovRadioButton.setText("Mascot distiller quantitation toolbox (.rov) files");
         gbc = new GridBagConstraints();
         gbc.gridx = 1;
-        gbc.gridy = 9;
+        gbc.gridy = 11;
         gbc.anchor = GridBagConstraints.WEST;
         gbc.insets = new Insets(5, 5, 5, 5);
         jpanContent.add(distillerQuantitationToolboxRovRadioButton, gbc);
@@ -235,7 +248,7 @@ public class RoverSourcePanel implements WizardPanel {
         distillerQuantitationToolboxMsLimsRadioButton.setText("Mascot distiller quantitation toolbox quantitation from ms_lims");
         gbc = new GridBagConstraints();
         gbc.gridx = 1;
-        gbc.gridy = 10;
+        gbc.gridy = 12;
         gbc.anchor = GridBagConstraints.WEST;
         gbc.insets = new Insets(5, 5, 5, 5);
         jpanContent.add(distillerQuantitationToolboxMsLimsRadioButton, gbc);
@@ -246,7 +259,7 @@ public class RoverSourcePanel implements WizardPanel {
         gbc = new GridBagConstraints();
         gbc.gridx = 0;
         gbc.gridy = 1;
-        gbc.gridheight = 10;
+        gbc.gridheight = 12;
         gbc.weightx = 1.0;
         gbc.anchor = GridBagConstraints.WEST;
         gbc.ipadx = 20;
@@ -266,7 +279,7 @@ public class RoverSourcePanel implements WizardPanel {
         maxQuantRadioButton.setText("MaxQuant evidence.txt and msms.txt files");
         gbc = new GridBagConstraints();
         gbc.gridx = 1;
-        gbc.gridy = 7;
+        gbc.gridy = 9;
         gbc.anchor = GridBagConstraints.WEST;
         gbc.insets = new Insets(5, 5, 5, 5);
         jpanContent.add(maxQuantRadioButton, gbc);
@@ -275,7 +288,7 @@ public class RoverSourcePanel implements WizardPanel {
         maxQuantMsLims.setText("MaxQuant quantifications from ms_lims");
         gbc = new GridBagConstraints();
         gbc.gridx = 1;
-        gbc.gridy = 8;
+        gbc.gridy = 10;
         gbc.anchor = GridBagConstraints.WEST;
         gbc.insets = new Insets(5, 5, 5, 5);
         jpanContent.add(maxQuantMsLims, gbc);
@@ -297,6 +310,24 @@ public class RoverSourcePanel implements WizardPanel {
         gbc.anchor = GridBagConstraints.WEST;
         gbc.insets = new Insets(5, 5, 5, 5);
         jpanContent.add(TMTQuantitationFromMascotRadioButton, gbc);
+        ThermoMsfFile = new JRadioButton();
+        ThermoMsfFile.setFont(new Font("Tahoma", ThermoMsfFile.getFont().getStyle(), ThermoMsfFile.getFont().getSize()));
+        ThermoMsfFile.setText("Proteome discoverer msf files (.msf)");
+        gbc = new GridBagConstraints();
+        gbc.gridx = 1;
+        gbc.gridy = 7;
+        gbc.anchor = GridBagConstraints.WEST;
+        gbc.insets = new Insets(5, 5, 5, 5);
+        jpanContent.add(ThermoMsfFile, gbc);
+        proteomeDiscovererQuantificationsFromRadioButton = new JRadioButton();
+        proteomeDiscovererQuantificationsFromRadioButton.setFont(new Font("Tahoma", proteomeDiscovererQuantificationsFromRadioButton.getFont().getStyle(), proteomeDiscovererQuantificationsFromRadioButton.getFont().getSize()));
+        proteomeDiscovererQuantificationsFromRadioButton.setText("Proteome discoverer quantifications from ms_lims");
+        gbc = new GridBagConstraints();
+        gbc.gridx = 1;
+        gbc.gridy = 8;
+        gbc.anchor = GridBagConstraints.WEST;
+        gbc.insets = new Insets(5, 5, 5, 5);
+        jpanContent.add(proteomeDiscovererQuantificationsFromRadioButton, gbc);
         ButtonGroup buttonGroup;
         buttonGroup = new ButtonGroup();
         buttonGroup.add(iTraqMs_limsRadioButton);

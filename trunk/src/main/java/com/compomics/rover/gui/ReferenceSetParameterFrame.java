@@ -1,5 +1,6 @@
 package com.compomics.rover.gui;
 
+import com.compomics.rover.general.enumeration.ReferenceSetEnum;
 import org.apache.log4j.Logger;
 
 import com.compomics.rover.general.singelton.QuantitativeValidationSingelton;
@@ -19,14 +20,18 @@ import java.util.ArrayList;
  * Time: 13:09:58
  */
 public class ReferenceSetParameterFrame extends JFrame {
-	// Class specific log4j logger for ReferenceSetParameterFrame instances.
-	 private static Logger logger = Logger.getLogger(ReferenceSetParameterFrame.class);
+    // Class specific log4j logger for ReferenceSetParameterFrame instances.
+    private static Logger logger = Logger.getLogger(ReferenceSetParameterFrame.class);
     private JPanel jpanContent;
     private JRadioButton useAllProteinsRadioButton;
     private JRadioButton useMostAbundantProteinsRadioButton;
     private JSpinner spinner1;
     private JCheckBox checkBox1;
     private JButton createReferenceSetButton;
+    private JRadioButton useAllProteinsWithRadioButton;
+    private JTextField txtAccessionsOnly;
+    private JTextField txtAllAccessionsExcept;
+    private JRadioButton useAllProteinsExceptRadioButton;
     /**
      * This validation singelton holds information for the calculation of the ratio
      */
@@ -50,10 +55,16 @@ public class ReferenceSetParameterFrame extends JFrame {
         //set the checbox selected
         checkBox1.setSelected(iQuantitativeValidationSingelton.isRatioValidInReferenceSet());
         //set the use all proteins selected
-        if (iQuantitativeValidationSingelton.getUseAllProteinsForReferenceSet()) {
+        if (iQuantitativeValidationSingelton.getReferenceSetEnum() == ReferenceSetEnum.ALL) {
             useAllProteinsRadioButton.setSelected(true);
-        } else {
+        } else if (iQuantitativeValidationSingelton.getReferenceSetEnum() == ReferenceSetEnum.MOST_ABUNDANT) {
             useMostAbundantProteinsRadioButton.setSelected(true);
+        } else if (iQuantitativeValidationSingelton.getReferenceSetEnum() == ReferenceSetEnum.ONLY_ACCESSIONS) {
+            useAllProteinsWithRadioButton.setSelected(true);
+            txtAccessionsOnly.setText(iQuantitativeValidationSingelton.getReferenceSetSpecialAccessions());
+        } else if (iQuantitativeValidationSingelton.getReferenceSetEnum() == ReferenceSetEnum.ALL_EXCEPT_ACCESSIONS) {
+            useAllProteinsExceptRadioButton.setSelected(true);
+            txtAllAccessionsExcept.setText(iQuantitativeValidationSingelton.getReferenceSetSpecialAccessions());
         }
         //set the number of proteins to use
         spinner1.setValue(iQuantitativeValidationSingelton.getNumberOfProteinsInReferenceSet());
@@ -68,17 +79,56 @@ public class ReferenceSetParameterFrame extends JFrame {
                 //set the changed things
                 iQuantitativeValidationSingelton.setNumberOfProteinsInReferenceSet((Integer) spinner1.getValue());
                 iQuantitativeValidationSingelton.setUseOnlyValidRatioForProteinMean(checkBox1.isSelected());
-                iQuantitativeValidationSingelton.setUseAllProteinsForReferenceSet(useAllProteinsRadioButton.isSelected());
+                String lSpecialAccessions = "";
+                if (useAllProteinsRadioButton.isSelected()) {
+                    iQuantitativeValidationSingelton.setReferenceSetEnum(ReferenceSetEnum.ALL);
+                } else if (useMostAbundantProteinsRadioButton.isSelected()) {
+                    iQuantitativeValidationSingelton.setReferenceSetEnum(ReferenceSetEnum.MOST_ABUNDANT);
+                } else if (useAllProteinsWithRadioButton.isSelected()) {
+                    iQuantitativeValidationSingelton.setReferenceSetEnum(ReferenceSetEnum.ONLY_ACCESSIONS);
+                    iQuantitativeValidationSingelton.setReferenceSetSpecialAccessions(txtAccessionsOnly.getText());
+                    lSpecialAccessions = "," + txtAccessionsOnly.getText().trim() + ",";
+                    if (lSpecialAccessions.length() == 0) {
+                        JOptionPane.showMessageDialog(new JFrame(), "No accessions were found, give the accessions in the correct text field", "No accessions found!", JOptionPane.WARNING_MESSAGE);
+                        return;
+                    }
+
+                } else if (useAllProteinsExceptRadioButton.isSelected()) {
+                    iQuantitativeValidationSingelton.setReferenceSetEnum(ReferenceSetEnum.ALL_EXCEPT_ACCESSIONS);
+                    iQuantitativeValidationSingelton.setReferenceSetSpecialAccessions(txtAllAccessionsExcept.getText());
+                    lSpecialAccessions = "," + txtAllAccessionsExcept.getText().trim() + ",";
+                    if (lSpecialAccessions.length() == 0) {
+                        JOptionPane.showMessageDialog(new JFrame(), "No accessions were found, give the accessions in the correct text field", "No accessions found!", JOptionPane.WARNING_MESSAGE);
+                        return;
+                    }
+                }
 
                 //create a reference set
                 ReferenceSet lReferenceSet = new ReferenceSet(new ArrayList<QuantitativeProtein>(), iQuantitativeValidationSingelton.getReferenceSet().getTypes(), iQuantitativeValidationSingelton.getReferenceSet().getComponents());
 
                 int lReferenceSetSize = iQuantitativeValidationSingelton.getNumberOfProteinsInReferenceSet();
-                if (iQuantitativeValidationSingelton.getUseAllProteinsForReferenceSet()) {
+                if (iQuantitativeValidationSingelton.getReferenceSetEnum() == ReferenceSetEnum.ALL || iQuantitativeValidationSingelton.getReferenceSetEnum() == ReferenceSetEnum.ONLY_ACCESSIONS || iQuantitativeValidationSingelton.getReferenceSetEnum() == ReferenceSetEnum.ALL_EXCEPT_ACCESSIONS) {
                     lReferenceSetSize = iProteins.length;
                 }
                 for (int i = 0; i < lReferenceSetSize; i++) {
-                    lReferenceSet.addReferenceProtein(iProteins[i]);
+                    if (iQuantitativeValidationSingelton.getReferenceSetEnum() == ReferenceSetEnum.ONLY_ACCESSIONS) {
+                        if (lSpecialAccessions.indexOf("," + iProteins[i].getAccession() + ",") >= 0) {
+                            //we've found it
+                            lReferenceSet.addReferenceProtein(iProteins[i]);
+                        }
+
+                    } else if (iQuantitativeValidationSingelton.getReferenceSetEnum() == ReferenceSetEnum.ALL_EXCEPT_ACCESSIONS) {
+                        if (lSpecialAccessions.indexOf("," + iProteins[i].getAccession() + ",") == -1) {
+                            //we didn't  found it
+                            lReferenceSet.addReferenceProtein(iProteins[i]);
+                        }
+                    } else {
+                        lReferenceSet.addReferenceProtein(iProteins[i]);
+                    }
+                }
+                if (lReferenceSet.getUsedProteinsNumber() == 0) {
+                    JOptionPane.showMessageDialog(new JFrame(), "No proteins were added to the new reference set.\nPlease select a different option.", "Reference set creation error!", JOptionPane.WARNING_MESSAGE);
+                    return;
                 }
                 iQuantitativeValidationSingelton.setReferenceSet(lReferenceSet);
                 iParent.loadProtein(false);
@@ -140,7 +190,7 @@ public class ReferenceSetParameterFrame extends JFrame {
         label2.setText("Ratios from the reference proteins must be true");
         gbc = new GridBagConstraints();
         gbc.gridx = 0;
-        gbc.gridy = 2;
+        gbc.gridy = 4;
         gbc.anchor = GridBagConstraints.WEST;
         gbc.insets = new Insets(5, 5, 5, 5);
         jpanContent.add(label2, gbc);
@@ -148,7 +198,7 @@ public class ReferenceSetParameterFrame extends JFrame {
         checkBox1.setText("");
         gbc = new GridBagConstraints();
         gbc.gridx = 2;
-        gbc.gridy = 2;
+        gbc.gridy = 4;
         gbc.anchor = GridBagConstraints.WEST;
         gbc.insets = new Insets(5, 5, 5, 5);
         jpanContent.add(checkBox1, gbc);
@@ -156,15 +206,51 @@ public class ReferenceSetParameterFrame extends JFrame {
         createReferenceSetButton.setText("Create reference set");
         gbc = new GridBagConstraints();
         gbc.gridx = 0;
-        gbc.gridy = 3;
+        gbc.gridy = 5;
         gbc.gridwidth = 3;
         gbc.fill = GridBagConstraints.HORIZONTAL;
         gbc.insets = new Insets(5, 5, 5, 5);
         jpanContent.add(createReferenceSetButton, gbc);
+        useAllProteinsWithRadioButton = new JRadioButton();
+        useAllProteinsWithRadioButton.setText("Use all proteins with accessions (comma seperated)");
+        gbc = new GridBagConstraints();
+        gbc.gridx = 1;
+        gbc.gridy = 2;
+        gbc.anchor = GridBagConstraints.WEST;
+        gbc.insets = new Insets(5, 5, 5, 5);
+        jpanContent.add(useAllProteinsWithRadioButton, gbc);
+        txtAccessionsOnly = new JTextField();
+        gbc = new GridBagConstraints();
+        gbc.gridx = 2;
+        gbc.gridy = 2;
+        gbc.weightx = 1.0;
+        gbc.anchor = GridBagConstraints.WEST;
+        gbc.fill = GridBagConstraints.HORIZONTAL;
+        gbc.insets = new Insets(5, 5, 5, 5);
+        jpanContent.add(txtAccessionsOnly, gbc);
+        txtAllAccessionsExcept = new JTextField();
+        gbc = new GridBagConstraints();
+        gbc.gridx = 2;
+        gbc.gridy = 3;
+        gbc.weightx = 1.0;
+        gbc.anchor = GridBagConstraints.WEST;
+        gbc.fill = GridBagConstraints.HORIZONTAL;
+        gbc.insets = new Insets(5, 5, 5, 5);
+        jpanContent.add(txtAllAccessionsExcept, gbc);
+        useAllProteinsExceptRadioButton = new JRadioButton();
+        useAllProteinsExceptRadioButton.setText("Use all proteins except accessions (comma seperated)");
+        gbc = new GridBagConstraints();
+        gbc.gridx = 1;
+        gbc.gridy = 3;
+        gbc.anchor = GridBagConstraints.WEST;
+        gbc.insets = new Insets(5, 5, 5, 5);
+        jpanContent.add(useAllProteinsExceptRadioButton, gbc);
         ButtonGroup buttonGroup;
         buttonGroup = new ButtonGroup();
         buttonGroup.add(useAllProteinsRadioButton);
         buttonGroup.add(useMostAbundantProteinsRadioButton);
+        buttonGroup.add(useAllProteinsWithRadioButton);
+        buttonGroup.add(useAllProteinsExceptRadioButton);
     }
 
     /**

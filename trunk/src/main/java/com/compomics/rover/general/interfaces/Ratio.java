@@ -72,6 +72,8 @@ public interface Ratio {
      */
     public void setRecalculatedRatio(double lNewRatio);
 
+    public void setRecalculatedRatio(double lNewRatio, boolean lLog2);
+
     public void setOriginalRatio(double lOriginalRatio);
 
     public void setNormalizationPart(int j);

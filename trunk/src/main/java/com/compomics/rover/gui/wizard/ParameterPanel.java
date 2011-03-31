@@ -49,6 +49,15 @@ public class ParameterPanel implements WizardPanel {
     private JLabel lblFasta;
     private JCheckBox chbNormalization;
     private JLabel doRatioNormalizationLabel;
+    private JCheckBox chbExcludePeptizer;
+    private JLabel lblExcludePeptizerInvalidIdentificationsLabel;
+    private JLabel msfFilePeptideConfidence;
+    private JRadioButton highRadioButton;
+    private JRadioButton mediumRadioButton;
+    private JRadioButton lowRadioButton;
+    private JLabel msfPeptidesLabel;
+    private JRadioButton onlyHighestScoringRadioButton;
+    private JRadioButton onlyLowesScoringRadioButton;
 
 
     /**
@@ -118,7 +127,7 @@ public class ParameterPanel implements WizardPanel {
         GridBagConstraints gbc;
         gbc = new GridBagConstraints();
         gbc.gridx = 0;
-        gbc.gridy = 23;
+        gbc.gridy = 26;
         gbc.fill = GridBagConstraints.VERTICAL;
         jpanContent.add(spacer1, gbc);
         lblConfidence = new JLabel();
@@ -158,12 +167,39 @@ public class ParameterPanel implements WizardPanel {
         gbc.anchor = GridBagConstraints.WEST;
         gbc.insets = new Insets(5, 5, 5, 5);
         jpanContent.add(lblValid, gbc);
+        lblExcludePeptizerInvalidIdentificationsLabel = new JLabel();
+        lblExcludePeptizerInvalidIdentificationsLabel.setFont(new Font("Tahoma", lblExcludePeptizerInvalidIdentificationsLabel.getFont().getStyle(), lblExcludePeptizerInvalidIdentificationsLabel.getFont().getSize()));
+        lblExcludePeptizerInvalidIdentificationsLabel.setText("- Exclude Peptizer invalid identifications");
+        gbc = new GridBagConstraints();
+        gbc.gridx = 0;
+        gbc.gridy = 4;
+        gbc.anchor = GridBagConstraints.WEST;
+        gbc.insets = new Insets(5, 5, 5, 5);
+        jpanContent.add(lblExcludePeptizerInvalidIdentificationsLabel, gbc);
+        msfFilePeptideConfidence = new JLabel();
+        msfFilePeptideConfidence.setFont(new Font("Tahoma", msfFilePeptideConfidence.getFont().getStyle(), msfFilePeptideConfidence.getFont().getSize()));
+        msfFilePeptideConfidence.setText("- Msf file peptide confidence level");
+        gbc = new GridBagConstraints();
+        gbc.gridx = 0;
+        gbc.gridy = 5;
+        gbc.anchor = GridBagConstraints.WEST;
+        gbc.insets = new Insets(5, 5, 5, 5);
+        jpanContent.add(msfFilePeptideConfidence, gbc);
+        msfPeptidesLabel = new JLabel();
+        msfPeptidesLabel.setFont(new Font("Tahoma", msfPeptidesLabel.getFont().getStyle(), msfPeptidesLabel.getFont().getSize()));
+        msfPeptidesLabel.setText("- Msf peptides: ");
+        gbc = new GridBagConstraints();
+        gbc.gridx = 0;
+        gbc.gridy = 6;
+        gbc.anchor = GridBagConstraints.WEST;
+        gbc.insets = new Insets(5, 5, 5, 5);
+        jpanContent.add(msfPeptidesLabel, gbc);
         doRatioNormalizationLabel = new JLabel();
         doRatioNormalizationLabel.setFont(new Font("Tahoma", doRatioNormalizationLabel.getFont().getStyle(), doRatioNormalizationLabel.getFont().getSize()));
         doRatioNormalizationLabel.setText("- Do ratio normalization");
         gbc = new GridBagConstraints();
         gbc.gridx = 0;
-        gbc.gridy = 4;
+        gbc.gridy = 7;
         gbc.anchor = GridBagConstraints.WEST;
         gbc.insets = new Insets(5, 5, 5, 5);
         jpanContent.add(doRatioNormalizationLabel, gbc);
@@ -172,7 +208,7 @@ public class ParameterPanel implements WizardPanel {
         label1.setText("- Set protein database type");
         gbc = new GridBagConstraints();
         gbc.gridx = 0;
-        gbc.gridy = 5;
+        gbc.gridy = 8;
         gbc.gridheight = 17;
         gbc.anchor = GridBagConstraints.WEST;
         gbc.insets = new Insets(5, 5, 5, 5);
@@ -182,7 +218,7 @@ public class ParameterPanel implements WizardPanel {
         label2.setText("- Set the calibrated standard deviation for log2 scale ratios for 1/1 ratio mixtures on the mass spectrometer");
         gbc = new GridBagConstraints();
         gbc.gridx = 0;
-        gbc.gridy = 22;
+        gbc.gridy = 25;
         gbc.gridwidth = 7;
         gbc.anchor = GridBagConstraints.WEST;
         gbc.insets = new Insets(5, 5, 5, 5);
@@ -205,12 +241,21 @@ public class ParameterPanel implements WizardPanel {
         gbc.anchor = GridBagConstraints.WEST;
         gbc.insets = new Insets(5, 5, 5, 5);
         jpanContent.add(chbValidInReferenceSet, gbc);
+        chbExcludePeptizer = new JCheckBox();
+        chbExcludePeptizer.setSelected(true);
+        chbExcludePeptizer.setText("");
+        gbc = new GridBagConstraints();
+        gbc.gridx = 6;
+        gbc.gridy = 4;
+        gbc.anchor = GridBagConstraints.WEST;
+        gbc.insets = new Insets(5, 5, 5, 5);
+        jpanContent.add(chbExcludePeptizer, gbc);
         chbNormalization = new JCheckBox();
         chbNormalization.setSelected(false);
         chbNormalization.setText("");
         gbc = new GridBagConstraints();
         gbc.gridx = 6;
-        gbc.gridy = 4;
+        gbc.gridy = 7;
         gbc.anchor = GridBagConstraints.WEST;
         gbc.insets = new Insets(5, 5, 5, 5);
         jpanContent.add(chbNormalization, gbc);
@@ -218,7 +263,7 @@ public class ParameterPanel implements WizardPanel {
         separator1.setOrientation(1);
         gbc = new GridBagConstraints();
         gbc.gridx = 2;
-        gbc.gridy = 12;
+        gbc.gridy = 15;
         gbc.gridwidth = 2;
         gbc.gridheight = 10;
         gbc.fill = GridBagConstraints.BOTH;
@@ -230,7 +275,7 @@ public class ParameterPanel implements WizardPanel {
         uniprotRadioButton.setText("Uniprot");
         gbc = new GridBagConstraints();
         gbc.gridx = 6;
-        gbc.gridy = 12;
+        gbc.gridy = 15;
         gbc.gridwidth = 12;
         gbc.anchor = GridBagConstraints.WEST;
         jpanContent.add(uniprotRadioButton, gbc);
@@ -239,7 +284,7 @@ public class ParameterPanel implements WizardPanel {
         localRadioButton.setText("Local fasta database");
         gbc = new GridBagConstraints();
         gbc.gridx = 6;
-        gbc.gridy = 18;
+        gbc.gridy = 21;
         gbc.anchor = GridBagConstraints.WEST;
         jpanContent.add(localRadioButton, gbc);
         final JSeparator separator2 = new JSeparator();
@@ -263,14 +308,14 @@ public class ParameterPanel implements WizardPanel {
         lblFasta.setText("Select location of FASTA protein database:");
         gbc = new GridBagConstraints();
         gbc.gridx = 6;
-        gbc.gridy = 19;
+        gbc.gridy = 22;
         gbc.anchor = GridBagConstraints.WEST;
         gbc.insets = new Insets(5, 5, 5, 5);
         jpanContent.add(lblFasta, gbc);
         txtFasta = new JTextField();
         gbc = new GridBagConstraints();
         gbc.gridx = 6;
-        gbc.gridy = 20;
+        gbc.gridy = 23;
         gbc.anchor = GridBagConstraints.WEST;
         gbc.fill = GridBagConstraints.HORIZONTAL;
         gbc.insets = new Insets(5, 5, 5, 5);
@@ -280,13 +325,14 @@ public class ParameterPanel implements WizardPanel {
         nonOfTheAboveRadioButton.setText("Non of the above");
         gbc = new GridBagConstraints();
         gbc.gridx = 18;
-        gbc.gridy = 18;
-        gbc.gridwidth = 24;
+        gbc.gridy = 21;
+        gbc.gridwidth = 26;
         gbc.anchor = GridBagConstraints.WEST;
         jpanContent.add(nonOfTheAboveRadioButton, gbc);
         gbc = new GridBagConstraints();
         gbc.gridx = 41;
         gbc.gridy = 1;
+        gbc.gridwidth = 3;
         gbc.fill = GridBagConstraints.HORIZONTAL;
         gbc.insets = new Insets(5, 5, 5, 5);
         jpanContent.add(spinReference, gbc);
@@ -294,7 +340,8 @@ public class ParameterPanel implements WizardPanel {
         btnFasta.setText("Open");
         gbc = new GridBagConstraints();
         gbc.gridx = 41;
-        gbc.gridy = 20;
+        gbc.gridy = 23;
+        gbc.gridwidth = 3;
         gbc.fill = GridBagConstraints.HORIZONTAL;
         gbc.insets = new Insets(5, 5, 5, 5);
         jpanContent.add(btnFasta, gbc);
@@ -303,7 +350,8 @@ public class ParameterPanel implements WizardPanel {
         txtCalibratedSD.setText("0.14277725");
         gbc = new GridBagConstraints();
         gbc.gridx = 41;
-        gbc.gridy = 22;
+        gbc.gridy = 25;
+        gbc.gridwidth = 3;
         gbc.anchor = GridBagConstraints.WEST;
         gbc.fill = GridBagConstraints.HORIZONTAL;
         gbc.insets = new Insets(5, 5, 5, 5);
@@ -313,7 +361,8 @@ public class ParameterPanel implements WizardPanel {
         IPIRadioButton.setText("IPI");
         gbc = new GridBagConstraints();
         gbc.gridx = 41;
-        gbc.gridy = 12;
+        gbc.gridy = 15;
+        gbc.gridwidth = 3;
         gbc.anchor = GridBagConstraints.WEST;
         jpanContent.add(IPIRadioButton, gbc);
         NCBIRadioButton = new JRadioButton();
@@ -321,7 +370,7 @@ public class ParameterPanel implements WizardPanel {
         NCBIRadioButton.setText("NCBI");
         gbc = new GridBagConstraints();
         gbc.gridx = 6;
-        gbc.gridy = 13;
+        gbc.gridy = 16;
         gbc.anchor = GridBagConstraints.WEST;
         jpanContent.add(NCBIRadioButton, gbc);
         TAIRRadioButton = new JRadioButton();
@@ -329,7 +378,8 @@ public class ParameterPanel implements WizardPanel {
         TAIRRadioButton.setText("TAIR");
         gbc = new GridBagConstraints();
         gbc.gridx = 41;
-        gbc.gridy = 13;
+        gbc.gridy = 16;
+        gbc.gridwidth = 3;
         gbc.anchor = GridBagConstraints.WEST;
         jpanContent.add(TAIRRadioButton, gbc);
         MIPSRadioButton1 = new JRadioButton();
@@ -337,9 +387,51 @@ public class ParameterPanel implements WizardPanel {
         MIPSRadioButton1.setText("mips CYGD");
         gbc = new GridBagConstraints();
         gbc.gridx = 6;
-        gbc.gridy = 16;
+        gbc.gridy = 19;
         gbc.anchor = GridBagConstraints.WEST;
         jpanContent.add(MIPSRadioButton1, gbc);
+        highRadioButton = new JRadioButton();
+        highRadioButton.setSelected(true);
+        highRadioButton.setText("High");
+        gbc = new GridBagConstraints();
+        gbc.gridx = 6;
+        gbc.gridy = 5;
+        gbc.anchor = GridBagConstraints.WEST;
+        gbc.insets = new Insets(5, 5, 5, 5);
+        jpanContent.add(highRadioButton, gbc);
+        mediumRadioButton = new JRadioButton();
+        mediumRadioButton.setText("Medium");
+        gbc = new GridBagConstraints();
+        gbc.gridx = 42;
+        gbc.gridy = 5;
+        gbc.anchor = GridBagConstraints.WEST;
+        gbc.insets = new Insets(5, 5, 5, 5);
+        jpanContent.add(mediumRadioButton, gbc);
+        lowRadioButton = new JRadioButton();
+        lowRadioButton.setText("Low");
+        gbc = new GridBagConstraints();
+        gbc.gridx = 43;
+        gbc.gridy = 5;
+        gbc.anchor = GridBagConstraints.WEST;
+        gbc.insets = new Insets(5, 5, 5, 5);
+        jpanContent.add(lowRadioButton, gbc);
+        onlyHighestScoringRadioButton = new JRadioButton();
+        onlyHighestScoringRadioButton.setSelected(true);
+        onlyHighestScoringRadioButton.setText("Only highest scoring");
+        gbc = new GridBagConstraints();
+        gbc.gridx = 6;
+        gbc.gridy = 6;
+        gbc.anchor = GridBagConstraints.WEST;
+        gbc.insets = new Insets(5, 5, 5, 5);
+        jpanContent.add(onlyHighestScoringRadioButton, gbc);
+        onlyLowesScoringRadioButton = new JRadioButton();
+        onlyLowesScoringRadioButton.setText("Only lowest scoring");
+        gbc = new GridBagConstraints();
+        gbc.gridx = 42;
+        gbc.gridy = 6;
+        gbc.anchor = GridBagConstraints.WEST;
+        gbc.insets = new Insets(5, 5, 5, 5);
+        jpanContent.add(onlyLowesScoringRadioButton, gbc);
         ButtonGroup buttonGroup;
         buttonGroup = new ButtonGroup();
         buttonGroup.add(allProteinsRadioButton);
@@ -352,6 +444,13 @@ public class ParameterPanel implements WizardPanel {
         buttonGroup.add(MIPSRadioButton1);
         buttonGroup.add(localRadioButton);
         buttonGroup.add(nonOfTheAboveRadioButton);
+        buttonGroup = new ButtonGroup();
+        buttonGroup.add(highRadioButton);
+        buttonGroup.add(mediumRadioButton);
+        buttonGroup.add(lowRadioButton);
+        buttonGroup = new ButtonGroup();
+        buttonGroup.add(onlyHighestScoringRadioButton);
+        buttonGroup.add(onlyLowesScoringRadioButton);
     }
 
     /**
@@ -446,6 +545,24 @@ public class ParameterPanel implements WizardPanel {
         iParent.setRatioValidInReferenceSet(chbValidInReferenceSet.isSelected());
         //set the ratio normalization boolean
         iParent.setRatioNormalization(chbNormalization.isSelected());
+        //set the peptizer status
+        iParent.setPeptizerStatus(chbExcludePeptizer.isSelected());
+        //set the msf peptide confidence level
+        if (iParent.getRoverSource() != RoverSource.THERMO_MSF_FILES) {
+            if (highRadioButton.isSelected()) {
+                iParent.setMsfPeptideConfidence(3);
+            } else if (mediumRadioButton.isSelected()) {
+                iParent.setMsfPeptideConfidence(2);
+            } else if (lowRadioButton.isSelected()) {
+                iParent.setMsfPeptideConfidence(1);
+            }
+            if (onlyHighestScoringRadioButton.isSelected()) {
+                iParent.setMsfOnlyHighesScoring(true);
+            } else {
+                iParent.setMsfOnlyHighesScoring(false);
+            }
+        }
+
         //Set the calibrated SD
         double lCalibratedSD = 0.0;
         try {
@@ -457,6 +574,8 @@ public class ParameterPanel implements WizardPanel {
             iNotFeasableReason = "\"" + txtCalibratedSD.getText() + "\" is not a correct standard deviation.";
             return;
         }
+
+
     }
 
     /**
@@ -481,11 +600,43 @@ public class ParameterPanel implements WizardPanel {
             //if we use ms_lims we don't need to set the confidence
             lblConfidence.setVisible(false);
             spinConfidence.setVisible(false);
+            lblExcludePeptizerInvalidIdentificationsLabel.setVisible(true);
+            chbExcludePeptizer.setVisible(true);
+            msfFilePeptideConfidence.setVisible(false);
+            highRadioButton.setVisible(false);
+            mediumRadioButton.setVisible(false);
+            lowRadioButton.setVisible(false);
+            msfPeptidesLabel.setVisible(false);
+            onlyHighestScoringRadioButton.setVisible(false);
+            onlyLowesScoringRadioButton.setVisible(false);
         } else {
+            lblExcludePeptizerInvalidIdentificationsLabel.setVisible(false);
+            chbExcludePeptizer.setVisible(false);
             if (iParent.getRoverSource() != RoverSource.DISTILLER_QUANT_TOOLBOX_MS_LIMS && iParent.getRoverSource() != RoverSource.MAX_QUANT_NO_SIGN && iParent.getRoverSource() != RoverSource.MAX_QUANT && iParent.getRoverSource() != RoverSource.MS_QUANT && iParent.getRoverSource() != RoverSource.CENSUS) {
                 lblConfidence.setVisible(true);
                 spinConfidence.setVisible(true);
             } else {
+                lblValid.setVisible(false);
+                chbValidInReferenceSet.setVisible(false);
+                lblConfidence.setVisible(false);
+                spinConfidence.setVisible(false);
+            }
+            if (iParent.getRoverSource() != RoverSource.THERMO_MSF_FILES) {
+                msfFilePeptideConfidence.setVisible(false);
+                highRadioButton.setVisible(false);
+                mediumRadioButton.setVisible(false);
+                lowRadioButton.setVisible(false);
+                msfPeptidesLabel.setVisible(false);
+                onlyHighestScoringRadioButton.setVisible(false);
+                onlyLowesScoringRadioButton.setVisible(false);
+            } else {
+                msfFilePeptideConfidence.setVisible(true);
+                highRadioButton.setVisible(true);
+                mediumRadioButton.setVisible(true);
+                lowRadioButton.setVisible(true);
+                msfPeptidesLabel.setVisible(true);
+                onlyHighestScoringRadioButton.setVisible(true);
+                onlyLowesScoringRadioButton.setVisible(true);
                 lblValid.setVisible(false);
                 chbValidInReferenceSet.setVisible(false);
                 lblConfidence.setVisible(false);

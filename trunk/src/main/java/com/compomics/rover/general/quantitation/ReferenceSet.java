@@ -55,6 +55,11 @@ public class ReferenceSet {
      */
     private HashMap[] iHuberEstimators;
     /**
+     * An array of hashmaps with the huber estimators for every ratio type
+     */
+    private Vector<HashMap[]> iHuberEstimatorsForDifferentSets = new Vector<HashMap[]>();
+    private Vector<HashMap[]> iHuberEstimatorsForDifferentSetsOriginal = new Vector<HashMap[]>();
+    /**
      * The log2 status is true when the descriptive statistics is calculated with log2(ratios).
      */
     private boolean iLog2StatusDescriptiveStatistics;
@@ -85,7 +90,7 @@ public class ReferenceSet {
      */
     private int[] iUsedRatiosByType;
 
-    /*
+    /* todo comment
     private Vector<HashMap> iRandomMeansMapVector = new Vector<HashMap>();
     private Vector<HashMap> iRandomSDMapVector = new Vector<HashMap>();
     private Vector<HashMap> iRandomOriginalRatioMeansMapVector = new Vector<HashMap>();
@@ -95,7 +100,10 @@ public class ReferenceSet {
     private Vector<HashMap> iRandomIntMedianMapVector = new Vector<HashMap>();
     private Vector<HashMap> iRandomIntSumMapVector = new Vector<HashMap>();
     private HashMap iRatiosByType = new HashMap();
-    private HashMap iOriginalRatiosByType = new HashMap(); */
+    private HashMap iOriginalRatiosByType = new HashMap();
+    */
+
+
     private boolean iUpdating = false;
 
 
@@ -201,9 +209,29 @@ public class ReferenceSet {
         // Create an array where the number of ratios used for a Huber estimation will be stored
         this.iNumberOfRatiosUsedInHuberStatistics = new int[iRatioTypes.length];
 
+        Vector<String> lTitles = iQuantitativeValidationSingelton.getTitles();
+
+
+        if(lTitles != null){
+            for(int i = 0; i<lTitles.size(); i++){
+                iHuberEstimatorsForDifferentSets.add(new HashMap[iRatioTypes.length]);
+                iHuberEstimatorsForDifferentSetsOriginal.add(new HashMap[iRatioTypes.length]);
+            }
+        }
+
+
         // Okay, do the stats on the log2 ratios.
         for(int t = 0; t<iRatioTypes.length; t ++){
             Vector<Double> lLog2Ratios = new Vector<Double>();
+            Vector<Vector<Double>> lLog2RatiosFromSet = new Vector<Vector<Double>>();
+            Vector<Vector<Double>> lLog2RatiosFromSetOriginal = new Vector<Vector<Double>>();
+            if(lTitles != null){
+                for(int s = 0; s<lTitles.size(); s ++){
+                    lLog2RatiosFromSet.add(new Vector<Double>());
+                    lLog2RatiosFromSetOriginal.add(new Vector<Double>());
+                }
+            }
+
             //we will first look for the ratios where we want to do statistics on
             for (int i = 0; i < iReferenceProteins.size(); i++) {
                 Vector<RatioGroup> lRatioGroups = iReferenceProteins.get(i).getRatioGroups();
@@ -216,17 +244,84 @@ public class ReferenceSet {
                                 if(!Double.isNaN(lRatio.getRatio(true)) && !Double.isInfinite(lRatio.getRatio(true))){
                                     lLog2Ratios.add(lRatio.getRatio(true));
                                     iUsedRatiosByType[t] = iUsedRatiosByType[t] + 1;
+                                    if(lTitles != null){
+                                        for(int s = 0; s<lTitles.size(); s ++){
+                                            if(lRatio.getParentRatioGroup().getParentCollection().getIndex() == s){
+                                                lLog2RatiosFromSet.get(s).add(lRatio.getRatio(true));
+                                                lLog2RatiosFromSetOriginal.get(s).add(lRatio.getOriginalRatio(true));
+                                            }
+                                        }
+                                    }
                                 }
                             }
                         } else {
                             if(!Double.isNaN(lRatio.getRatio(true)) && !Double.isInfinite(lRatio.getRatio(true))){
                                 lLog2Ratios.add(lRatio.getRatio(true));
                                 iUsedRatiosByType[t] = iUsedRatiosByType[t] + 1;
+                                if(lTitles != null){
+                                    for(int s = 0; s<lTitles.size(); s ++){
+                                        if(lRatio.getParentRatioGroup().getParentCollection().getIndex() == s){
+                                            lLog2RatiosFromSet.get(s).add(lRatio.getRatio(true));
+                                            lLog2RatiosFromSetOriginal.get(s).add(lRatio.getOriginalRatio(true));
+                                        }
+                                    }
+                                }
                             }
                         }
                     }
                 }
             }
+
+
+
+            if(lTitles != null){
+
+                for(int i = 0; i<lTitles.size(); i++){
+
+
+                    //we have the ratios to do the statistics on
+                    double[] log2Ratios = new double[lLog2RatiosFromSet.get(i).size()];
+                    double[] log2RatiosOriginal = new double[lLog2RatiosFromSetOriginal.get(i).size()];
+
+                    for(int k = 0; k<lLog2RatiosFromSet.get(i).size(); k ++){
+                        log2Ratios[k] = lLog2RatiosFromSet.get(i).get(k);
+                    }
+
+                    for(int k = 0; k<lLog2RatiosFromSetOriginal.get(i).size(); k ++){
+                        log2RatiosOriginal[k] = lLog2RatiosFromSetOriginal.get(i).get(k);
+                    }
+
+
+                    //do the statistics
+                    double[] estimators = BasicStats.hubers(log2Ratios, 1e-06, false);
+                    double[] estimatorsOriginal = BasicStats.hubers(log2RatiosOriginal, 1e-06, false);
+
+                    //correct the StDev with the instrument calibrated SD
+                    double lCorrectedStDev = Math.sqrt(Math.pow(estimators[1],2) + Math.pow(iQuantitativeValidationSingelton.getCalibratedStdev(),2));
+                    double lCorrectedStDevOriginal = Math.sqrt(Math.pow(estimatorsOriginal[1],2) + Math.pow(iQuantitativeValidationSingelton.getCalibratedStdev(),2));
+                    HashMap lMap = new HashMap();
+                    lMap.put("mean", estimators[0]);
+                    lMap.put("stdev", lCorrectedStDev);
+                    lMap.put("iterations", estimators[2]);
+                    lMap.put("numberofratios", log2Ratios.length);
+
+                    HashMap lMapOrig = new HashMap();
+                    lMapOrig.put("mean", estimatorsOriginal[0]);
+                    lMapOrig.put("stdev", lCorrectedStDevOriginal);
+                    lMapOrig.put("iterations", estimatorsOriginal[2]);
+                    lMapOrig.put("iterations", estimatorsOriginal[2]);
+                    lMap.put("numberofratios", log2RatiosOriginal.length);
+
+
+                    iHuberEstimatorsForDifferentSets.get(i)[t] = lMap;
+                    iHuberEstimatorsForDifferentSetsOriginal.get(i)[t] = lMapOrig;
+
+
+                }
+            }
+
+
+
             //we have the ratios to do the statistics on
             double[] log2Ratios = new double[lLog2Ratios.size()];
             for(int i = 0; i<lLog2Ratios.size(); i ++){
@@ -517,7 +612,16 @@ public class ReferenceSet {
         return iUsedRatiosByType;
     }
 
+    public Vector<HashMap[]> getHuberEstimatorsForDifferentSetsOriginal() {
+        return iHuberEstimatorsForDifferentSetsOriginal;
+    }
 
+    public Vector<HashMap[]> getHuberEstimatorsForDifferentSets() {
+        return iHuberEstimatorsForDifferentSets;
+    }
+
+
+    //todo comment
     /*public double getIndexCloseToRatio(Ratio lRatio, String lType){
         Vector<Ratio> lRatios;
         if(iQuantitativeValidationSingelton.isUseOriginalRatio()){
@@ -553,10 +657,12 @@ public class ReferenceSet {
         }
         return (double) lIndex;
 
-    }
-    
+    } */
+
+    //todo comment
+    /*
     public void calculateStatisticsByRandomSampling(){
-        RANDOM SAMPLING in a ratio dependant sorted list
+        //RANDOM SAMPLING in a ratio dependant sorted list
 
         Vector<QuantitativeProtein> lAllProteins = iQuantitativeValidationSingelton.getAllProteins();
 
@@ -789,6 +895,7 @@ public class ReferenceSet {
         iQuantitativeValidationSingelton.setUseOnlyValidRatioForProteinMean(lValid);
         *//*
     }
+    //todo comment
 
     public double getZscoreForRatioMean(double lMean, int lNumberOfRatios, String lType){
         double lZScore = 0;
@@ -805,6 +912,7 @@ public class ReferenceSet {
         }
         return lZScore;
     }
+    //todo comment
 
     public double getZscoreForRatioSd(double lSd, int lNumberOfRatios, String lType){
         double lZScore = 0;
@@ -821,6 +929,7 @@ public class ReferenceSet {
         }
         return lZScore;
     }
+    //todo comment
 
     public double getZscoreForIntensityMean(double lMean, int lNumberOfRatios, String lType){
         double lZScore = 0;
@@ -834,6 +943,7 @@ public class ReferenceSet {
         }
         return lZScore;
     }
+    //todo comment
 
     public double getZscoreForIntensityMedian(double lMedian, int lNumberOfRatios, String lType){
         double lZScore = 0;
@@ -847,6 +957,7 @@ public class ReferenceSet {
         }
         return lZScore;
     }
+    //todo comment
 
     public double getZscoreForIntensitySd(double lSd, int lNumberOfRatios, String lType){
         double lZScore = 0;
@@ -860,6 +971,7 @@ public class ReferenceSet {
         }
         return lZScore;
     }
+    //todo comment
 
     public double getZscoreForIntensitySum(double lSum, int lNumberOfRatios, String lType){
         double lZScore = 0;
@@ -872,6 +984,6 @@ public class ReferenceSet {
             }
         }
         return lZScore;
-    } */
-
+    }
+         */
 }

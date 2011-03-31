@@ -13,5 +13,5 @@ import org.apache.log4j.Logger;
  * The types of data that can be loaded by rover
  */
 public enum DataType {
-    ITRAQ_ROV, ITRAQ_DAT, MDQT_ROV, MAXQUANT, MAXQUANT_NO_SIGN, MSQUANT, CENSUS
+    ITRAQ_ROV, ITRAQ_DAT, MDQT_ROV, MAXQUANT, MAXQUANT_NO_SIGN, MSQUANT, CENSUS, PROTEOME_DISCOVERER
 }

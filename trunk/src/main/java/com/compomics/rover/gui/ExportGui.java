@@ -49,8 +49,8 @@ import com.lowagie.text.pdf.DefaultFontMapper;
  * Time: 14:30:30
  */
 public class ExportGui extends JFrame {
-	// Class specific log4j logger for ExportGui instances.
-	 private static Logger logger = Logger.getLogger(ExportGui.class);
+    // Class specific log4j logger for ExportGui instances.
+    private static Logger logger = Logger.getLogger(ExportGui.class);
     private JPanel jpanContent;
     private JRadioButton validatedProteinsRadioButton;
     private JRadioButton selectedProteinsRadioButton;
@@ -454,6 +454,7 @@ public class ExportGui extends JFrame {
 
                     boolean hasMaxQuant = false;
                     boolean hasMsQuantCensus = false;
+                    boolean hasMSF = false;
                     boolean hasDistiller = false;
 
 
@@ -462,6 +463,8 @@ public class ExportGui extends JFrame {
                             hasDistiller = true;
                         } else if (iQuantitativeValidationSingelton.getRoverSources().get(p) == RoverSource.MAX_QUANT || iQuantitativeValidationSingelton.getRoverSources().get(p) == RoverSource.MAX_QUANT_NO_SIGN || iQuantitativeValidationSingelton.getRoverSources().get(p) == RoverSource.MAX_QUANT_MS_LIMS) {
                             hasMaxQuant = true;
+                        } else if (iQuantitativeValidationSingelton.getRoverSources().get(p) == RoverSource.THERMO_MSF_FILES) {
+                            hasMSF = true;
                         } else {
                             hasMsQuantCensus = true;
                         }
@@ -509,7 +512,7 @@ public class ExportGui extends JFrame {
                             lTitle = lTitle + lSeparator + lComponents[k] + " absolute intensity";
                         }
                     }
-                    if (hasMsQuantCensus || hasDistiller) {
+                    if (hasMsQuantCensus || hasDistiller || hasMSF) {
                         // not in distiller mode => we only have a filename
                         lTitle = lTitle + lSeparator + "quantitation file name";
                     }
@@ -685,7 +688,7 @@ public class ExportGui extends JFrame {
                                                 MaxQuantRatioGroup lMaxQuantRatioGroup = (MaxQuantRatioGroup) lRatioGroup;
                                                 lResult = lResult + lSeparator + lMaxQuantRatioGroup.getAbsoluteIntensities()[k];
                                             }
-                                            if (hasMsQuantCensus) {
+                                            if (hasMsQuantCensus || hasMSF) {
                                                 lResult = lResult + lSeparator;
                                             }
                                         } else {
