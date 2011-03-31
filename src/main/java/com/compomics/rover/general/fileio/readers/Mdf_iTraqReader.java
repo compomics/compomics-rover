@@ -65,7 +65,7 @@ public class Mdf_iTraqReader {
     /**
      * A vector with the DatfilePeptideIdentfications found in the mascot datfile
      */
-    private Vector<PeptideIdentification> iPeptideIdentifications;
+    private HashMap<Integer,PeptideIdentification> iPeptideIdentifications;
     /**
      * The type of quantitation used (ex. iTRAQ 4plex)
      */
@@ -209,9 +209,9 @@ public class Mdf_iTraqReader {
      * This method will get the peptide identifications from the datfile or the database
      * @return Vector<PeptideIdentification>
      */
-    public Vector<PeptideIdentification> getPeptideIdentifiations(){
+    public HashMap<Integer, PeptideIdentification> getPeptideIdentifiations(){
         //create the vector with peptide identifications
-        Vector<PeptideIdentification> lIdentifications = null;
+        HashMap<Integer, PeptideIdentification> lIdentifications = null;
 
         //if we use ms_lims we will get the identifications from the database, otherwise we will get them from the datfile
         if(iUseMs_lims){
@@ -239,7 +239,7 @@ public class Mdf_iTraqReader {
         iQuantitationType = lParam.getQuantiation();
 
         //check if the quantitation type is itraq
-        if(iQuantitationType.indexOf("iTRAQ") == -1 && iQuantitationType.indexOf("TMT") == -1){
+        if(iQuantitationType.toLowerCase().indexOf("tmt") == -1 && iQuantitationType.toLowerCase().indexOf("itraq") == -1){
             iFlamable.passHotPotato(new Throwable("No correct quantification information could be extracted from the datfile '" + iRatioGroupCollection.getMetaData(QuantitationMetaType.FILENAME) + "'! The quantitation type was: " + iQuantitationType + "."));
             return;
         }
@@ -272,13 +272,15 @@ public class Mdf_iTraqReader {
             //create the ratiogroup
             RatioGroup lRatioGroup = new RatioGroup(iRatioGroupCollection);
             //add an peptide identification to the group
-            for(int i = 0; i<iPeptideIdentifications.size(); i ++){
-                if(lQuery.getQueryNumber() == iPeptideIdentifications.get(i).getDatfile_query()){
+
+            PeptideIdentification lIdent = iPeptideIdentifications.get(lQuery.getQueryNumber());
+            if(lIdent != null){
+                if(lQuery.getQueryNumber() == lIdent.getDatfile_query()){
                     //the query number matches the query number from the peptide identification
                     //set the quantitation type
-                    iPeptideIdentifications.get(i).setType(iQuantitationType);
+                    lIdent.setType(iQuantitationType);
                     //add the identificatoin to the ratiogroup
-                    lRatioGroup.addIdentification(iPeptideIdentifications.get(i), iQuantitationType);
+                    lRatioGroup.addIdentification(lIdent, iQuantitationType);
                     //add the different ratios
                     for(int j = 0; j<iRatioTypes.length; j ++){
                         Ratio lMDFRatio = iRatioTypes[j];
@@ -289,13 +291,14 @@ public class Mdf_iTraqReader {
                         }
                     }
                     //set the peptide sequence
-                    lRatioGroup.setPeptideSequence(iPeptideIdentifications.get(i).getSequence());
+                    lRatioGroup.setPeptideSequence(lIdent.getSequence());
                     //add the ratiogroup to the ratiogroup collection
                     if(lRatioGroup.getNumberOfRatios() > 0){
                         iRatioGroupCollection.add(lRatioGroup);
                     }
                 }
             }
+
         }
         //check if we have added anything
         if(iRatioGroupCollection.size() == 0){
@@ -435,13 +438,19 @@ public class Mdf_iTraqReader {
 
                             // Create a filename for the spectrum, based on the filename of the mergefile, with
                             // an '_[spectrumCounter]' before the extension (eg., myParent.mgf --> myParent_1.mgf).
-                            String spectrumFilename = Query.processMGFTitleToFilename(iCurrentSpectrumTitle, lMultiFile, lMultiFileNameArray, iCurrentSpectrumScans, iCurrentCharge);
+                            String spectrumFilename;
                             //the spectrum is fully parsed
                             //create a peak array
                             Peak[] lPeakArray = new Peak[lPeaks.size()];
                             lPeaks.toArray(lPeakArray);
+                            try{
+                                spectrumFilename = Query.processMGFTitleToFilename(iCurrentSpectrumTitle, lMultiFile, lMultiFileNameArray, iCurrentSpectrumScans, iCurrentCharge);
+                                iSpectra.put(this.getComponentNumberFromTitle(spectrumFilename), lPeakArray);
+                            } catch(Exception e){
+                                spectrumFilename = iCurrentSpectrumTitle;
+                                iSpectra.put(spectrumFilename.substring(spectrumFilename.indexOf("=") + 1, spectrumFilename.indexOf(":")), lPeakArray);
+                            }
                             //add a new spectrum to the hashmap
-                            iSpectra.put(this.getComponentNumberFromTitle(spectrumFilename), lPeakArray);
                             //remove everything from the vector and delete the title
                             iCurrentCharge = null;
                             iCurrentSpectrumScans = null;

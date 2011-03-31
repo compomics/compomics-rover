@@ -452,12 +452,14 @@ public class QuantitativeProtein {
         return  lLenghtPeptides; 
     }
 
-/*
+    //todo comment
     public double getProteinPvalue(String aType, int aMultipleSourceIndex){
         double lZScore = Math.abs(getProteinZScore(aType, aMultipleSourceIndex));
         return iQuantitativeValidationSingelton.calculateTwoSidedPvalueForZvalue(lZScore);
     }
 
+    //todo comment
+    /*
     public double getPower(String aType, int aMultipleSourceIndex, double lZscore){
         double lResult;
         double lProteinRatioMean = 0.0;
@@ -485,7 +487,7 @@ public class QuantitativeProtein {
         double lPvalueResult = 1.0 - iQuantitativeValidationSingelton.calculateTwoSidedPvalueForZvalue(lResult);
         //System.out.println(lNumberOfRatiosUsed+","+lRefSD + "," + (lMean- lRefMean) +  "," + 1.96 + "," + lResult + "," + lPvalueResult);
         return lPvalueResult;
-    }  */
+    }      */
 
     /**
      * This method calculates the Z-score for this protein based on the SD and mean of the reference set, the protein ratio and the
@@ -1043,8 +1045,8 @@ public class QuantitativeProtein {
         return lCounter;
     }
 
-    /*
-    public double getRatioIndexMeanForType(String lType){
+    //todo comment
+    /*public double getRatioIndexMeanForType(String lType){
         DescriptiveStatistics lIndexHolder = new DescriptiveStatistics();
 
         for (int i = 0; i < iPeptideGroups.size(); i++) {
@@ -1103,7 +1105,7 @@ public class QuantitativeProtein {
 
         double lResult = lIndexHolder.getStandardDeviation();
         return Math.round(lResult*10000.0)/10000.0;
-    }  */
+    }  
 
     /**
      * This method will calculate in a multiple source environment the maximum difference between the combined protein ratio

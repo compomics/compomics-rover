@@ -7,6 +7,7 @@ import com.compomics.rover.general.quantitation.ReferenceSet;
 
 import javax.swing.*;
 import java.awt.*;
+import java.util.HashMap;
 
 /**
  * Created by IntelliJ IDEA.
@@ -15,8 +16,8 @@ import java.awt.*;
  * Time: 10:34:38
  */
 public class ReferenceSetInfoFrame extends JFrame {
-	// Class specific log4j logger for ReferenceSetInfoFrame instances.
-	 private static Logger logger = Logger.getLogger(ReferenceSetInfoFrame.class);
+    // Class specific log4j logger for ReferenceSetInfoFrame instances.
+    private static Logger logger = Logger.getLogger(ReferenceSetInfoFrame.class);
 
     /**
      * This distiller validation singelton holds information for the calculation of the ratio
@@ -50,10 +51,33 @@ public class ReferenceSetInfoFrame extends JFrame {
             panelInfo.add(Box.createVerticalStrut(5));
             panelInfo.add(new JLabel("         Huber estimated distribution [-1.96; 1.96] = [" + Math.round(iReferenceSet.getPercentileHuber(lTypes[i], -1.96) * 1000.0) / 1000.0 + "; " + Math.round(iReferenceSet.getPercentileHuber(lTypes[i], 1.96) * 1000.0) / 1000.0 + "]"));
             panelInfo.add(Box.createVerticalStrut(5));
-            panelInfo.add(new JLabel("                     Standard deviation (log2) = " + Math.round((Double) (iReferenceSet.getHuberEstimatorsForType(lTypes[i]).get("stdev")) * 1000.0) / 1000.0));
+            panelInfo.add(new JLabel("                     Standard deviation (log2) = " + Math.round((Double) (iReferenceSet.getHuberEstimatorsForType(lTypes[i]).get("stdev")) * 10000.0) / 10000.0));
             panelInfo.add(Box.createVerticalStrut(5));
-            panelInfo.add(new JLabel("                     Mean (log2) = " + Math.round((Double) (iReferenceSet.getHuberEstimatorsForType(lTypes[i]).get("mean")) * 1000.0) / 1000.0));
+            panelInfo.add(new JLabel("                     Mean (log2) = " + Math.round((Double) (iReferenceSet.getHuberEstimatorsForType(lTypes[i]).get("mean")) * 10000.0) / 10000.0));
             panelInfo.add(Box.createVerticalStrut(5));
+
+
+            if (iQuantitativeValidationSingelton.getTitles() != null) {
+                if (iQuantitativeValidationSingelton.getTitles().size() > 1) {
+                    for (int j = 0; j < iQuantitativeValidationSingelton.getTitles().size(); j++) {
+                        HashMap lMap = iReferenceSet.getHuberEstimatorsForDifferentSets().get(j)[i];
+                        HashMap lMapOriginal = iReferenceSet.getHuberEstimatorsForDifferentSetsOriginal().get(j)[i];
+                        panelInfo.add(new JLabel("    -    Set: " + iQuantitativeValidationSingelton.getTitles().get(j) + "         Ratios used: " + lMap.get("numberofratios")));
+                        panelInfo.add(Box.createVerticalStrut(5));
+                        panelInfo.add(new JLabel("                     Standard deviation (log2) = " + Math.round((Double) (lMap.get("stdev")) * 10000.0) / 10000.0));
+                        panelInfo.add(Box.createVerticalStrut(5));
+                        panelInfo.add(new JLabel("                     Mean (log2) = " + Math.round((Double) (lMap.get("mean")) * 10000.0) / 10000.0));
+                        panelInfo.add(Box.createVerticalStrut(5));
+                        panelInfo.add(new JLabel("                     Standard deviation Original (log2) = " + Math.round((Double) (lMapOriginal.get("stdev")) * 10000.0) / 10000.0));
+                        panelInfo.add(Box.createVerticalStrut(5));
+                        panelInfo.add(new JLabel("                     Mean Original(log2) = " + Math.round((Double) (lMapOriginal.get("mean")) * 10000.0) / 10000.0));
+                        panelInfo.add(Box.createVerticalStrut(5));
+
+                    }
+                }
+            }
+
+
         }
 
 

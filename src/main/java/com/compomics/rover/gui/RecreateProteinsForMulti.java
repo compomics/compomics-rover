@@ -1,5 +1,6 @@
 package com.compomics.rover.gui;
 
+import com.compomics.rover.general.enumeration.ReferenceSetEnum;
 import org.apache.log4j.Logger;
 
 import com.compomics.rover.general.singelton.QuantitativeValidationSingelton;
@@ -27,6 +28,7 @@ import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
 import java.awt.*;
 import java.sql.Connection;
+import java.util.concurrent.atomic.AtomicReference;
 
 /**
  * Created by IntelliJ IDEA.
@@ -83,7 +85,7 @@ public class RecreateProteinsForMulti extends JFrame {
             public void actionPerformed(ActionEvent e) {
                 final boolean[] lOneIsSelected = new boolean[]{false};
 
-                SwingWorker lStarter = new SwingWorker() {
+                AtomicReference<SwingWorker> lStarter = new AtomicReference<SwingWorker>(new SwingWorker() {
                     public Boolean construct() {
                         Vector<Boolean> lSelected = new Vector<Boolean>();
                         for (int i = 0; i < iCheckboxes.size(); i++) {
@@ -166,7 +168,7 @@ public class RecreateProteinsForMulti extends JFrame {
                             Collections.sort(lQuantProtein, new QuantitativeProteinSorterByRatioGroupNumbers());
                             //get the reference set size from the singelton
                             int lReferenceSetSize = iQuantitativeValidationSingelton.getNumberOfProteinsInReferenceSet();
-                            if (iQuantitativeValidationSingelton.getUseAllProteinsForReferenceSet()) {
+                            if (iQuantitativeValidationSingelton.getReferenceSetEnum() == ReferenceSetEnum.ALL) {
                                 lReferenceSetSize = lQuantProtein.size();
                             }
                             if (lReferenceSetSize > lQuantProtein.size()) {
@@ -212,8 +214,8 @@ public class RecreateProteinsForMulti extends JFrame {
                         }
                     }
 
-                };
-                lStarter.start();
+                });
+                lStarter.get().start();
 
 
             }

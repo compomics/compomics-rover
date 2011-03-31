@@ -6,6 +6,7 @@
  */
 package com.compomics.rover.general.singelton;
 
+import com.compomics.rover.general.enumeration.*;
 import org.apache.log4j.Logger;
 
 import com.compomics.rover.general.quantitation.QuantitativeProtein;
@@ -14,10 +15,6 @@ import com.compomics.rover.general.quantitation.ReferenceSet;
 import com.compomics.rover.general.quantitation.RatioGroupCollection;
 import com.compomics.rover.general.quantitation.source.distiller.DistillerRatio;
 import com.compomics.rover.general.interfaces.Ratio;
-import com.compomics.rover.general.enumeration.ProteinDatabaseType;
-import com.compomics.rover.general.enumeration.QuantitationMetaType;
-import com.compomics.rover.general.enumeration.RoverSource;
-import com.compomics.rover.general.enumeration.MaxQuantScoreType;
 
 import java.io.*;
 import java.util.Vector;
@@ -108,9 +105,9 @@ public class QuantitativeValidationSingelton {
      */
     private Vector<String> iNotUsedPeptides = new Vector<String>();
     /**
-     * Boolean that indicates if we must use all the proteins in the reference set
+     * Enum that indicates the reference set type
      */
-    private boolean iUseAllProteinsForReferenceSet;
+    private ReferenceSetEnum iProteinsReferenceSetType;
     /**
      * The number of proteins that will be used for the creation of the reference set
      */
@@ -176,6 +173,15 @@ public class QuantitativeValidationSingelton {
      */
     private boolean iNormalization = false;
     private boolean iMsLimsPre7_2 = false;
+    /**
+     * The special accessions for the reference set, these can only be taken to create the reference set, or these can be excluded
+     * from the reference set, depending on the referencesetenum
+     */
+    private String iReferenceSetSpecialAccessions = "";
+    /**
+     * boolean that indicates if the petizer unvalid peptide identification should be excluded
+     */
+    private boolean iExcludePeptizerUnvalid = false;
 
 
     public static QuantitativeValidationSingelton getInstance() {
@@ -242,7 +248,7 @@ public class QuantitativeValidationSingelton {
         boolean lDatabaseMode = false;
         for(int i = 0;i<iRoverSources.size(); i ++){
             RoverSource lRoverSource = iRoverSources.get(i);
-            if(lRoverSource ==  RoverSource.ITRAQ_MS_LIMS || lRoverSource == RoverSource.DISTILLER_QUANT_TOOLBOX_MS_LIMS || lRoverSource == RoverSource.MAX_QUANT_MS_LIMS){
+            if(lRoverSource ==  RoverSource.THERMO_MSF_LIMS || lRoverSource ==  RoverSource.ITRAQ_MS_LIMS || lRoverSource == RoverSource.DISTILLER_QUANT_TOOLBOX_MS_LIMS || lRoverSource == RoverSource.MAX_QUANT_MS_LIMS){
                 lDatabaseMode = true;
             }
         }
@@ -645,19 +651,19 @@ public class QuantitativeValidationSingelton {
     }
 
     /**
-     * Setter for the boolean that indicates if all the proteins or just a subset of the proteins are used in the reference set
-     * @param lUseAllProteins boolean to set
+     * Setter for the ReferenceSetEnum that indicates the reference set
+     * @param lProteinsReferenceSetType ReferenceSetEnum to set
      */
-    public void setUseAllProteinsForReferenceSet(boolean lUseAllProteins) {
-        this.iUseAllProteinsForReferenceSet = lUseAllProteins;
+    public void setReferenceSetEnum(ReferenceSetEnum lProteinsReferenceSetType) {
+        this.iProteinsReferenceSetType = lProteinsReferenceSetType;
     }
 
     /**
-     * This method gives a boolean that indicates if all the proteins or just a subset of the proteins are used in the reference set
-     * @return boolean
+     * This method gives a ReferenceSetEnum that indicates the reference set
+     * @return ReferenceSetEnum
      */
-    public boolean getUseAllProteinsForReferenceSet(){
-        return iUseAllProteinsForReferenceSet;
+    public ReferenceSetEnum getReferenceSetEnum(){
+        return iProteinsReferenceSetType;
     }
 
     /**
@@ -921,5 +927,20 @@ public class QuantitativeValidationSingelton {
 
     public boolean getMsLimsPre7_2() {
         return iMsLimsPre7_2;
+    }
+
+    public String getReferenceSetSpecialAccessions() {
+        return iReferenceSetSpecialAccessions;
+    }
+
+    public void setReferenceSetSpecialAccessions(String lSet) {
+        this.iReferenceSetSpecialAccessions = lSet;
+    }
+
+    public void setExcludePeptizerUnvalid(boolean lExclude){
+        this.iExcludePeptizerUnvalid = lExclude;
+    }
+    public boolean getExcludePeptizerUnvalid(){
+        return iExcludePeptizerUnvalid;
     }
 }

@@ -74,6 +74,7 @@ public class DatFile {
     public DatFile(File aDatFile, File aMergeFile, Flamable aFlamable) {
         this.iFlamable = aFlamable;
         this.iFilePath = aDatFile.getAbsolutePath();
+        this.iOriginalDatFile = aDatFile;
         this.iMergeFile = aMergeFile;
     }
 
@@ -127,14 +128,14 @@ public class DatFile {
      * @param lThreshold The threshold
      * @return Vector<DatfilePeptideIdentification> Vector with DatfilePeptideIdentification
      */
-    public Vector<PeptideIdentification> extractDatfilePeptideIdentification(double lThreshold){
+    public HashMap<Integer, PeptideIdentification> extractDatfilePeptideIdentification(double lThreshold){
         //check if the datfile has been parsed
         if(iMascotDatFile == null){
             this.readMascotDatFile();
         }
 
         // Vector that will contain the DatfilePeptideIdentification instances.
-        Vector<PeptideIdentification> result = new Vector<PeptideIdentification>();
+        HashMap<Integer, PeptideIdentification> result = new HashMap<Integer, PeptideIdentification>();
         try{
 
             // Get the generic parameters for the search,
@@ -204,22 +205,22 @@ public class DatFile {
                     HashMap hm = new HashMap();
 
                     hm.put("SCORE", new Long((long) ph.getIonsScore()));
-                    hm.put("MODIFIED_SEQUENCE", lModifiedSequence);
+                    hm.put("MODIFIED_SEQUENCE", new String(lModifiedSequence));
                     hm.put("CAL_MASS", ph.getPeptideMr());
                     hm.put("EXP_MASS", ph.getPeptideMr() + ph.getDeltaMass());
-                    hm.put("SEQUENCE", ph.getSequence());
+                    hm.put("SEQUENCE", new String(ph.getSequence()));
                     hm.put("HOMOLOGY", ph.getHomologyThreshold());
                     hm.put("VALID", new Integer(1));
                     hm.put("IDENTITYTHRESHOLD", new Long((long) ph.calculateIdentityThreshold(lThreshold)));
                     hm.put("CONFIDENCE", new Double(lThreshold));
                     hm.put("PRECURSOR",  mz);
-                    hm.put("DB",dbName);
+                    hm.put("DB", new String(dbName));
                     hm.put("CHARGE",  charge);
-                    hm.put("TITLE", searchTitle);
-                    hm.put("DB_FILENAME", dbfilename);
-                    hm.put("MASCOT_VERSION", version);
+                    hm.put("TITLE", new String(searchTitle));
+                    hm.put("DB_FILENAME", new String(dbfilename));
+                    hm.put("MASCOT_VERSION", new String(version));
                     hm.put("DATFILE_QUERY", new Long(lQueryCounter));
-                    hm.put("SPECTRUM_FILE_NAME", query.getTitle());
+                    hm.put("SPECTRUM_FILE_NAME", new String(query.getTitle()));
 
                     // Protein stuff.
 
@@ -254,11 +255,11 @@ public class DatFile {
                             tempEnd = protein.getStop();
                         }
                         if(firstProtein){
-                            hm.put("ACCESSION", trimmedAccession);
+                            hm.put("ACCESSION", new String(trimmedAccession));
                             hm.put("END", new Long(tempEnd));
                             hm.put("START", new Long(tempStart));
                             String lDescription = proteinMap.getProteinDescription(originalAccession);
-                            hm.put("DESCRIPTION",lDescription);
+                            hm.put("DESCRIPTION", new String(lDescription));
                             // Isolate the enzymatic part.
                             String descr = lDescription;
                             if(descr == null) {
@@ -274,23 +275,27 @@ public class DatFile {
                             } else {
                                 descr = descr.substring(start, end);
                             }
-                            hm.put("ENZYMATIC", descr);
+                            hm.put("ENZYMATIC", new String(descr));
                             firstProtein = false;
                         } else {
                             lIsoforms = lIsoforms + "^A" + trimmedAccession + " (" + tempStart + "-" + tempEnd + ")";
                         }
 
                     }
-                    hm.put("ISOFORMS", lIsoforms);
+                    hm.put("ISOFORMS", new String(lIsoforms));
 
                     //add to the results
-                    result.add(new DatfilePeptideIdentification(hm));
+                    result.put(lQueryCounter, new DatfilePeptideIdentification(hm));
                 }
             }
         } catch (Exception e){
             iFlamable.passHotPotato(new Throwable("Problem reading the dat file"));
             logger.error(e.getMessage(), e);
         }
+        iMascotDatFile = null;
+        //System.out.println("read file");
+        System.gc();
+        System.gc();
     	return result;
     }
 

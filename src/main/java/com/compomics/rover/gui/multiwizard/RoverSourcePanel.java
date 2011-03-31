@@ -34,6 +34,8 @@ public class RoverSourcePanel implements WizardPanel {
     private JRadioButton censusOutTxtAndRadioButton;
     private JTextField txtTitle;
     private JRadioButton maxQuantMsLims;
+    private JRadioButton thermoMSFFilesMsfRadioButton;
+    private JRadioButton proteomeDiscovererQuantificationsFromRadioButton;
 
 
     /**
@@ -68,6 +70,8 @@ public class RoverSourcePanel implements WizardPanel {
         maxQuantRadioButton.addActionListener(listener);
         censusOutTxtAndRadioButton.addActionListener(listener);
         maxQuantMsLims.addActionListener(listener);
+        proteomeDiscovererQuantificationsFromRadioButton.addActionListener(listener);
+        thermoMSFFilesMsfRadioButton.addActionListener(listener);
     }
 
 
@@ -107,6 +111,10 @@ public class RoverSourcePanel implements WizardPanel {
             lSource = RoverSource.CENSUS;
         } else if (maxQuantMsLims.isSelected()) {
             lSource = RoverSource.MAX_QUANT_MS_LIMS;
+        } else if (proteomeDiscovererQuantificationsFromRadioButton.isSelected()) {
+            lSource = RoverSource.THERMO_MSF_LIMS;
+        } else if (thermoMSFFilesMsfRadioButton.isSelected()) {
+            lSource = RoverSource.THERMO_MSF_FILES;
         }
 
         //check if anything was selected
@@ -154,6 +162,7 @@ public class RoverSourcePanel implements WizardPanel {
      */
     public void construct() {
         logger.info("Multiple source method started");
+        maxQuantMsLims.setVisible(false);
         iParent.setNextButtonEnabled(false);
         if (iParent.getRoverSources().size() != 0) {
             if (iParent.getUseMs_lims()) {
@@ -161,9 +170,11 @@ public class RoverSourcePanel implements WizardPanel {
                 msQuantTxtFilesRadioButton.setEnabled(false);
                 maxQuantRadioButton.setEnabled(false);
                 censusOutTxtAndRadioButton.setEnabled(false);
+                thermoMSFFilesMsfRadioButton.setEnabled(false);
             } else {
                 distillerQuantitationToolboxMsLimsRadioButton.setEnabled(false);
                 maxQuantMsLims.setEnabled(false);
+                proteomeDiscovererQuantificationsFromRadioButton.setEnabled(false);
             }
         }
         if (distillerQuantitationToolboxMsLimsRadioButton.isSelected()) {
@@ -177,6 +188,10 @@ public class RoverSourcePanel implements WizardPanel {
         } else if (censusOutTxtAndRadioButton.isSelected()) {
             iParent.setNextButtonEnabled(true);
         } else if (maxQuantMsLims.isSelected()) {
+            iParent.setNextButtonEnabled(true);
+        } else if (proteomeDiscovererQuantificationsFromRadioButton.isSelected()) {
+            iParent.setNextButtonEnabled(true);
+        } else if (thermoMSFFilesMsfRadioButton.isSelected()) {
             iParent.setNextButtonEnabled(true);
         }
     }
@@ -199,7 +214,7 @@ public class RoverSourcePanel implements WizardPanel {
         GridBagConstraints gbc;
         gbc = new GridBagConstraints();
         gbc.gridx = 1;
-        gbc.gridy = 8;
+        gbc.gridy = 10;
         gbc.anchor = GridBagConstraints.WEST;
         gbc.insets = new Insets(5, 5, 5, 5);
         jpanContent.add(distillerQuantitationToolboxRovRadioButton, gbc);
@@ -208,7 +223,7 @@ public class RoverSourcePanel implements WizardPanel {
         distillerQuantitationToolboxMsLimsRadioButton.setText("Mascot distiller quantitation toolbox quantitation from ms_lims");
         gbc = new GridBagConstraints();
         gbc.gridx = 1;
-        gbc.gridy = 9;
+        gbc.gridy = 11;
         gbc.anchor = GridBagConstraints.WEST;
         gbc.insets = new Insets(5, 5, 5, 5);
         jpanContent.add(distillerQuantitationToolboxMsLimsRadioButton, gbc);
@@ -219,7 +234,7 @@ public class RoverSourcePanel implements WizardPanel {
         gbc = new GridBagConstraints();
         gbc.gridx = 0;
         gbc.gridy = 1;
-        gbc.gridheight = 9;
+        gbc.gridheight = 11;
         gbc.weightx = 1.0;
         gbc.anchor = GridBagConstraints.WEST;
         gbc.ipadx = 20;
@@ -252,6 +267,15 @@ public class RoverSourcePanel implements WizardPanel {
         gbc.anchor = GridBagConstraints.WEST;
         gbc.insets = new Insets(5, 5, 5, 5);
         jpanContent.add(maxQuantMsLims, gbc);
+        thermoMSFFilesMsfRadioButton = new JRadioButton();
+        thermoMSFFilesMsfRadioButton.setFont(new Font("Tahoma", thermoMSFFilesMsfRadioButton.getFont().getStyle(), thermoMSFFilesMsfRadioButton.getFont().getSize()));
+        thermoMSFFilesMsfRadioButton.setText("Proteome discoverer MSF files (.msf)");
+        gbc = new GridBagConstraints();
+        gbc.gridx = 1;
+        gbc.gridy = 8;
+        gbc.anchor = GridBagConstraints.WEST;
+        gbc.insets = new Insets(5, 5, 5, 5);
+        jpanContent.add(thermoMSFFilesMsfRadioButton, gbc);
         censusOutTxtAndRadioButton = new JRadioButton();
         censusOutTxtAndRadioButton.setFont(new Font("Tahoma", censusOutTxtAndRadioButton.getFont().getStyle(), censusOutTxtAndRadioButton.getFont().getSize()));
         censusOutTxtAndRadioButton.setText("Census out (.txt) and Census chro (.xml) files");
@@ -266,7 +290,7 @@ public class RoverSourcePanel implements WizardPanel {
         label2.setText("Title:");
         gbc = new GridBagConstraints();
         gbc.gridx = 0;
-        gbc.gridy = 10;
+        gbc.gridy = 12;
         gbc.anchor = GridBagConstraints.WEST;
         gbc.ipadx = 20;
         gbc.insets = new Insets(5, 5, 5, 5);
@@ -274,11 +298,20 @@ public class RoverSourcePanel implements WizardPanel {
         txtTitle = new JTextField();
         gbc = new GridBagConstraints();
         gbc.gridx = 1;
-        gbc.gridy = 10;
+        gbc.gridy = 12;
         gbc.anchor = GridBagConstraints.WEST;
         gbc.fill = GridBagConstraints.HORIZONTAL;
         gbc.insets = new Insets(5, 5, 5, 5);
         jpanContent.add(txtTitle, gbc);
+        proteomeDiscovererQuantificationsFromRadioButton = new JRadioButton();
+        proteomeDiscovererQuantificationsFromRadioButton.setFont(new Font("Tahoma", proteomeDiscovererQuantificationsFromRadioButton.getFont().getStyle(), proteomeDiscovererQuantificationsFromRadioButton.getFont().getSize()));
+        proteomeDiscovererQuantificationsFromRadioButton.setText("Proteome discoverer quantifications from ms_lims");
+        gbc = new GridBagConstraints();
+        gbc.gridx = 1;
+        gbc.gridy = 9;
+        gbc.anchor = GridBagConstraints.WEST;
+        gbc.insets = new Insets(5, 5, 5, 5);
+        jpanContent.add(proteomeDiscovererQuantificationsFromRadioButton, gbc);
         ButtonGroup buttonGroup;
         buttonGroup = new ButtonGroup();
         buttonGroup.add(distillerQuantitationToolboxRovRadioButton);
@@ -286,6 +319,7 @@ public class RoverSourcePanel implements WizardPanel {
         buttonGroup.add(msQuantTxtFilesRadioButton);
         buttonGroup.add(maxQuantRadioButton);
         buttonGroup.add(maxQuantMsLims);
+        buttonGroup.add(thermoMSFFilesMsfRadioButton);
         buttonGroup.add(censusOutTxtAndRadioButton);
     }
 

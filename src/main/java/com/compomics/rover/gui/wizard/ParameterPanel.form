@@ -2,14 +2,14 @@
 <form xmlns="http://www.intellij.com/uidesigner/form/" version="1" bind-to-class="com.compomics.rover.gui.wizard.ParameterPanel">
   <grid id="27dc6" binding="jpanContent" layout-manager="GridBagLayout">
     <constraints>
-      <xy x="20" y="109" width="844" height="407"/>
+      <xy x="20" y="109" width="844" height="461"/>
     </constraints>
     <properties/>
     <border type="none"/>
     <children>
       <vspacer id="2180">
         <constraints>
-          <grid row="23" column="0" row-span="1" col-span="1" vsize-policy="6" hsize-policy="1" anchor="0" fill="2" indent="0" use-parent-layout="false"/>
+          <grid row="26" column="0" row-span="1" col-span="1" vsize-policy="6" hsize-policy="1" anchor="0" fill="2" indent="0" use-parent-layout="false"/>
           <gridbag weightx="0.0" weighty="0.0"/>
         </constraints>
       </vspacer>
@@ -54,9 +54,39 @@
           <text value="- Ratios from the reference proteins must be true"/>
         </properties>
       </component>
-      <component id="36547" class="javax.swing.JLabel" binding="doRatioNormalizationLabel" default-binding="true">
+      <component id="5a7de" class="javax.swing.JLabel" binding="lblExcludePeptizerInvalidIdentificationsLabel">
         <constraints>
           <grid row="4" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+          <gridbag top="5" left="5" bottom="5" right="5" weightx="0.0" weighty="0.0"/>
+        </constraints>
+        <properties>
+          <font name="Tahoma"/>
+          <text value="- Exclude Peptizer invalid identifications"/>
+        </properties>
+      </component>
+      <component id="415cd" class="javax.swing.JLabel" binding="msfFilePeptideConfidence">
+        <constraints>
+          <grid row="5" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+          <gridbag top="5" left="5" bottom="5" right="5" weightx="0.0" weighty="0.0"/>
+        </constraints>
+        <properties>
+          <font name="Tahoma"/>
+          <text value="- Msf file peptide confidence level"/>
+        </properties>
+      </component>
+      <component id="aa127" class="javax.swing.JLabel" binding="msfPeptidesLabel" default-binding="true">
+        <constraints>
+          <grid row="6" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+          <gridbag top="5" left="5" bottom="5" right="5" weightx="0.0" weighty="0.0"/>
+        </constraints>
+        <properties>
+          <font name="Tahoma"/>
+          <text value="- Msf peptides: "/>
+        </properties>
+      </component>
+      <component id="36547" class="javax.swing.JLabel" binding="doRatioNormalizationLabel" default-binding="true">
+        <constraints>
+          <grid row="7" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
           <gridbag top="5" left="5" bottom="5" right="5" weightx="0.0" weighty="0.0"/>
         </constraints>
         <properties>
@@ -66,7 +96,7 @@
       </component>
       <component id="b21" class="javax.swing.JLabel">
         <constraints>
-          <grid row="5" column="0" row-span="17" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+          <grid row="8" column="0" row-span="17" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
           <gridbag top="5" left="5" bottom="5" right="5" weightx="0.0" weighty="0.0"/>
         </constraints>
         <properties>
@@ -76,7 +106,7 @@
       </component>
       <component id="e4192" class="javax.swing.JLabel">
         <constraints>
-          <grid row="22" column="0" row-span="1" col-span="7" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+          <grid row="25" column="0" row-span="1" col-span="7" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
           <gridbag top="5" left="5" bottom="5" right="5" weightx="0.0" weighty="0.0"/>
         </constraints>
         <properties>
@@ -105,9 +135,19 @@
           <text value=""/>
         </properties>
       </component>
-      <component id="c712b" class="javax.swing.JCheckBox" binding="chbNormalization">
+      <component id="fdd87" class="javax.swing.JCheckBox" binding="chbExcludePeptizer">
         <constraints>
           <grid row="4" column="6" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+          <gridbag top="5" left="5" bottom="5" right="5" weightx="0.0" weighty="0.0"/>
+        </constraints>
+        <properties>
+          <selected value="true"/>
+          <text value=""/>
+        </properties>
+      </component>
+      <component id="c712b" class="javax.swing.JCheckBox" binding="chbNormalization">
+        <constraints>
+          <grid row="7" column="6" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
           <gridbag top="5" left="5" bottom="5" right="5" weightx="0.0" weighty="0.0"/>
         </constraints>
         <properties>
@@ -117,7 +157,7 @@
       </component>
       <component id="cd075" class="javax.swing.JSeparator">
         <constraints>
-          <grid row="12" column="2" row-span="10" col-span="2" vsize-policy="6" hsize-policy="6" anchor="0" fill="3" indent="0" use-parent-layout="false"/>
+          <grid row="15" column="2" row-span="10" col-span="2" vsize-policy="6" hsize-policy="6" anchor="0" fill="3" indent="0" use-parent-layout="false"/>
           <gridbag top="2" left="2" bottom="2" right="2" weightx="0.0" weighty="0.0"/>
         </constraints>
         <properties>
@@ -126,7 +166,7 @@
       </component>
       <component id="b1b3a" class="javax.swing.JRadioButton" binding="uniprotRadioButton" default-binding="true">
         <constraints>
-          <grid row="12" column="6" row-span="1" col-span="12" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+          <grid row="15" column="6" row-span="1" col-span="12" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
           <gridbag weightx="0.0" weighty="0.0"/>
         </constraints>
         <properties>
@@ -137,7 +177,7 @@
       </component>
       <component id="57f60" class="javax.swing.JRadioButton" binding="localRadioButton" default-binding="true">
         <constraints>
-          <grid row="18" column="6" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+          <grid row="21" column="6" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
           <gridbag weightx="0.0" weighty="0.0"/>
         </constraints>
         <properties>
@@ -163,7 +203,7 @@
       </component>
       <component id="45571" class="javax.swing.JLabel" binding="lblFasta">
         <constraints>
-          <grid row="19" column="6" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+          <grid row="22" column="6" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
           <gridbag top="5" left="5" bottom="5" right="5" weightx="0.0" weighty="0.0"/>
         </constraints>
         <properties>
@@ -173,7 +213,7 @@
       </component>
       <component id="e6b91" class="javax.swing.JTextField" binding="txtFasta">
         <constraints>
-          <grid row="20" column="6" row-span="1" col-span="1" vsize-policy="0" hsize-policy="6" anchor="8" fill="1" indent="0" use-parent-layout="false">
+          <grid row="23" column="6" row-span="1" col-span="1" vsize-policy="0" hsize-policy="6" anchor="8" fill="1" indent="0" use-parent-layout="false">
             <preferred-size width="150" height="-1"/>
           </grid>
           <gridbag top="5" left="5" bottom="5" right="5" weightx="0.0" weighty="0.0"/>
@@ -182,7 +222,7 @@
       </component>
       <component id="5bbd7" class="javax.swing.JRadioButton" binding="nonOfTheAboveRadioButton" default-binding="true">
         <constraints>
-          <grid row="18" column="18" row-span="1" col-span="24" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+          <grid row="21" column="18" row-span="1" col-span="26" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
           <gridbag weightx="0.0" weighty="0.0"/>
         </constraints>
         <properties>
@@ -192,14 +232,14 @@
       </component>
       <component id="679a7" class="javax.swing.JSpinner" binding="spinReference" custom-create="true">
         <constraints>
-          <grid row="1" column="41" row-span="1" col-span="1" vsize-policy="0" hsize-policy="6" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
+          <grid row="1" column="41" row-span="1" col-span="3" vsize-policy="0" hsize-policy="6" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
           <gridbag top="5" left="5" bottom="5" right="5" weightx="0.0" weighty="0.0"/>
         </constraints>
         <properties/>
       </component>
       <component id="acf8d" class="javax.swing.JButton" binding="btnFasta">
         <constraints>
-          <grid row="20" column="41" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
+          <grid row="23" column="41" row-span="1" col-span="3" vsize-policy="0" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
           <gridbag top="5" left="5" bottom="5" right="5" weightx="0.0" weighty="0.0"/>
         </constraints>
         <properties>
@@ -208,7 +248,7 @@
       </component>
       <component id="1ea5f" class="javax.swing.JTextField" binding="txtCalibratedSD">
         <constraints>
-          <grid row="22" column="41" row-span="1" col-span="1" vsize-policy="0" hsize-policy="6" anchor="8" fill="1" indent="0" use-parent-layout="false">
+          <grid row="25" column="41" row-span="1" col-span="3" vsize-policy="0" hsize-policy="6" anchor="8" fill="1" indent="0" use-parent-layout="false">
             <preferred-size width="150" height="-1"/>
           </grid>
           <gridbag top="5" left="5" bottom="5" right="5" weightx="0.0" weighty="0.0"/>
@@ -220,7 +260,7 @@
       </component>
       <component id="3f600" class="javax.swing.JRadioButton" binding="IPIRadioButton" default-binding="true">
         <constraints>
-          <grid row="12" column="41" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+          <grid row="15" column="41" row-span="1" col-span="3" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
           <gridbag weightx="0.0" weighty="0.0"/>
         </constraints>
         <properties>
@@ -230,7 +270,7 @@
       </component>
       <component id="b1d1d" class="javax.swing.JRadioButton" binding="NCBIRadioButton" default-binding="true">
         <constraints>
-          <grid row="13" column="6" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+          <grid row="16" column="6" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
           <gridbag weightx="0.0" weighty="0.0"/>
         </constraints>
         <properties>
@@ -240,7 +280,7 @@
       </component>
       <component id="e406" class="javax.swing.JRadioButton" binding="TAIRRadioButton" default-binding="true">
         <constraints>
-          <grid row="13" column="41" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+          <grid row="16" column="41" row-span="1" col-span="3" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
           <gridbag weightx="0.0" weighty="0.0"/>
         </constraints>
         <properties>
@@ -250,12 +290,59 @@
       </component>
       <component id="cf1d1" class="javax.swing.JRadioButton" binding="MIPSRadioButton1">
         <constraints>
-          <grid row="16" column="6" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+          <grid row="19" column="6" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
           <gridbag weightx="0.0" weighty="0.0"/>
         </constraints>
         <properties>
           <font name="Tahoma"/>
           <text value="mips CYGD"/>
+        </properties>
+      </component>
+      <component id="115ac" class="javax.swing.JRadioButton" binding="highRadioButton" default-binding="true">
+        <constraints>
+          <grid row="5" column="6" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+          <gridbag top="5" left="5" bottom="5" right="5" weightx="0.0" weighty="0.0"/>
+        </constraints>
+        <properties>
+          <selected value="true"/>
+          <text value="High"/>
+        </properties>
+      </component>
+      <component id="cf468" class="javax.swing.JRadioButton" binding="mediumRadioButton" default-binding="true">
+        <constraints>
+          <grid row="5" column="42" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+          <gridbag top="5" left="5" bottom="5" right="5" weightx="0.0" weighty="0.0"/>
+        </constraints>
+        <properties>
+          <text value="Medium"/>
+        </properties>
+      </component>
+      <component id="5bffe" class="javax.swing.JRadioButton" binding="lowRadioButton" default-binding="true">
+        <constraints>
+          <grid row="5" column="43" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+          <gridbag top="5" left="5" bottom="5" right="5" weightx="0.0" weighty="0.0"/>
+        </constraints>
+        <properties>
+          <text value="Low"/>
+        </properties>
+      </component>
+      <component id="d8394" class="javax.swing.JRadioButton" binding="onlyHighestScoringRadioButton" default-binding="true">
+        <constraints>
+          <grid row="6" column="6" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+          <gridbag top="5" left="5" bottom="5" right="5" weightx="0.0" weighty="0.0"/>
+        </constraints>
+        <properties>
+          <selected value="true"/>
+          <text value="Only highest scoring"/>
+        </properties>
+      </component>
+      <component id="c6d0c" class="javax.swing.JRadioButton" binding="onlyLowesScoringRadioButton" default-binding="true">
+        <constraints>
+          <grid row="6" column="42" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+          <gridbag top="5" left="5" bottom="5" right="5" weightx="0.0" weighty="0.0"/>
+        </constraints>
+        <properties>
+          <text value="Only lowest scoring"/>
         </properties>
       </component>
     </children>
@@ -273,6 +360,15 @@
       <member id="cf1d1"/>
       <member id="57f60"/>
       <member id="5bbd7"/>
+    </group>
+    <group name="buttonGroup2">
+      <member id="115ac"/>
+      <member id="cf468"/>
+      <member id="5bffe"/>
+    </group>
+    <group name="buttonGroup3">
+      <member id="d8394"/>
+      <member id="c6d0c"/>
     </group>
   </buttonGroups>
 </form>

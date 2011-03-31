@@ -47,7 +47,7 @@ public class IdentificationExtension extends Identification implements PeptideId
      */
     private String iSpectrumFileName;
 
-    private long iFileRef;
+    private long iQuanGroupid;
 
     /**
      * Default constructor.
@@ -128,6 +128,26 @@ public class IdentificationExtension extends Identification implements PeptideId
         return lIDs;
     }
 
+    public static Vector<Long> getUnvalidIdentificationdIdsForProject(Connection aConn, long aProjectID) throws SQLException {
+        String sql;
+        QuantitativeValidationSingelton iQuantitationSingelton = QuantitativeValidationSingelton.getInstance();
+         if(iQuantitationSingelton.getMsLimsPre7_2()){
+             sql = "select i.identificationid, s.filename from identification as i, spectrumfile as s, validation as v where i.identificationid = v.l_identificationid and v.status = 0 and i.l_spectrumfileid = s.spectrumfileid and s.l_projectid=?";
+         } else {
+             sql = "select i.identificationid from identification as i, spectrum as s, validation as v where i.identificationid = v.l_identificationid and v.status = 0 and i.l_spectrumid = s.spectrumid and s.l_projectid=?";
+         }
+        PreparedStatement prep = aConn.prepareStatement(sql);
+        prep.setLong(1, aProjectID);
+        ResultSet rs = prep.executeQuery();
+        Vector<Long> v = new Vector<Long>();
+        while (rs.next()) {
+            v.add(rs.getLong(1));
+        }
+        rs.close();
+        prep.close();
+        return v;
+    }
+
     /**
      * This methods reads all the IdentificationExtension  with a 'where'
      * clause addition. Note that the two tables you can use are 'identifciation' and 'spectrumfile'. The former is
@@ -139,7 +159,7 @@ public class IdentificationExtension extends Identification implements PeptideId
      * @return IdentificationExtension[]
      * @throws SQLException when the retrieving of the identifications went wrong.
      */
-    public static Vector<PeptideIdentification> getIdentificationExtensions(Connection aConn, String aWhereAddition) throws SQLException {
+    public static HashMap<Integer,PeptideIdentification> getIdentificationExtensions(Connection aConn, String aWhereAddition) throws SQLException {
 
         String sql;
         QuantitativeValidationSingelton iQuantitationSingelton = QuantitativeValidationSingelton.getInstance();
@@ -157,9 +177,10 @@ public class IdentificationExtension extends Identification implements PeptideId
 
         PreparedStatement prep = aConn.prepareStatement(sql);
         ResultSet rs = prep.executeQuery();
-        Vector v = new Vector();
+        HashMap<Integer,PeptideIdentification> v = new HashMap<Integer,PeptideIdentification>();
         while (rs.next()) {
-            v.add(new IdentificationExtension(rs));
+            IdentificationExtension lEx = new IdentificationExtension(rs);
+            v.put(Integer.valueOf(String.valueOf(lEx.getDatfile_query())), lEx);
         }
         rs.close();
         prep.close();
@@ -241,11 +262,11 @@ public class IdentificationExtension extends Identification implements PeptideId
         this.iSpectrumFileName = aFileName;
     }
 
-    public long getFileRef() {
-        return iFileRef;
+    public long getQuantitationGroupId() {
+        return iQuanGroupid;
     }
 
-    public void setFileRef(long iFileRef) {
-        this.iFileRef = iFileRef;
+    public void setQuantitationGroupId(long lQuanGroupId) {
+        this.iQuanGroupid = lQuanGroupId;
     }
 }

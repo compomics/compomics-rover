@@ -22,8 +22,8 @@ import java.util.HashMap;
  * To change this template use File | Settings | File Templates.
  */
 public class RatioPanel {
-	// Class specific log4j logger for RatioPanel instances.
-	 private static Logger logger = Logger.getLogger(RatioPanel.class);
+    // Class specific log4j logger for RatioPanel instances.
+    private static Logger logger = Logger.getLogger(RatioPanel.class);
     private JLabel lblRatioType;
     private JLabel lblRatio;
     private JLabel lblQualityText;
@@ -113,11 +113,16 @@ public class RatioPanel {
         }
 
         HashMap lStatMeas = iQuantitativeValidationSingelton.getReferenceSet().getStatisticalMeasermentForRatio(aRatio.getType(), aRatio);
-        lblZScoreNumbers.setText(String.valueOf(Math.round((Double) lStatMeas.get("significance") * 1000.0) / 1000.0));
-        lblPValueNumbers.setText(String.valueOf(Math.round(iQuantitativeValidationSingelton.calculateTwoSidedPvalueForZvalue((Double) lStatMeas.get("significance")) * 1000.0) / 1000.0));
-        if (aRatio.getComment() != null) {
-            lblComment.setVisible(true);
-            lblComment.setText(" " + aRatio.getComment() + " ");
+        if (lStatMeas.get("significance") != null) {
+
+            lblZScoreNumbers.setText(String.valueOf(Math.round((Double) lStatMeas.get("significance") * 1000.0) / 1000.0));
+            lblPValueNumbers.setText(String.valueOf(Math.round(iQuantitativeValidationSingelton.calculateTwoSidedPvalueForZvalue((Double) lStatMeas.get("significance")) * 1000.0) / 1000.0));
+            if (aRatio.getComment() != null) {
+                lblComment.setVisible(true);
+                lblComment.setText(" " + aRatio.getComment() + " ");
+            }
+        } else {
+            System.out.println("error");
         }
 
 

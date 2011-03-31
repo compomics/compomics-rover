@@ -233,6 +233,16 @@ public class MaxQuantRatio implements Ratio {
         iUpdates = iUpdates + 1;
     }
 
+    public void setRecalculatedRatio(double lNewRatio, boolean lLog2) {
+        if(lLog2){
+            iRatio = Math.pow(2,lNewRatio);
+        } else {
+            iRatio = lNewRatio;
+        }
+        iUpdates = iUpdates + 1;
+    }
+
+
     public void setRecalculatedNormRatio(double lNewRatio) {
         iRatioNorm = Math.pow(2,lNewRatio);
         iUpdates = iUpdates + 1;
