@@ -155,7 +155,7 @@ public class RatioPanel {
         gbc.gridx = 0;
         gbc.gridy = 0;
         gbc.anchor = GridBagConstraints.WEST;
-        gbc.insets = new Insets(5, 2, 5, 2);
+        gbc.insets = new Insets(2, 2, 2, 2);
         jpanContent.add(lblRatioType, gbc);
         lblRatio = new JLabel();
         lblRatio.setText("ratio");
@@ -163,7 +163,7 @@ public class RatioPanel {
         gbc.gridx = 1;
         gbc.gridy = 0;
         gbc.anchor = GridBagConstraints.WEST;
-        gbc.insets = new Insets(5, 2, 5, 2);
+        gbc.insets = new Insets(2, 2, 2, 2);
         jpanContent.add(lblRatio, gbc);
         lblZScoreText = new JLabel();
         lblZScoreText.setText("Z-score: ");
@@ -171,7 +171,7 @@ public class RatioPanel {
         gbc.gridx = 12;
         gbc.gridy = 0;
         gbc.anchor = GridBagConstraints.WEST;
-        gbc.insets = new Insets(5, 2, 5, 2);
+        gbc.insets = new Insets(2, 2, 2, 2);
         jpanContent.add(lblZScoreText, gbc);
         lblZScoreNumbers = new JLabel();
         lblZScoreNumbers.setText("zScore");
@@ -179,7 +179,7 @@ public class RatioPanel {
         gbc.gridx = 13;
         gbc.gridy = 0;
         gbc.anchor = GridBagConstraints.WEST;
-        gbc.insets = new Insets(5, 2, 5, 2);
+        gbc.insets = new Insets(2, 2, 2, 2);
         jpanContent.add(lblZScoreNumbers, gbc);
         lblPValueText = new JLabel();
         lblPValueText.setText("P-value: ");
@@ -187,7 +187,7 @@ public class RatioPanel {
         gbc.gridx = 14;
         gbc.gridy = 0;
         gbc.anchor = GridBagConstraints.WEST;
-        gbc.insets = new Insets(5, 2, 5, 2);
+        gbc.insets = new Insets(2, 2, 2, 2);
         jpanContent.add(lblPValueText, gbc);
         lblPValueNumbers = new JLabel();
         lblPValueNumbers.setText("pValue");
@@ -196,7 +196,7 @@ public class RatioPanel {
         gbc.gridy = 0;
         gbc.weightx = 1.0;
         gbc.anchor = GridBagConstraints.WEST;
-        gbc.insets = new Insets(5, 2, 5, 2);
+        gbc.insets = new Insets(2, 2, 2, 2);
         jpanContent.add(lblPValueNumbers, gbc);
         lblQualityText = new JLabel();
         lblQualityText.setText("Quality: ");
@@ -204,7 +204,7 @@ public class RatioPanel {
         gbc.gridx = 10;
         gbc.gridy = 0;
         gbc.anchor = GridBagConstraints.WEST;
-        gbc.insets = new Insets(5, 2, 5, 2);
+        gbc.insets = new Insets(2, 2, 2, 2);
         jpanContent.add(lblQualityText, gbc);
         lblQualityNumbers = new JLabel();
         lblQualityNumbers.setText("qual");
@@ -212,7 +212,7 @@ public class RatioPanel {
         gbc.gridx = 11;
         gbc.gridy = 0;
         gbc.anchor = GridBagConstraints.WEST;
-        gbc.insets = new Insets(5, 2, 5, 2);
+        gbc.insets = new Insets(2, 2, 2, 2);
         jpanContent.add(lblQualityNumbers, gbc);
         lblError0 = new JLabel();
         lblError0.setFont(new Font(lblError0.getFont().getName(), lblError0.getFont().getStyle(), 11));
@@ -222,7 +222,7 @@ public class RatioPanel {
         gbc.gridy = 2;
         gbc.gridwidth = 15;
         gbc.anchor = GridBagConstraints.WEST;
-        gbc.insets = new Insets(5, 5, 5, 5);
+        gbc.insets = new Insets(2, 2, 2, 2);
         jpanContent.add(lblError0, gbc);
         lblError2 = new JLabel();
         lblError2.setFont(new Font(lblError2.getFont().getName(), lblError2.getFont().getStyle(), 11));
@@ -232,7 +232,7 @@ public class RatioPanel {
         gbc.gridy = 4;
         gbc.gridwidth = 15;
         gbc.anchor = GridBagConstraints.WEST;
-        gbc.insets = new Insets(5, 5, 5, 5);
+        gbc.insets = new Insets(2, 2, 2, 2);
         jpanContent.add(lblError2, gbc);
         lblError3 = new JLabel();
         lblError3.setFont(new Font(lblError3.getFont().getName(), lblError3.getFont().getStyle(), 11));
@@ -242,7 +242,7 @@ public class RatioPanel {
         gbc.gridy = 5;
         gbc.gridwidth = 15;
         gbc.anchor = GridBagConstraints.WEST;
-        gbc.insets = new Insets(5, 5, 5, 5);
+        gbc.insets = new Insets(2, 2, 2, 2);
         jpanContent.add(lblError3, gbc);
         lblError4 = new JLabel();
         lblError4.setFont(new Font(lblError4.getFont().getName(), lblError4.getFont().getStyle(), 11));
@@ -252,7 +252,7 @@ public class RatioPanel {
         gbc.gridy = 6;
         gbc.gridwidth = 15;
         gbc.anchor = GridBagConstraints.WEST;
-        gbc.insets = new Insets(5, 5, 5, 5);
+        gbc.insets = new Insets(2, 2, 2, 2);
         jpanContent.add(lblError4, gbc);
         lblError1 = new JLabel();
         lblError1.setFont(new Font(lblError1.getFont().getName(), lblError1.getFont().getStyle(), 11));
@@ -262,7 +262,7 @@ public class RatioPanel {
         gbc.gridy = 3;
         gbc.gridwidth = 15;
         gbc.anchor = GridBagConstraints.WEST;
-        gbc.insets = new Insets(5, 5, 5, 5);
+        gbc.insets = new Insets(2, 2, 2, 2);
         jpanContent.add(lblError1, gbc);
         lblComment = new JLabel();
         lblComment.setFont(new Font(lblComment.getFont().getName(), Font.ITALIC, lblComment.getFont().getSize()));
@@ -272,7 +272,7 @@ public class RatioPanel {
         gbc.gridy = 1;
         gbc.gridwidth = 15;
         gbc.anchor = GridBagConstraints.WEST;
-        gbc.insets = new Insets(5, 5, 5, 5);
+        gbc.insets = new Insets(2, 2, 2, 2);
         jpanContent.add(lblComment, gbc);
     }
 

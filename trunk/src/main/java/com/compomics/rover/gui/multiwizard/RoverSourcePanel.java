@@ -321,6 +321,7 @@ public class RoverSourcePanel implements WizardPanel {
         buttonGroup.add(maxQuantMsLims);
         buttonGroup.add(thermoMSFFilesMsfRadioButton);
         buttonGroup.add(censusOutTxtAndRadioButton);
+        buttonGroup.add(proteomeDiscovererQuantificationsFromRadioButton);
     }
 
     /**

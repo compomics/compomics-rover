@@ -19,8 +19,8 @@ import java.sql.Connection;
  * To change this template use File | Settings | File Templates.
  */
 public class RatioGroupPanel {
-	// Class specific log4j logger for RatioGroupPanel instances.
-	 private static Logger logger = Logger.getLogger(RatioGroupPanel.class);
+    // Class specific log4j logger for RatioGroupPanel instances.
+    private static Logger logger = Logger.getLogger(RatioGroupPanel.class);
     private JPanel jpanRatios;
     private JButton moreInfoButton;
     private JPanel jpanContent;
@@ -67,20 +67,20 @@ public class RatioGroupPanel {
         lTemp.setLayout(new BoxLayout(lTemp, BoxLayout.Y_AXIS));
         lTemp.setBackground(Color.WHITE);
         for (int i = 0; i < aRatioGroup.getNumberOfRatios(); i++) {
-            lTemp.add(Box.createHorizontalStrut(5));
+            lTemp.add(Box.createHorizontalStrut(2));
             RatioPanel lRatioPanel = new RatioPanel(aRatioGroup.getRatio(i));
 
             JPanel lTemp2 = new JPanel();
             lTemp2.setLayout(new BoxLayout(lTemp2, BoxLayout.X_AXIS));
             lTemp2.setBackground(Color.WHITE);
             lTemp2.setBackground(Color.WHITE);
-            lTemp2.add(Box.createHorizontalStrut(5));
+            lTemp2.add(Box.createHorizontalStrut(2));
             lTemp2.add(lRatioPanel.getContentPane());
             lTemp2.add(Box.createHorizontalGlue());
 
             lTemp.add(lTemp2);
         }
-        jpanRatios.add(Box.createHorizontalStrut(5));
+        jpanRatios.add(Box.createHorizontalStrut(2));
         jpanRatios.add(lTemp);
         jpanRatios.add(Box.createHorizontalGlue());
     }
@@ -117,7 +117,6 @@ public class RatioGroupPanel {
         gbc.gridx = 0;
         gbc.gridy = 0;
         gbc.weightx = 1.0;
-        gbc.weighty = 1.0;
         gbc.fill = GridBagConstraints.BOTH;
         jpanContent.add(jpanRatios, gbc);
         moreInfoButton = new JButton();
@@ -132,7 +131,7 @@ public class RatioGroupPanel {
         gbc.gridx = 4;
         gbc.gridy = 0;
         gbc.fill = GridBagConstraints.HORIZONTAL;
-        gbc.insets = new Insets(2, 2, 2, 2);
+        gbc.insets = new Insets(0, 2, 0, 2);
         jpanContent.add(moreInfoButton, gbc);
         multiSeparator = new JSeparator();
         multiSeparator.setOrientation(1);
@@ -140,7 +139,7 @@ public class RatioGroupPanel {
         gbc.gridx = 1;
         gbc.gridy = 0;
         gbc.fill = GridBagConstraints.BOTH;
-        gbc.insets = new Insets(0, 2, 0, 2);
+        gbc.insets = new Insets(5, 2, 5, 2);
         jpanContent.add(multiSeparator, gbc);
         final JSeparator separator1 = new JSeparator();
         separator1.setOrientation(1);
@@ -148,7 +147,7 @@ public class RatioGroupPanel {
         gbc.gridx = 3;
         gbc.gridy = 0;
         gbc.fill = GridBagConstraints.BOTH;
-        gbc.insets = new Insets(0, 2, 0, 2);
+        gbc.insets = new Insets(5, 2, 5, 2);
         jpanContent.add(separator1, gbc);
         lblMulti = new JLabel();
         lblMulti.setText("");

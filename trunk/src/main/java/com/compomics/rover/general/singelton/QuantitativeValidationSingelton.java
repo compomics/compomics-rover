@@ -173,6 +173,7 @@ public class QuantitativeValidationSingelton {
      */
     private boolean iNormalization = false;
     private boolean iMsLimsPre7_2 = false;
+    private boolean iMsLimsPre7_6 = false;
     /**
      * The special accessions for the reference set, these can only be taken to create the reference set, or these can be excluded
      * from the reference set, depending on the referencesetenum
@@ -927,6 +928,14 @@ public class QuantitativeValidationSingelton {
 
     public boolean getMsLimsPre7_2() {
         return iMsLimsPre7_2;
+    }
+
+    public void setMsLimsPre7_6(boolean msLimsPre7_6) {
+        this.iMsLimsPre7_6 = msLimsPre7_6;
+    }
+
+    public boolean getMsLimsPre7_6() {
+        return iMsLimsPre7_6;
     }
 
     public String getReferenceSetSpecialAccessions() {

@@ -35,7 +35,7 @@
           <gridbag top="5" left="5" bottom="5" right="5" weightx="0.0" weighty="0.0"/>
         </constraints>
         <properties>
-          <contentAreaFilled value="false"/>
+          <contentAreaFilled value="true"/>
           <focusPainted value="false"/>
           <icon value="exit.png"/>
           <text value=""/>
@@ -49,7 +49,7 @@
         </constraints>
         <properties>
           <borderPainted value="true"/>
-          <contentAreaFilled value="false"/>
+          <contentAreaFilled value="true"/>
           <focusPainted value="false"/>
           <icon value="forward.png"/>
           <text value=""/>
@@ -62,7 +62,7 @@
           <gridbag top="5" left="5" bottom="5" right="5" weightx="0.0" weighty="0.0"/>
         </constraints>
         <properties>
-          <contentAreaFilled value="false"/>
+          <contentAreaFilled value="true"/>
           <focusPainted value="false"/>
           <icon value="back.png"/>
           <text value=""/>

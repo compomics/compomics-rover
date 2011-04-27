@@ -222,6 +222,27 @@ public class RatioGroup {
     }
 
     /**
+     * Returns the PeptideIdentification for the given Type.
+     * @param aType The type of the PeptideIdentification
+     * @return A vector with the requested PeptideIdentifications. <br><b>null if no match!</b>
+     */
+    public Vector<PeptideIdentification> getIdentificationsForType(String aType){
+        Vector<PeptideIdentification> lResult = null;
+        // Iterate over all the types of the RatioGroup.
+        for (int i = 0; i < iPeptideTypes.size(); i++) {
+            String s = iPeptideTypes.get(i);
+            if(s.equals(aType)){
+                // Return the Identification that matches the type parameter.
+                if(lResult == null){
+                    lResult = new Vector<PeptideIdentification>();
+                }
+                lResult.add(iIdentifications.get(i));
+            }
+        }
+        return lResult;
+    }
+
+    /**
      * This method gets the protein accessions (also isoforms) linked to the identifications.
      * @return String[] with the different protein accessions
      */

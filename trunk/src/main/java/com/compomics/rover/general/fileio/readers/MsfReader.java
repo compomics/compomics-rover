@@ -5,7 +5,6 @@ import com.compomics.rover.general.enumeration.DataType;
 import com.compomics.rover.general.enumeration.QuantitationMetaType;
 import com.compomics.rover.general.quantitation.RatioGroup;
 import com.compomics.rover.general.quantitation.RatioGroupCollection;
-import com.compomics.rover.general.quantitation.source.DatFileiTraq.ITraqRatio;
 import com.compomics.rover.general.quantitation.source.thermo_msf.ThermoMsfRatio;
 import com.compomics.thermo_msf_parser.Parser;
 import com.compomics.thermo_msf_parser.msf.Peptide;
@@ -16,11 +15,8 @@ import com.compomics.thermo_msf_parser.msf.ScoreType;
 
 import java.io.*;
 import java.sql.*;
-import java.util.Collection;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.Vector;
-import java.util.zip.*;
 
 /**
  * Created by IntelliJ IDEA.
@@ -80,10 +76,10 @@ public class MsfReader {
             iRatioGroupCollection.putMetaData(QuantitationMetaType.FILENAME, lFileName);
 
             Vector<ScoreType> lScores = iMsfFile.getScoreTypes();
-            ScoreType lScoreType = null;
+            Vector<ScoreType> lScoreTypes = new Vector<ScoreType>();
             for (int i = 0; i < lScores.size(); i++) {
                 if (lScores.get(i).getIsMainScore() == 1) {
-                    lScoreType = lScores.get(i);
+                    lScoreTypes.add(lScores.get(i));
                 }
             }
 
@@ -98,11 +94,11 @@ public class MsfReader {
                     Peptide lPeptide = iMsfFile.getSpectra().get(i).getPeptides().get(p);
                     boolean lHighestOrLowestScoring = false;
                     if(iOnlyHighestScoring){
-                        if (lPeptide.getParentSpectrum().isHighestScoring(lPeptide, lScoreType)){
+                        if (lPeptide.getParentSpectrum().isHighestScoring(lPeptide, lScoreTypes)){
                             lHighestOrLowestScoring = true;
                         }
                     } else if(iOnlyLowestScoring){
-                        if (lPeptide.getParentSpectrum().isLowestScoring(lPeptide, lScoreType)){
+                        if (lPeptide.getParentSpectrum().isLowestScoring(lPeptide, lScoreTypes)){
                             lHighestOrLowestScoring = true;
                         }
                     } else {
@@ -139,7 +135,7 @@ public class MsfReader {
 
                             //create an identification and add it to the ratio
                             HashMap lIdentificationParameters = new HashMap();
-                            String lScore = String.valueOf(lPeptide.getScoreByScoreType(lScoreType));
+                            String lScore = String.valueOf(lPeptide.getMainScore());
                             if (lScore.indexOf(".") > 0) {
                                 lScore = lScore.substring(0, lScore.indexOf("."));
                             }
@@ -176,7 +172,7 @@ public class MsfReader {
                                     }
                                 }
                             } else {
-                                //System.out.println(lPeptide.getScoreByScoreType(lScoreType));
+                                //System.out.println(lPeptide.getScoreByScoreType(lScoreTypes));
                             }
                             iRatioGroupCollection.add(lRatioGroup);
                         }

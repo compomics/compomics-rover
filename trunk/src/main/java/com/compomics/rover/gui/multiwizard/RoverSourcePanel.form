@@ -127,7 +127,7 @@
       <member id="6e42"/>
       <member id="c4856"/>
     </group>
-    <group name="buttonGroup3">
+    <group name="buttonGroup1">
       <member id="7fe4"/>
       <member id="a6f74"/>
       <member id="609af"/>
@@ -135,6 +135,7 @@
       <member id="2307a"/>
       <member id="faa02"/>
       <member id="d1fbb"/>
+      <member id="8f5ce"/>
     </group>
   </buttonGroups>
 </form>
