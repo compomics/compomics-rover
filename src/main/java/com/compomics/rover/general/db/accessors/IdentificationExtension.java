@@ -133,8 +133,10 @@ public class IdentificationExtension extends Identification implements PeptideId
         QuantitativeValidationSingelton iQuantitationSingelton = QuantitativeValidationSingelton.getInstance();
          if(iQuantitationSingelton.getMsLimsPre7_2()){
              sql = "select i.identificationid, s.filename from identification as i, spectrumfile as s, validation as v where i.identificationid = v.l_identificationid and v.status = 0 and i.l_spectrumfileid = s.spectrumfileid and s.l_projectid=?";
-         } else {
+         } else if(iQuantitationSingelton.getMsLimsPre7_6()) {
              sql = "select i.identificationid from identification as i, spectrum as s, validation as v where i.identificationid = v.l_identificationid and v.status = 0 and i.l_spectrumid = s.spectrumid and s.l_projectid=?";
+         } else {
+             sql = "select i.identificationid from identification as i, spectrum as s, validation as v where i.identificationid = v.l_identificationid and v.l_validationtypeid < 0 and i.l_spectrumid = s.spectrumid and s.l_projectid=?";
          }
         PreparedStatement prep = aConn.prepareStatement(sql);
         prep.setLong(1, aProjectID);

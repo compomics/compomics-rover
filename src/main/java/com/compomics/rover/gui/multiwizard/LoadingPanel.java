@@ -275,7 +275,7 @@ public class LoadingPanel implements WizardPanel {
         //1.check the msf files
         for (int i = 0; i < lFiles.size(); i++) {
             try {
-                lMsfFiles.add(new MsfReader(lFiles.get(i).getAbsolutePath(), iParent.getMsfPeptideConfidence(), iParent.isMsfOnlyHighestScoring()));
+                lMsfFiles.add(new MsfReader(lFiles.get(i).getAbsolutePath(), iParent.getMsfPeptideConfidence(), iParent.isMsfOnlyHighestScoring(), !iParent.isMsfOnlyHighestScoring()));
             } catch (ClassNotFoundException e) {
                 logger.error(e.getMessage(), e);
             } catch (SQLException e) {

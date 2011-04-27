@@ -143,7 +143,7 @@
     </children>
   </grid>
   <buttonGroups>
-    <group name="buttonGroup2">
+    <group name="buttonGroup1">
       <member id="fe284"/>
       <member id="6e42"/>
       <member id="c4856"/>
@@ -154,6 +154,8 @@
       <member id="4a8ff"/>
       <member id="d1fbb"/>
       <member id="43a4b"/>
+      <member id="7b168"/>
+      <member id="7ce4"/>
     </group>
   </buttonGroups>
 </form>

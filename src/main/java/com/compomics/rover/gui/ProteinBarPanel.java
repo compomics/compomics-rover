@@ -131,6 +131,17 @@ public class ProteinBarPanel extends JPanel {
         //calculate the height and widht of one box
         int lBoxHeight = (iHeight - 25 - (iNumberOfBoxes - 1) * 5) / iNumberOfBoxes;
         int lBoxWidth = iWidth - 95;
+        int lLength = 0;
+        for (int i = 0; i < iNumberOfBoxes; i++) {
+            int lTempLength = iProtein.getTypes()[i].length();
+            if(lTempLength > lLength){
+                lLength = lTempLength;
+            }
+        }
+        if(lLength > 3 ){
+            lBoxWidth = lBoxWidth - (lLength - 3)*5;
+        }
+
 
         if (lBoxHeight < 5) {
             return;
@@ -165,11 +176,15 @@ public class ProteinBarPanel extends JPanel {
         //paint the boxes        
         for (int i = 0; i < iNumberOfBoxes; i++) {
             int lYstart = 5 + i * (5 + lBoxHeight);
-            g.drawRect(80, lYstart, lBoxWidth, lBoxHeight);
+            int lXstart = 80;
+            if(lLength > 3 ){
+                lXstart = lXstart + (lLength - 3)*5;
+            }
+            g.drawRect(lXstart, lYstart, lBoxWidth, lBoxHeight);
 
             //paint the box ratio type
             g.setFont(new Font("Times New Roman", Font.PLAIN, 12));
-            g.drawString(iProtein.getTypes()[i] + " : ", 50, lYstart + lBoxHeight / 2);
+            g.drawString(iProtein.getTypes()[i] + " : ", 50, lYstart + 5 + lBoxHeight / 2);
 
             //paint the ratio boxes (grouped by peptides)
 
@@ -208,12 +223,16 @@ public class ProteinBarPanel extends JPanel {
 
                             //paint box
                             g.setColor(lColor);
-                            g.fillRect(80 + lXratioBoxStart, lYstart, lXratioBoxEnd - lXratioBoxStart, lBoxHeight);
+                            int lXBoxstart = 80;
+                            if(lLength > 3 ){
+                                lXBoxstart = lXBoxstart + (lLength - 3)*5;
+                            }
+                            g.fillRect(lXBoxstart + lXratioBoxStart, lYstart, lXratioBoxEnd - lXratioBoxStart, lBoxHeight);
 
                             //paint identifier
                             g.setColor(Color.gray);
                             g.setFont(new Font("Times New Roman", Font.BOLD, 20));
-                            g.drawString(String.valueOf(j + 1), 80 + (lXratioBoxStart + lXratioBoxEnd) / 2 - 5, 10 + lBoxHeight / 2 + i * (5 + lBoxHeight));
+                            g.drawString(String.valueOf(j + 1), lXBoxstart + (lXratioBoxStart + lXratioBoxEnd) / 2 - 5, 15 + lBoxHeight / 2 + i * (5 + lBoxHeight));
                             g.setColor(Color.black);
                         }
                     }
@@ -225,8 +244,11 @@ public class ProteinBarPanel extends JPanel {
         //paint the bottom box
         //this is a box with orange and blue squares
         //the square is orange if the corresponding peptide is linked to multiple proteins
-
-        g.drawRect(80, iHeight - 15, lBoxWidth, 10);
+        int lXSubBoxstart = 80;
+        if(lLength > 3 ){
+            lXSubBoxstart = lXSubBoxstart + (lLength - 3)*5;
+        }
+        g.drawRect(lXSubBoxstart, iHeight - 15, lBoxWidth, 10);
 
         //paint the colored peptide boxes
         for (int j = 0; j < lPeptideGroups.size(); j++) {
@@ -252,7 +274,11 @@ public class ProteinBarPanel extends JPanel {
 
                 //paint box
                 g.setColor(lColor);
-                g.fillRect(80 + lXratioBoxStart, iHeight - 15, lXratioBoxEnd - lXratioBoxStart, 10 );
+                int lXBoxstart = 80;
+                if(lLength > 3 ){
+                    lXBoxstart = lXBoxstart + (lLength - 3)*5;
+                }
+                g.fillRect(lXBoxstart + lXratioBoxStart, iHeight - 15, lXratioBoxEnd - lXratioBoxStart, 10 );
 
                 //set color back to black
                 g.setColor(Color.black);

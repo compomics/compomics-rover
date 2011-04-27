@@ -6,6 +6,7 @@ import com.compomics.util.io.PropertiesManager;
 import com.jgoodies.looks.plastic.PlasticLookAndFeel;
 import com.jgoodies.looks.plastic.PlasticXPLookAndFeel;
 import com.jgoodies.looks.plastic.theme.SkyKrupp;
+import com.sun.java.swing.plaf.nimbus.NimbusLookAndFeel;
 import org.apache.log4j.Logger;
 
 import com.compomics.rover.general.interfaces.WizardPanel;
@@ -474,8 +475,7 @@ public class WizardFrameHolder extends JFrame implements Flamable {
         PropertiesManager.getInstance().updateLog4jConfiguration(logger, CompomicsTools.ROVER);
         logger.info("Rover started");
         try {
-            PlasticLookAndFeel.setPlasticTheme(new SkyKrupp());
-            UIManager.setLookAndFeel(new PlasticXPLookAndFeel());
+            UIManager.setLookAndFeel(new NimbusLookAndFeel());
         } catch (UnsupportedLookAndFeelException e) {
             // ignore exception
         }
@@ -567,13 +567,23 @@ public class WizardFrameHolder extends JFrame implements Flamable {
         gbc.gridwidth = 2;
         wizardPanel.add(label1, gbc);
         final JLabel label2 = new JLabel();
-        label2.setText("Start the analysis or combine quantitative data from different sources");
+        label2.setText("Combine quantitative data from different sources:");
         gbc = new GridBagConstraints();
         gbc.gridx = 0;
         gbc.gridy = 4;
         gbc.anchor = GridBagConstraints.WEST;
         gbc.insets = new Insets(5, 5, 5, 5);
         wizardPanel.add(label2, gbc);
+        final JLabel label3 = new JLabel();
+        label3.setFont(new Font(label3.getFont().getName(), Font.ITALIC, 10));
+        label3.setText("Please cite: Colaert et. al. Rover: a tool to visualize and validate quantitative proteomics data from different sources. Proteomics  2010 Mar;10(6):1226-9.");
+        gbc = new GridBagConstraints();
+        gbc.gridx = 0;
+        gbc.gridy = 5;
+        gbc.gridwidth = 2;
+        gbc.anchor = GridBagConstraints.WEST;
+        gbc.insets = new Insets(5, 5, 5, 5);
+        wizardPanel.add(label3, gbc);
         final JPanel spacer1 = new JPanel();
         gbc = new GridBagConstraints();
         gbc.gridx = 0;
@@ -590,25 +600,26 @@ public class WizardFrameHolder extends JFrame implements Flamable {
         wizardPanel.add(spacer2, gbc);
         btnOpenMulti = new JButton();
         btnOpenMulti.setBorderPainted(true);
-        btnOpenMulti.setContentAreaFilled(false);
+        btnOpenMulti.setContentAreaFilled(true);
         btnOpenMulti.setFocusPainted(false);
         btnOpenMulti.setIcon(new ImageIcon(getClass().getResource("/mutliRover.png")));
         btnOpenMulti.setText("");
-        btnOpenMulti.setToolTipText("next");
+        btnOpenMulti.setToolTipText("Combine different quantitative projects");
         gbc = new GridBagConstraints();
         gbc.gridx = 1;
         gbc.gridy = 4;
+        gbc.anchor = GridBagConstraints.WEST;
         gbc.insets = new Insets(5, 5, 5, 5);
         wizardPanel.add(btnOpenMulti, gbc);
         lblMemory = new JLabel();
         lblMemory.setText("Label");
         gbc = new GridBagConstraints();
-        gbc.gridx = 0;
+        gbc.gridx = 2;
         gbc.gridy = 3;
         gbc.anchor = GridBagConstraints.WEST;
         wizardPanel.add(lblMemory, gbc);
         exitButton = new JButton();
-        exitButton.setContentAreaFilled(false);
+        exitButton.setContentAreaFilled(true);
         exitButton.setFocusPainted(false);
         exitButton.setIcon(new ImageIcon(getClass().getResource("/exit.png")));
         exitButton.setText("");
@@ -621,7 +632,7 @@ public class WizardFrameHolder extends JFrame implements Flamable {
         jpanContent.add(exitButton, gbc);
         nextButton = new JButton();
         nextButton.setBorderPainted(true);
-        nextButton.setContentAreaFilled(false);
+        nextButton.setContentAreaFilled(true);
         nextButton.setFocusPainted(false);
         nextButton.setIcon(new ImageIcon(getClass().getResource("/forward.png")));
         nextButton.setText("");
@@ -633,7 +644,7 @@ public class WizardFrameHolder extends JFrame implements Flamable {
         gbc.insets = new Insets(5, 5, 5, 5);
         jpanContent.add(nextButton, gbc);
         previousButton = new JButton();
-        previousButton.setContentAreaFilled(false);
+        previousButton.setContentAreaFilled(true);
         previousButton.setFocusPainted(false);
         previousButton.setIcon(new ImageIcon(getClass().getResource("/back.png")));
         previousButton.setText("");

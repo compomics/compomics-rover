@@ -56,7 +56,6 @@ public class QuantitationValidationGUI extends JFrame {
     private JButton filterProteinsButton;
     private JPanel rightPanel;
     private JPanel jpanProteinMeanOptions;
-    private JCheckBox useOnlyValidRatiosCheckBox;
     private JPanel jpanProteinGraphWrapper;
     private JPanel jpanProteinRatioGroups;
     private JLabel lblProteinInfo;
@@ -64,7 +63,6 @@ public class QuantitationValidationGUI extends JFrame {
     private JButton addToSelectionButton;
     private JButton showSelectionButton;
     private JButton goToBrowserButton;
-    private JCheckBox log2CheckBox;
     private JButton saveSelectedProteinsToPDFButton;
     private JPanel jpanRatioInRovTab;
     private JPanel tabProtein;
@@ -88,20 +86,22 @@ public class QuantitationValidationGUI extends JFrame {
     private JButton graphExtenderLeft;
     private JButton graphExtenderLeftPlus;
     private JButton graphExtenderRightMin;
-    private JCheckBox showRealDistributionCheckBox;
-    private JCheckBox showHuberEstimatedDistributionCheckBox;
     private JTree treeRovFiles;
     private JButton miscButton;
     private JButton misc_infoButton;
     private JButton logButton;
-    private JCheckBox useOnlyUniquelyIdentifiedCheckBox;
     private JButton restartButton;
-    private JButton reconstructButton;
     private JComboBox cmbOrder;
     private JComboBox cmbRatioTypes;
     private JLabel lblRatioType;
-    private JCheckBox useOriginalCheckBox;
     private JProgressBar progressBar1;
+    private JSplitPane middleSplitter;
+    private JToggleButton tglBtnValues;
+    private JToggleButton tglBtnDistribution;
+    private JToggleButton tglBtnLog2;
+    private JToggleButton tglBtnOriginal;
+    private JToggleButton tglBtnValid;
+    private JToggleButton tglBtnUnique;
 
     /**
      * All the proteins (with isoforms) with quantitative information
@@ -227,9 +227,9 @@ public class QuantitationValidationGUI extends JFrame {
 
         //set these checkboxes selected (depending on the status in the validation singelton)
         iQuantitativeValidationSingelton.setLog2(true);
-        log2CheckBox.setSelected(iQuantitativeValidationSingelton.isLog2());
-        useOnlyValidRatiosCheckBox.setSelected(iQuantitativeValidationSingelton.isUseOnlyValidRatioForProteinMean());
-        useOnlyUniquelyIdentifiedCheckBox.setSelected(iQuantitativeValidationSingelton.isUseOnlyUniqueRatioForProteinMean());
+        tglBtnLog2.setSelected(iQuantitativeValidationSingelton.isLog2());
+        tglBtnValid.setSelected(iQuantitativeValidationSingelton.isUseOnlyValidRatioForProteinMean());
+        tglBtnUnique.setSelected(iQuantitativeValidationSingelton.isUseOnlyUniqueRatioForProteinMean());
 
         //set the frame parameters
         this.setContentPane(contentPane);
@@ -267,13 +267,12 @@ public class QuantitationValidationGUI extends JFrame {
                 tabbedPane.remove(1);
             }
         }
-        reconstructButton.setVisible(false);
 
         //show the normalization checkbox if needed
         if (iQuantitativeValidationSingelton.isNormalization()) {
-            useOriginalCheckBox.setVisible(true);
+            tglBtnOriginal.setVisible(true);
         } else {
-            useOriginalCheckBox.setVisible(false);
+            tglBtnOriginal.setVisible(false);
         }
 
         //show the ratio type selection combobox if needed
@@ -306,19 +305,13 @@ public class QuantitationValidationGUI extends JFrame {
      * This method will set all the action listeners
      */
     public void setActionListeners() {
-        reconstructButton.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                String lQuestion = "Do you want to close and reconstruct the validation? \nDo not forget to save your validated and seleted proteins in a .rover file!";
-                int answer = JOptionPane.showConfirmDialog(new JFrame(), lQuestion, "Close Validation ? ", JOptionPane.YES_NO_OPTION, JOptionPane.PLAIN_MESSAGE);
-                if (answer == JOptionPane.YES_OPTION) {
-                    RecreateProteinsForMulti lHolder = new RecreateProteinsForMulti(iConnMsLims, iStandAlone);
-                    closeFrame();
-                } else {
-                    //do not close this frame
-                }
+        middleSplitter.setDividerLocation(middleSplitter.getWidth() / 2);
+        contentPane.addComponentListener(new ComponentAdapter() {
+            public void componentResized(ComponentEvent evt) {
+                middleSplitter.setDividerLocation(middleSplitter.getWidth() / 2);
+                contentPane.updateUI();
             }
         });
-
         logButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 LogGui lLogGui = new LogGui();
@@ -329,21 +322,21 @@ public class QuantitationValidationGUI extends JFrame {
                 FilterFrame filter = new FilterFrame(iProteins, iQuantitativeValidationSingelton.getReferenceSet(), getFrame(), iQuantitativeValidationSingelton.getReferenceSet().getTypes(), iQuantitativeValidationSingelton.getReferenceSet().getComponents());
             }
         });
-        useOnlyValidRatiosCheckBox.addActionListener(new ActionListener() {
+        tglBtnValid.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                iQuantitativeValidationSingelton.setUseOnlyValidRatioForProteinMean(useOnlyValidRatiosCheckBox.isSelected());
+                iQuantitativeValidationSingelton.setUseOnlyValidRatioForProteinMean(tglBtnValid.isSelected());
                 loadProtein(false);
             }
         });
-        useOnlyUniquelyIdentifiedCheckBox.addActionListener(new ActionListener() {
+        tglBtnUnique.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                iQuantitativeValidationSingelton.setUseOnlyUniqueRatioForProteinMean(useOnlyUniquelyIdentifiedCheckBox.isSelected());
+                iQuantitativeValidationSingelton.setUseOnlyUniqueRatioForProteinMean(tglBtnUnique.isSelected());
                 loadProtein(false);
             }
         });
-        log2CheckBox.addActionListener(new ActionListener() {
+        tglBtnLog2.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                iQuantitativeValidationSingelton.setLog2(log2CheckBox.isSelected());
+                iQuantitativeValidationSingelton.setLog2(tglBtnLog2.isSelected());
                 if (iQuantitativeValidationSingelton.isLog2()) {
                     iQuantitativeValidationSingelton.setLeftGraphBorder(-2);
                     iQuantitativeValidationSingelton.setRightGraphBorder(2);
@@ -637,8 +630,8 @@ public class QuantitationValidationGUI extends JFrame {
                 loadProtein(false);
             }
         };
-        showRealDistributionCheckBox.addActionListener(statisticTypeListener);
-        showHuberEstimatedDistributionCheckBox.addActionListener(statisticTypeListener);
+        tglBtnValues.addActionListener(statisticTypeListener);
+        tglBtnDistribution.addActionListener(statisticTypeListener);
 
         proteinList.addMouseListener(new MouseAdapter() {
             @Override
@@ -759,9 +752,9 @@ public class QuantitationValidationGUI extends JFrame {
                 lStarter.start();
             }
         });
-        useOriginalCheckBox.addActionListener(new ActionListener() {
+        tglBtnOriginal.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                iQuantitativeValidationSingelton.setUseOriginalRatio(useOriginalCheckBox.isSelected());
+                iQuantitativeValidationSingelton.setUseOriginalRatio(tglBtnOriginal.isSelected());
                 iQuantitativeValidationSingelton.getReferenceSet().clearCalculateReferenceSet();
                 loadProtein(false);
             }
@@ -836,15 +829,15 @@ public class QuantitationValidationGUI extends JFrame {
                         //now add the new charts to the empty panel
                         for (int i = 0; i < lTypes.length; i++) {
                             //get the chart from the protein
-                            iChartPanels[i] = iProtein.getChart(iQuantitativeValidationSingelton.getReferenceSet(), lTypes[i], showHuberEstimatedDistributionCheckBox.isSelected(), showRealDistributionCheckBox.isSelected());
-                            jpanProteinGraph.add(Box.createVerticalStrut(5));
+                            iChartPanels[i] = iProtein.getChart(iQuantitativeValidationSingelton.getReferenceSet(), lTypes[i], tglBtnDistribution.isSelected(), tglBtnValues.isSelected());
+                            jpanProteinGraph.add(Box.createVerticalStrut(2));
                             jpanProteinGraph.add(new ChartPanel(iChartPanels[i]));
-                            jpanProteinGraph.add(Box.createVerticalStrut(5));
+                            jpanProteinGraph.add(Box.createVerticalStrut(2));
                         }
 
                         //remove everything from the ratio group information panel
                         jpanProteinRatioGroups.removeAll();
-                        jpanProteinRatioGroups.add(Box.createVerticalStrut(5));
+                        jpanProteinRatioGroups.add(Box.createVerticalStrut(2));
                         jpanProteinRatioGroups.setBackground(Color.white);
                         //now add the new info to the empty panel
 
@@ -860,17 +853,16 @@ public class QuantitationValidationGUI extends JFrame {
                         lProteinInfoLabel.setFont(new Font("sansserif", Font.BOLD, 18));
                         lProteinInfoPanel.add(lProteinInfoLabel);
                         lProteinInfoPanel.add(new JLabel("   Protein accession : " + iProtein.getAccession()));
-                        lProteinInfoPanel.add(Box.createVerticalStrut(5));
                         for (int i = 0; i < lTypes.length; i++) {
-                            lProteinInfoPanel.add(Box.createVerticalStrut(5));
+                            lProteinInfoPanel.add(Box.createVerticalStrut(2));
                             lProteinInfoPanel.add(new JLabel("   Protein mean for " + lTypes[i] + " : " + Math.round(iProtein.getProteinRatio(lTypes[i]) * 1000.0) / 1000.0));
-                            lProteinInfoPanel.add(Box.createVerticalStrut(5));
+                            lProteinInfoPanel.add(Box.createVerticalStrut(2));
                             lProteinInfoPanel.add(new JLabel("   Peptide grouped protein mean for " + lTypes[i] + " : " + Math.round(iProtein.getGroupedProteinRatio(lTypes[i]) * 1000.0) / 1000.0));
-                            lProteinInfoPanel.add(Box.createVerticalStrut(5));
+                            lProteinInfoPanel.add(Box.createVerticalStrut(2));
                             lProteinInfoPanel.add(new JLabel("   Peptide SD " + lTypes[i] + " : " + Math.round(iProtein.getProteinRatioStandardDeviationForType(lTypes[i]) * 1000.0) / 1000.0));
-                            lProteinInfoPanel.add(Box.createVerticalStrut(5));
+                            lProteinInfoPanel.add(Box.createVerticalStrut(2));
                             lProteinInfoPanel.add(new JLabel("   Protein Z-score " + lTypes[i] + " : " + (Math.round(iProtein.getProteinZScore(lTypes[i], -1) * 1000.0) / 1000.0)));
-                            lProteinInfoPanel.add(Box.createVerticalStrut(5));
+                            lProteinInfoPanel.add(Box.createVerticalStrut(2));
                         }
                         //add the label to a temp panel with X axis layout
                         JPanel lTemp = new JPanel();
@@ -950,7 +942,7 @@ public class QuantitationValidationGUI extends JFrame {
 
                         for (int i = 0; i < lPeptideGroups.size(); i++) {
                             progressBar1.setValue(i + 1);
-                            jpanProteinRatioGroups.add(Box.createVerticalStrut(5));
+                            jpanProteinRatioGroups.add(Box.createVerticalStrut(2));
                             //create the title button
                             JButton lGroupTitleButton = new JButton((i + 1) + ". " + lPeptideGroups.get(i).getFullSequence());
                             lGroupTitleButton.setBorderPainted(false);
@@ -995,23 +987,37 @@ public class QuantitationValidationGUI extends JFrame {
                             JPanel lTempRatioGroupInfo = new JPanel();
                             lTempRatioGroupInfo.setLayout(new BoxLayout(lTempRatioGroupInfo, BoxLayout.X_AXIS));
                             lTempRatioGroupInfo.setBackground(Color.WHITE);
-                            lTempRatioGroupInfo.add(Box.createHorizontalStrut(5));
+                            lTempRatioGroupInfo.add(Box.createHorizontalStrut(2));
                             lTempRatioGroupInfo.add(lGroupTitleButton);
                             lTempRatioGroupInfo.add(Box.createHorizontalGlue());
                             lTempRatioGroupInfo.add(lUsePeptides);
-                            lTempRatioGroupInfo.add(Box.createHorizontalStrut(5));
+                            lTempRatioGroupInfo.add(Box.createHorizontalStrut(2));
 
                             jpanProteinRatioGroups.add(lTempRatioGroupInfo);
 
                             for (int j = 0; j < lTypes.length; j++) {
                                 Double lMean = lPeptideGroups.get(i).getMeanRatioForGroup(lTypes[j]);
                                 if (lMean == null) {
-                                    jpanProteinRatioGroups.add(new JLabel("     Peptide group ratio mean (" + lTypes[j] + "): /"));
-                                    jpanProteinRatioGroups.add(Box.createVerticalStrut(5));
+                                    JLabel lLab = new JLabel("     Peptide group ratio mean (" + lTypes[j] + "): /");
+                                    JPanel jLabelHolderPanel = new JPanel();
+                                    jLabelHolderPanel.setLayout(new BoxLayout(jLabelHolderPanel, BoxLayout.X_AXIS));
+                                    jLabelHolderPanel.add(Box.createHorizontalStrut(15));
+                                    jLabelHolderPanel.add(lLab);
+                                    jLabelHolderPanel.add(Box.createHorizontalGlue());
+                                    jLabelHolderPanel.setBackground(Color.white);
+                                    jpanProteinRatioGroups.add(jLabelHolderPanel);
+                                    jpanProteinRatioGroups.add(Box.createVerticalStrut(2));
                                 } else {
-                                    jpanProteinRatioGroups.add(new JLabel("     Peptide group ratio mean (" + lTypes[j] + "): " + (Math.round(lMean * 1000.0)) / 1000.0));
-                                    jpanProteinRatioGroups.add(Box.createVerticalStrut(5));
 
+                                    JLabel lLab = new JLabel("     Peptide group ratio mean (" + lTypes[j] + "): " + (Math.round(lMean * 1000.0)) / 1000.0);
+                                    JPanel jLabelHolderPanel = new JPanel();
+                                    jLabelHolderPanel.setLayout(new BoxLayout(jLabelHolderPanel, BoxLayout.X_AXIS));
+                                    jLabelHolderPanel.add(Box.createHorizontalStrut(15));
+                                    jLabelHolderPanel.add(lLab);
+                                    jLabelHolderPanel.add(Box.createHorizontalGlue());
+                                    jLabelHolderPanel.setBackground(Color.white);
+                                    jpanProteinRatioGroups.add(jLabelHolderPanel);
+                                    jpanProteinRatioGroups.add(Box.createVerticalStrut(2));
                                 }
                             }
 
@@ -1021,12 +1027,13 @@ public class QuantitationValidationGUI extends JFrame {
                             jpanRatioGroup.setBackground(Color.WHITE);
                             //add the different ratio groups to the panel
                             for (int j = 0; j < lPeptideGroups.get(i).getRatioGroups().size(); j++) {
-                                jpanRatioGroup.add(Box.createVerticalStrut(5));
+                                jpanRatioGroup.add(Box.createVerticalStrut(1));
                                 //create the ratio group panel
                                 RatioGroupPanel lPanel = new RatioGroupPanel(lPeptideGroups.get(i).getRatioGroups().get(j), iConnMsLims, getFrame());
                                 //add the created panel to the vector
                                 jpanRatioGroup.add(lPanel.getContentPane());
                             }
+                            jpanRatioGroup.add(Box.createVerticalGlue());
                             //check if these ratiogroups must be shown
                             if (lPeptideGroups.get(i).isCollapsed()) {
                                 jpanRatioGroup.setVisible(false);
@@ -1057,6 +1064,7 @@ public class QuantitationValidationGUI extends JFrame {
                             }
                         };
                         lProteinBarThread.start();
+                        jpanProteinRatioGroups.add(Box.createVerticalGlue());
                         jpanProteinRatioGroups.updateUI();
                         jpanExtraProteinInfo.updateUI();
                         jpanProteinGraph.updateUI();
@@ -1331,7 +1339,7 @@ public class QuantitationValidationGUI extends JFrame {
 
         //remove everything from the jpanRatioInRovTab
         jpanRatioInRovTab.removeAll();
-        jpanRatioInRovTab.add(Box.createVerticalStrut(5));
+        jpanRatioInRovTab.add(Box.createVerticalStrut(2));
         RatioGroupInformationPanel lPanel = new RatioGroupInformationPanel(aRatioGroup, iConnMsLims, getFrame());
         jpanRatioInRovTab.add(lPanel.getContentPane());
         update(getGraphics());
@@ -1375,9 +1383,9 @@ public class QuantitationValidationGUI extends JFrame {
         createUIComponents();
         contentPane = new JPanel();
         contentPane.setLayout(new GridBagLayout());
-        contentPane.setBackground(new Color(-1));
         tabbedPane = new JTabbedPane();
-        tabbedPane.setBackground(new Color(-1));
+        tabbedPane.setTabLayoutPolicy(0);
+        tabbedPane.setTabPlacement(3);
         GridBagConstraints gbc;
         gbc = new GridBagConstraints();
         gbc.gridx = 0;
@@ -1403,7 +1411,6 @@ public class QuantitationValidationGUI extends JFrame {
         tabProtein.add(splitPane1, gbc);
         leftPanel = new JPanel();
         leftPanel.setLayout(new GridBagLayout());
-        leftPanel.setBackground(new Color(-1));
         splitPane1.setLeftComponent(leftPanel);
         final JScrollPane scrollPane1 = new JScrollPane();
         gbc = new GridBagConstraints();
@@ -1413,12 +1420,13 @@ public class QuantitationValidationGUI extends JFrame {
         gbc.weightx = 1.0;
         gbc.weighty = 1.0;
         gbc.fill = GridBagConstraints.BOTH;
+        gbc.insets = new Insets(2, 5, 2, 5);
         leftPanel.add(scrollPane1, gbc);
         proteinList.setSelectionMode(0);
         scrollPane1.setViewportView(proteinList);
         showSelectionButton = new JButton();
         showSelectionButton.setBorderPainted(true);
-        showSelectionButton.setContentAreaFilled(false);
+        showSelectionButton.setContentAreaFilled(true);
         showSelectionButton.setFocusPainted(false);
         showSelectionButton.setIcon(new ImageIcon(getClass().getResource("/viewSelection.gif")));
         showSelectionButton.setIconTextGap(0);
@@ -1429,7 +1437,7 @@ public class QuantitationValidationGUI extends JFrame {
         gbc.gridx = 0;
         gbc.gridy = 6;
         gbc.fill = GridBagConstraints.HORIZONTAL;
-        gbc.insets = new Insets(5, 5, 5, 5);
+        gbc.insets = new Insets(2, 5, 2, 5);
         leftPanel.add(showSelectionButton, gbc);
         jLabelTotaleNumber.setEnabled(true);
         jLabelTotaleNumber.setText("# proteins: 99999");
@@ -1438,7 +1446,7 @@ public class QuantitationValidationGUI extends JFrame {
         gbc.gridy = 0;
         gbc.gridwidth = 9;
         gbc.anchor = GridBagConstraints.WEST;
-        gbc.insets = new Insets(5, 5, 5, 5);
+        gbc.insets = new Insets(2, 5, 2, 5);
         leftPanel.add(jLabelTotaleNumber, gbc);
         jLabelValidated.setText("validated");
         gbc = new GridBagConstraints();
@@ -1446,10 +1454,11 @@ public class QuantitationValidationGUI extends JFrame {
         gbc.gridy = 2;
         gbc.gridwidth = 9;
         gbc.anchor = GridBagConstraints.WEST;
-        gbc.insets = new Insets(5, 5, 5, 5);
+        gbc.insets = new Insets(2, 5, 2, 5);
         leftPanel.add(jLabelValidated, gbc);
         showAllProteinsButton = new JButton();
-        showAllProteinsButton.setContentAreaFilled(false);
+        showAllProteinsButton.setBorderPainted(true);
+        showAllProteinsButton.setContentAreaFilled(true);
         showAllProteinsButton.setFocusPainted(false);
         showAllProteinsButton.setIcon(new ImageIcon(getClass().getResource("/viewAll.gif")));
         showAllProteinsButton.setIconTextGap(0);
@@ -1461,7 +1470,7 @@ public class QuantitationValidationGUI extends JFrame {
         gbc.gridy = 6;
         gbc.gridwidth = 3;
         gbc.fill = GridBagConstraints.HORIZONTAL;
-        gbc.insets = new Insets(5, 5, 5, 5);
+        gbc.insets = new Insets(2, 5, 2, 5);
         leftPanel.add(showAllProteinsButton, gbc);
         jLabelSelected.setText("# selected proteins : 99999");
         gbc = new GridBagConstraints();
@@ -1469,10 +1478,11 @@ public class QuantitationValidationGUI extends JFrame {
         gbc.gridy = 1;
         gbc.gridwidth = 9;
         gbc.anchor = GridBagConstraints.WEST;
-        gbc.insets = new Insets(5, 5, 5, 5);
+        gbc.insets = new Insets(2, 5, 2, 5);
         leftPanel.add(jLabelSelected, gbc);
         addAllProteinsInButton = new JButton();
-        addAllProteinsInButton.setContentAreaFilled(false);
+        addAllProteinsInButton.setContentAreaFilled(true);
+        addAllProteinsInButton.setDefaultCapable(true);
         addAllProteinsInButton.setFocusPainted(false);
         addAllProteinsInButton.setIcon(new ImageIcon(getClass().getResource("/plus.gif")));
         addAllProteinsInButton.setIconTextGap(0);
@@ -1483,10 +1493,10 @@ public class QuantitationValidationGUI extends JFrame {
         gbc.gridx = 0;
         gbc.gridy = 7;
         gbc.fill = GridBagConstraints.HORIZONTAL;
-        gbc.insets = new Insets(5, 5, 5, 5);
+        gbc.insets = new Insets(2, 5, 2, 5);
         leftPanel.add(addAllProteinsInButton, gbc);
         deleteAllProteinsInButton = new JButton();
-        deleteAllProteinsInButton.setContentAreaFilled(false);
+        deleteAllProteinsInButton.setContentAreaFilled(true);
         deleteAllProteinsInButton.setFocusPainted(false);
         deleteAllProteinsInButton.setIcon(new ImageIcon(getClass().getResource("/min.gif")));
         deleteAllProteinsInButton.setIconTextGap(0);
@@ -1498,7 +1508,7 @@ public class QuantitationValidationGUI extends JFrame {
         gbc.gridy = 7;
         gbc.gridwidth = 3;
         gbc.fill = GridBagConstraints.HORIZONTAL;
-        gbc.insets = new Insets(5, 5, 5, 5);
+        gbc.insets = new Insets(2, 5, 2, 5);
         leftPanel.add(deleteAllProteinsInButton, gbc);
         gbc = new GridBagConstraints();
         gbc.gridx = 0;
@@ -1506,7 +1516,7 @@ public class QuantitationValidationGUI extends JFrame {
         gbc.gridwidth = 9;
         gbc.anchor = GridBagConstraints.WEST;
         gbc.fill = GridBagConstraints.HORIZONTAL;
-        gbc.insets = new Insets(5, 5, 5, 5);
+        gbc.insets = new Insets(2, 5, 2, 5);
         leftPanel.add(cmbOrder, gbc);
         gbc = new GridBagConstraints();
         gbc.gridx = 3;
@@ -1514,7 +1524,7 @@ public class QuantitationValidationGUI extends JFrame {
         gbc.gridwidth = 6;
         gbc.anchor = GridBagConstraints.WEST;
         gbc.fill = GridBagConstraints.HORIZONTAL;
-        gbc.insets = new Insets(5, 5, 5, 5);
+        gbc.insets = new Insets(2, 5, 2, 5);
         leftPanel.add(cmbRatioTypes, gbc);
         lblRatioType = new JLabel();
         lblRatioType.setText("Select type:");
@@ -1522,11 +1532,10 @@ public class QuantitationValidationGUI extends JFrame {
         gbc.gridx = 0;
         gbc.gridy = 4;
         gbc.anchor = GridBagConstraints.WEST;
-        gbc.insets = new Insets(5, 5, 5, 5);
+        gbc.insets = new Insets(2, 5, 2, 5);
         leftPanel.add(lblRatioType, gbc);
         rightPanel = new JPanel();
         rightPanel.setLayout(new GridBagLayout());
-        rightPanel.setBackground(new Color(-1));
         splitPane1.setRightComponent(rightPanel);
         lblProteinInfo = new JLabel();
         lblProteinInfo.setText("No protein selected");
@@ -1534,7 +1543,7 @@ public class QuantitationValidationGUI extends JFrame {
         gbc.gridx = 0;
         gbc.gridy = 0;
         gbc.anchor = GridBagConstraints.WEST;
-        gbc.insets = new Insets(5, 5, 5, 5);
+        gbc.insets = new Insets(2, 5, 2, 5);
         rightPanel.add(lblProteinInfo, gbc);
         final JSplitPane splitPane2 = new JSplitPane();
         splitPane2.setContinuousLayout(false);
@@ -1555,26 +1564,25 @@ public class QuantitationValidationGUI extends JFrame {
         final JPanel panel1 = new JPanel();
         panel1.setLayout(new GridBagLayout());
         splitPane2.setRightComponent(panel1);
-        final JSplitPane splitPane3 = new JSplitPane();
-        splitPane3.setDividerLocation(453);
-        splitPane3.setOneTouchExpandable(true);
+        middleSplitter = new JSplitPane();
+        middleSplitter.setDividerLocation(457);
+        middleSplitter.setOneTouchExpandable(true);
         gbc = new GridBagConstraints();
         gbc.gridx = 0;
         gbc.gridy = 0;
         gbc.weightx = 1.0;
         gbc.weighty = 1.0;
         gbc.fill = GridBagConstraints.BOTH;
-        panel1.add(splitPane3, gbc);
+        panel1.add(middleSplitter, gbc);
         final JScrollPane scrollPane2 = new JScrollPane();
-        splitPane3.setLeftComponent(scrollPane2);
+        middleSplitter.setLeftComponent(scrollPane2);
         jpanProteinRatioGroups.setBackground(new Color(-1));
         scrollPane2.setViewportView(jpanProteinRatioGroups);
         jpanProteinGraphWrapper = new JPanel();
         jpanProteinGraphWrapper.setLayout(new GridBagLayout());
-        splitPane3.setRightComponent(jpanProteinGraphWrapper);
+        middleSplitter.setRightComponent(jpanProteinGraphWrapper);
         jpanGraphButtons = new JPanel();
         jpanGraphButtons.setLayout(new GridBagLayout());
-        jpanGraphButtons.setBackground(new Color(-1));
         gbc = new GridBagConstraints();
         gbc.gridx = 0;
         gbc.gridy = 1;
@@ -1582,11 +1590,11 @@ public class QuantitationValidationGUI extends JFrame {
         gbc.fill = GridBagConstraints.BOTH;
         jpanProteinGraphWrapper.add(jpanGraphButtons, gbc);
         graphExtenderLeft = new JButton();
-        graphExtenderLeft.setContentAreaFilled(false);
+        graphExtenderLeft.setContentAreaFilled(true);
         graphExtenderLeft.setFocusPainted(false);
         graphExtenderLeft.setIcon(new ImageIcon(getClass().getResource("/1leftarrow.png")));
         graphExtenderLeft.setLabel("");
-        graphExtenderLeft.setMargin(new Insets(3, 3, 3, 3));
+        graphExtenderLeft.setMargin(new Insets(0, 0, 0, 0));
         graphExtenderLeft.setText("");
         graphExtenderLeft.setToolTipText("Move the left graph border to the left");
         gbc = new GridBagConstraints();
@@ -1594,25 +1602,25 @@ public class QuantitationValidationGUI extends JFrame {
         gbc.gridy = 0;
         gbc.anchor = GridBagConstraints.WEST;
         jpanGraphButtons.add(graphExtenderLeft, gbc);
-        graphExtenderRight = new JButton();
-        graphExtenderRight.setContentAreaFilled(false);
-        graphExtenderRight.setFocusPainted(false);
-        graphExtenderRight.setIcon(new ImageIcon(getClass().getResource("/1rightarrow.png")));
-        graphExtenderRight.setLabel("");
-        graphExtenderRight.setMargin(new Insets(3, 3, 3, 3));
-        graphExtenderRight.setText("");
-        graphExtenderRight.setToolTipText("Move the right graph border to the right");
+        graphExtenderRightMin = new JButton();
+        graphExtenderRightMin.setContentAreaFilled(true);
+        graphExtenderRightMin.setFocusPainted(false);
+        graphExtenderRightMin.setIcon(new ImageIcon(getClass().getResource("/1leftarrow.png")));
+        graphExtenderRightMin.setLabel("");
+        graphExtenderRightMin.setMargin(new Insets(0, 0, 0, 0));
+        graphExtenderRightMin.setText("");
+        graphExtenderRightMin.setToolTipText("Move the right graph border to the left");
         gbc = new GridBagConstraints();
-        gbc.gridx = 5;
+        gbc.gridx = 6;
         gbc.gridy = 0;
-        gbc.anchor = GridBagConstraints.EAST;
-        jpanGraphButtons.add(graphExtenderRight, gbc);
+        gbc.fill = GridBagConstraints.HORIZONTAL;
+        jpanGraphButtons.add(graphExtenderRightMin, gbc);
         graphExtenderLeftPlus = new JButton();
-        graphExtenderLeftPlus.setContentAreaFilled(false);
+        graphExtenderLeftPlus.setContentAreaFilled(true);
         graphExtenderLeftPlus.setFocusPainted(false);
         graphExtenderLeftPlus.setIcon(new ImageIcon(getClass().getResource("/1rightarrow.png")));
         graphExtenderLeftPlus.setLabel("");
-        graphExtenderLeftPlus.setMargin(new Insets(3, 3, 3, 3));
+        graphExtenderLeftPlus.setMargin(new Insets(0, 0, 0, 0));
         graphExtenderLeftPlus.setText("");
         graphExtenderLeftPlus.setToolTipText("Move the left graph border to the right");
         gbc = new GridBagConstraints();
@@ -1620,39 +1628,56 @@ public class QuantitationValidationGUI extends JFrame {
         gbc.gridy = 0;
         gbc.fill = GridBagConstraints.HORIZONTAL;
         jpanGraphButtons.add(graphExtenderLeftPlus, gbc);
-        graphExtenderRightMin = new JButton();
-        graphExtenderRightMin.setContentAreaFilled(false);
-        graphExtenderRightMin.setFocusPainted(false);
-        graphExtenderRightMin.setIcon(new ImageIcon(getClass().getResource("/1leftarrow.png")));
-        graphExtenderRightMin.setLabel("");
-        graphExtenderRightMin.setMargin(new Insets(3, 3, 3, 3));
-        graphExtenderRightMin.setText("");
-        graphExtenderRightMin.setToolTipText("Move the right graph border to the left");
+        tglBtnValues = new JToggleButton();
+        tglBtnValues.setMaximumSize(new Dimension(120, 25));
+        tglBtnValues.setMinimumSize(new Dimension(120, 25));
+        tglBtnValues.setPreferredSize(new Dimension(120, 25));
+        tglBtnValues.setSelected(true);
+        tglBtnValues.setText("Values");
+        tglBtnValues.setToolTipText("Show distribution of real values");
+        gbc = new GridBagConstraints();
+        gbc.gridx = 3;
+        gbc.gridy = 0;
+        jpanGraphButtons.add(tglBtnValues, gbc);
+        tglBtnDistribution = new JToggleButton();
+        tglBtnDistribution.setMaximumSize(new Dimension(120, 25));
+        tglBtnDistribution.setMinimumSize(new Dimension(120, 25));
+        tglBtnDistribution.setPreferredSize(new Dimension(120, 25));
+        tglBtnDistribution.setSelected(true);
+        tglBtnDistribution.setText("Distribution");
+        tglBtnDistribution.setToolTipText("Show Huber Estimated Distribution");
         gbc = new GridBagConstraints();
         gbc.gridx = 4;
         gbc.gridy = 0;
-        gbc.fill = GridBagConstraints.HORIZONTAL;
-        jpanGraphButtons.add(graphExtenderRightMin, gbc);
-        showRealDistributionCheckBox = new JCheckBox();
-        showRealDistributionCheckBox.setBackground(new Color(-1));
-        showRealDistributionCheckBox.setSelected(true);
-        showRealDistributionCheckBox.setText("Show \"real\" distribution");
+        gbc.insets = new Insets(2, 2, 2, 2);
+        jpanGraphButtons.add(tglBtnDistribution, gbc);
+        graphExtenderRight = new JButton();
+        graphExtenderRight.setContentAreaFilled(true);
+        graphExtenderRight.setFocusPainted(false);
+        graphExtenderRight.setIcon(new ImageIcon(getClass().getResource("/1rightarrow.png")));
+        graphExtenderRight.setLabel("");
+        graphExtenderRight.setMargin(new Insets(0, 0, 0, 0));
+        graphExtenderRight.setText("");
+        graphExtenderRight.setToolTipText("Move the right graph border to the right");
+        gbc = new GridBagConstraints();
+        gbc.gridx = 7;
+        gbc.gridy = 0;
+        gbc.anchor = GridBagConstraints.EAST;
+        jpanGraphButtons.add(graphExtenderRight, gbc);
+        final JPanel spacer1 = new JPanel();
         gbc = new GridBagConstraints();
         gbc.gridx = 2;
         gbc.gridy = 0;
         gbc.weightx = 1.0;
-        gbc.anchor = GridBagConstraints.EAST;
-        jpanGraphButtons.add(showRealDistributionCheckBox, gbc);
-        showHuberEstimatedDistributionCheckBox = new JCheckBox();
-        showHuberEstimatedDistributionCheckBox.setBackground(new Color(-1));
-        showHuberEstimatedDistributionCheckBox.setSelected(true);
-        showHuberEstimatedDistributionCheckBox.setText("Show Huber estimated distribution");
+        gbc.fill = GridBagConstraints.HORIZONTAL;
+        jpanGraphButtons.add(spacer1, gbc);
+        final JPanel spacer2 = new JPanel();
         gbc = new GridBagConstraints();
-        gbc.gridx = 3;
+        gbc.gridx = 5;
         gbc.gridy = 0;
         gbc.weightx = 1.0;
-        gbc.anchor = GridBagConstraints.WEST;
-        jpanGraphButtons.add(showHuberEstimatedDistributionCheckBox, gbc);
+        gbc.fill = GridBagConstraints.HORIZONTAL;
+        jpanGraphButtons.add(spacer2, gbc);
         jpanProteinGraph.setBackground(new Color(-1));
         gbc = new GridBagConstraints();
         gbc.gridx = 0;
@@ -1662,7 +1687,7 @@ public class QuantitationValidationGUI extends JFrame {
         gbc.fill = GridBagConstraints.BOTH;
         jpanProteinGraphWrapper.add(jpanProteinGraph, gbc);
         addToSelectionButton = new JButton();
-        addToSelectionButton.setContentAreaFilled(false);
+        addToSelectionButton.setContentAreaFilled(true);
         addToSelectionButton.setFocusPainted(false);
         addToSelectionButton.setIcon(new ImageIcon(getClass().getResource("/addSelection.gif")));
         addToSelectionButton.setMargin(new Insets(3, 3, 3, 3));
@@ -1671,10 +1696,10 @@ public class QuantitationValidationGUI extends JFrame {
         gbc.gridx = 4;
         gbc.gridy = 0;
         gbc.anchor = GridBagConstraints.EAST;
-        gbc.insets = new Insets(5, 5, 5, 5);
+        gbc.insets = new Insets(2, 5, 2, 5);
         rightPanel.add(addToSelectionButton, gbc);
         goToBrowserButton = new JButton();
-        goToBrowserButton.setContentAreaFilled(false);
+        goToBrowserButton.setContentAreaFilled(true);
         goToBrowserButton.setFocusPainted(false);
         goToBrowserButton.setIcon(new ImageIcon(getClass().getResource("/homepage.png")));
         goToBrowserButton.setLabel("");
@@ -1685,11 +1710,11 @@ public class QuantitationValidationGUI extends JFrame {
         gbc.gridx = 2;
         gbc.gridy = 0;
         gbc.anchor = GridBagConstraints.EAST;
-        gbc.insets = new Insets(5, 5, 5, 5);
+        gbc.insets = new Insets(2, 5, 2, 5);
         rightPanel.add(goToBrowserButton, gbc);
         jpanProteinMeanOptions = new JPanel();
         jpanProteinMeanOptions.setLayout(new GridBagLayout());
-        jpanProteinMeanOptions.setBackground(new Color(-1));
+        jpanProteinMeanOptions.setAutoscrolls(false);
         gbc = new GridBagConstraints();
         gbc.gridx = 0;
         gbc.gridy = 2;
@@ -1697,7 +1722,7 @@ public class QuantitationValidationGUI extends JFrame {
         gbc.fill = GridBagConstraints.BOTH;
         rightPanel.add(jpanProteinMeanOptions, gbc);
         showRovButton = new JButton();
-        showRovButton.setContentAreaFilled(false);
+        showRovButton.setContentAreaFilled(true);
         showRovButton.setFocusPainted(false);
         showRovButton.setIcon(new ImageIcon(getClass().getResource("/edu_science.png")));
         showRovButton.setMargin(new Insets(3, 3, 3, 3));
@@ -1708,10 +1733,10 @@ public class QuantitationValidationGUI extends JFrame {
         gbc.gridy = 0;
         gbc.gridheight = 45;
         gbc.fill = GridBagConstraints.HORIZONTAL;
-        gbc.insets = new Insets(5, 5, 5, 5);
+        gbc.insets = new Insets(2, 2, 2, 2);
         jpanProteinMeanOptions.add(showRovButton, gbc);
         filterProteinsButton = new JButton();
-        filterProteinsButton.setContentAreaFilled(false);
+        filterProteinsButton.setContentAreaFilled(true);
         filterProteinsButton.setFocusPainted(false);
         filterProteinsButton.setIcon(new ImageIcon(getClass().getResource("/wizard.png")));
         filterProteinsButton.setLabel("");
@@ -1723,10 +1748,10 @@ public class QuantitationValidationGUI extends JFrame {
         gbc.gridy = 0;
         gbc.gridheight = 45;
         gbc.fill = GridBagConstraints.HORIZONTAL;
-        gbc.insets = new Insets(5, 5, 5, 5);
+        gbc.insets = new Insets(2, 2, 2, 2);
         jpanProteinMeanOptions.add(filterProteinsButton, gbc);
         miscButton = new JButton();
-        miscButton.setContentAreaFilled(false);
+        miscButton.setContentAreaFilled(true);
         miscButton.setFocusPainted(false);
         miscButton.setIcon(new ImageIcon(getClass().getResource("/misc.png")));
         miscButton.setLabel("");
@@ -1738,10 +1763,10 @@ public class QuantitationValidationGUI extends JFrame {
         gbc.gridy = 0;
         gbc.gridheight = 45;
         gbc.fill = GridBagConstraints.HORIZONTAL;
-        gbc.insets = new Insets(5, 5, 5, 5);
+        gbc.insets = new Insets(2, 2, 2, 2);
         jpanProteinMeanOptions.add(miscButton, gbc);
         misc_infoButton = new JButton();
-        misc_infoButton.setContentAreaFilled(false);
+        misc_infoButton.setContentAreaFilled(true);
         misc_infoButton.setFocusPainted(false);
         misc_infoButton.setIcon(new ImageIcon(getClass().getResource("/misc_info.png")));
         misc_infoButton.setLabel("");
@@ -1753,10 +1778,10 @@ public class QuantitationValidationGUI extends JFrame {
         gbc.gridy = 0;
         gbc.gridheight = 45;
         gbc.fill = GridBagConstraints.HORIZONTAL;
-        gbc.insets = new Insets(5, 5, 5, 5);
+        gbc.insets = new Insets(2, 2, 2, 2);
         jpanProteinMeanOptions.add(misc_infoButton, gbc);
         logButton = new JButton();
-        logButton.setContentAreaFilled(false);
+        logButton.setContentAreaFilled(true);
         logButton.setFocusPainted(false);
         logButton.setIcon(new ImageIcon(getClass().getResource("/log.png")));
         logButton.setLabel("");
@@ -1768,48 +1793,10 @@ public class QuantitationValidationGUI extends JFrame {
         gbc.gridy = 0;
         gbc.gridheight = 45;
         gbc.fill = GridBagConstraints.HORIZONTAL;
-        gbc.insets = new Insets(5, 5, 5, 5);
+        gbc.insets = new Insets(2, 2, 2, 2);
         jpanProteinMeanOptions.add(logButton, gbc);
-        useOnlyValidRatiosCheckBox = new JCheckBox();
-        useOnlyValidRatiosCheckBox.setBackground(new Color(-1));
-        useOnlyValidRatiosCheckBox.setText("Use only valid ratios");
-        gbc = new GridBagConstraints();
-        gbc.gridx = 5;
-        gbc.gridy = 43;
-        gbc.anchor = GridBagConstraints.WEST;
-        gbc.insets = new Insets(5, 5, 5, 5);
-        jpanProteinMeanOptions.add(useOnlyValidRatiosCheckBox, gbc);
-        useOnlyUniquelyIdentifiedCheckBox = new JCheckBox();
-        useOnlyUniquelyIdentifiedCheckBox.setBackground(new Color(-1));
-        useOnlyUniquelyIdentifiedCheckBox.setText("Use only uniquely identified (blue) peptides");
-        gbc = new GridBagConstraints();
-        gbc.gridx = 5;
-        gbc.gridy = 0;
-        gbc.anchor = GridBagConstraints.WEST;
-        gbc.insets = new Insets(5, 5, 5, 5);
-        jpanProteinMeanOptions.add(useOnlyUniquelyIdentifiedCheckBox, gbc);
-        log2CheckBox = new JCheckBox();
-        log2CheckBox.setBackground(new Color(-1));
-        log2CheckBox.setText("log 2");
-        gbc = new GridBagConstraints();
-        gbc.gridx = 6;
-        gbc.gridy = 0;
-        gbc.anchor = GridBagConstraints.WEST;
-        gbc.insets = new Insets(5, 5, 5, 5);
-        jpanProteinMeanOptions.add(log2CheckBox, gbc);
-        useOriginalCheckBox = new JCheckBox();
-        useOriginalCheckBox.setBackground(new Color(-1));
-        useOriginalCheckBox.setText("Use original ratios");
-        gbc = new GridBagConstraints();
-        gbc.gridx = 6;
-        gbc.gridy = 22;
-        gbc.gridheight = 22;
-        gbc.weightx = 0.1;
-        gbc.anchor = GridBagConstraints.WEST;
-        gbc.insets = new Insets(5, 5, 5, 5);
-        jpanProteinMeanOptions.add(useOriginalCheckBox, gbc);
         exportButton = new JButton();
-        exportButton.setContentAreaFilled(false);
+        exportButton.setContentAreaFilled(true);
         exportButton.setFocusPainted(false);
         exportButton.setFocusTraversalPolicyProvider(true);
         exportButton.setIcon(new ImageIcon(getClass().getResource("/filesave.png")));
@@ -1818,13 +1805,14 @@ public class QuantitationValidationGUI extends JFrame {
         exportButton.setText("");
         exportButton.setToolTipText("Export proteins");
         gbc = new GridBagConstraints();
-        gbc.gridx = 11;
+        gbc.gridx = 10;
         gbc.gridy = 0;
         gbc.gridheight = 44;
         gbc.fill = GridBagConstraints.HORIZONTAL;
+        gbc.insets = new Insets(2, 2, 2, 2);
         jpanProteinMeanOptions.add(exportButton, gbc);
         loadRoverFileButton = new JButton();
-        loadRoverFileButton.setContentAreaFilled(false);
+        loadRoverFileButton.setContentAreaFilled(true);
         loadRoverFileButton.setFocusPainted(false);
         loadRoverFileButton.setIcon(new ImageIcon(getClass().getResource("/rover.gif")));
         loadRoverFileButton.setLabel("");
@@ -1832,43 +1820,79 @@ public class QuantitationValidationGUI extends JFrame {
         loadRoverFileButton.setText("");
         loadRoverFileButton.setToolTipText("Import a .rover file");
         gbc = new GridBagConstraints();
-        gbc.gridx = 13;
+        gbc.gridx = 11;
         gbc.gridy = 0;
         gbc.gridheight = 44;
         gbc.fill = GridBagConstraints.HORIZONTAL;
+        gbc.insets = new Insets(2, 2, 2, 2);
         jpanProteinMeanOptions.add(loadRoverFileButton, gbc);
-        reconstructButton = new JButton();
-        reconstructButton.setContentAreaFilled(false);
-        reconstructButton.setIcon(new ImageIcon(getClass().getResource("/recon.png")));
-        reconstructButton.setMargin(new Insets(3, 3, 3, 3));
-        reconstructButton.setText("");
-        reconstructButton.setToolTipText("Reconstruct protein from different sources");
-        gbc = new GridBagConstraints();
-        gbc.gridx = 12;
-        gbc.gridy = 0;
-        gbc.gridheight = 44;
-        gbc.fill = GridBagConstraints.HORIZONTAL;
-        jpanProteinMeanOptions.add(reconstructButton, gbc);
-        progressBar1 = new JProgressBar();
-        gbc = new GridBagConstraints();
-        gbc.gridx = 7;
-        gbc.gridy = 0;
-        gbc.gridheight = 44;
-        gbc.weightx = 1.0;
-        gbc.fill = GridBagConstraints.HORIZONTAL;
-        gbc.insets = new Insets(5, 5, 5, 5);
-        jpanProteinMeanOptions.add(progressBar1, gbc);
         final JPanel panel2 = new JPanel();
         panel2.setLayout(new GridBagLayout());
-        panel2.setBackground(new Color(-1));
         gbc = new GridBagConstraints();
-        gbc.gridx = 10;
-        gbc.gridy = 43;
+        gbc.gridx = 9;
+        gbc.gridy = 0;
+        gbc.gridheight = 44;
         gbc.weightx = 1.0;
         gbc.fill = GridBagConstraints.BOTH;
         jpanProteinMeanOptions.add(panel2, gbc);
+        progressBar1 = new JProgressBar();
+        gbc = new GridBagConstraints();
+        gbc.gridx = 0;
+        gbc.gridy = 0;
+        gbc.weightx = 1.0;
+        gbc.fill = GridBagConstraints.HORIZONTAL;
+        gbc.insets = new Insets(2, 2, 2, 2);
+        panel2.add(progressBar1, gbc);
+        tglBtnLog2 = new JToggleButton();
+        tglBtnLog2.setMaximumSize(new Dimension(120, 25));
+        tglBtnLog2.setMinimumSize(new Dimension(120, 25));
+        tglBtnLog2.setPreferredSize(new Dimension(120, 25));
+        tglBtnLog2.setSelected(false);
+        tglBtnLog2.setText("Log 2");
+        tglBtnLog2.setToolTipText("Log 2 ratio values will be used if selected");
+        gbc = new GridBagConstraints();
+        gbc.gridx = 6;
+        gbc.gridy = 0;
+        gbc.insets = new Insets(2, 2, 2, 2);
+        jpanProteinMeanOptions.add(tglBtnLog2, gbc);
+        tglBtnOriginal = new JToggleButton();
+        tglBtnOriginal.setMaximumSize(new Dimension(120, 25));
+        tglBtnOriginal.setMinimumSize(new Dimension(120, 25));
+        tglBtnOriginal.setPreferredSize(new Dimension(120, 25));
+        tglBtnOriginal.setSelected(false);
+        tglBtnOriginal.setText("Original Ratios");
+        tglBtnOriginal.setToolTipText("The not normalized ratio will be used if selected");
+        gbc = new GridBagConstraints();
+        gbc.gridx = 6;
+        gbc.gridy = 1;
+        gbc.insets = new Insets(2, 2, 2, 2);
+        jpanProteinMeanOptions.add(tglBtnOriginal, gbc);
+        tglBtnValid = new JToggleButton();
+        tglBtnValid.setMaximumSize(new Dimension(120, 25));
+        tglBtnValid.setMinimumSize(new Dimension(120, 25));
+        tglBtnValid.setPreferredSize(new Dimension(120, 25));
+        tglBtnValid.setSelected(false);
+        tglBtnValid.setText("Valid Ratios");
+        tglBtnValid.setToolTipText("Only valid ratios will be used if selected");
+        gbc = new GridBagConstraints();
+        gbc.gridx = 5;
+        gbc.gridy = 1;
+        gbc.insets = new Insets(2, 2, 2, 2);
+        jpanProteinMeanOptions.add(tglBtnValid, gbc);
+        tglBtnUnique = new JToggleButton();
+        tglBtnUnique.setMaximumSize(new Dimension(120, 25));
+        tglBtnUnique.setMinimumSize(new Dimension(120, 25));
+        tglBtnUnique.setPreferredSize(new Dimension(120, 25));
+        tglBtnUnique.setSelected(false);
+        tglBtnUnique.setText("Unique Peptides");
+        tglBtnUnique.setToolTipText("Only unique (blue) peptides will be used if selected");
+        gbc = new GridBagConstraints();
+        gbc.gridx = 5;
+        gbc.gridy = 0;
+        gbc.insets = new Insets(2, 2, 2, 2);
+        jpanProteinMeanOptions.add(tglBtnUnique, gbc);
         showPossibleIsoformsButton = new JButton();
-        showPossibleIsoformsButton.setContentAreaFilled(false);
+        showPossibleIsoformsButton.setContentAreaFilled(true);
         showPossibleIsoformsButton.setFocusPainted(false);
         showPossibleIsoformsButton.setIcon(new ImageIcon(getClass().getResource("/isoform.gif")));
         showPossibleIsoformsButton.setMargin(new Insets(3, 3, 3, 3));
@@ -1878,10 +1902,10 @@ public class QuantitationValidationGUI extends JFrame {
         gbc.gridx = 3;
         gbc.gridy = 0;
         gbc.anchor = GridBagConstraints.EAST;
-        gbc.insets = new Insets(5, 5, 5, 5);
+        gbc.insets = new Insets(2, 5, 2, 5);
         rightPanel.add(showPossibleIsoformsButton, gbc);
         setValidatedButton = new JButton();
-        setValidatedButton.setContentAreaFilled(false);
+        setValidatedButton.setContentAreaFilled(true);
         setValidatedButton.setFocusPainted(false);
         setValidatedButton.setMargin(new Insets(3, 3, 3, 3));
         setValidatedButton.setText("");
@@ -1889,24 +1913,24 @@ public class QuantitationValidationGUI extends JFrame {
         gbc.gridx = 1;
         gbc.gridy = 0;
         gbc.fill = GridBagConstraints.HORIZONTAL;
-        gbc.insets = new Insets(5, 5, 5, 5);
+        gbc.insets = new Insets(2, 5, 2, 5);
         rightPanel.add(setValidatedButton, gbc);
         tabRov = new JPanel();
         tabRov.setLayout(new GridBagLayout());
         tabbedPane.addTab("Rov file", tabRov);
-        final JSplitPane splitPane4 = new JSplitPane();
+        final JSplitPane splitPane3 = new JSplitPane();
         gbc = new GridBagConstraints();
         gbc.gridx = 0;
         gbc.gridy = 0;
         gbc.weightx = 1.0;
         gbc.weighty = 1.0;
         gbc.fill = GridBagConstraints.BOTH;
-        tabRov.add(splitPane4, gbc);
-        splitPane4.setRightComponent(jpanRatioInRovTab);
+        tabRov.add(splitPane3, gbc);
+        splitPane3.setRightComponent(jpanRatioInRovTab);
         final JPanel panel3 = new JPanel();
         panel3.setLayout(new GridBagLayout());
         panel3.setBackground(new Color(-1));
-        splitPane4.setLeftComponent(panel3);
+        splitPane3.setLeftComponent(panel3);
         final JScrollPane scrollPane3 = new JScrollPane();
         gbc = new GridBagConstraints();
         gbc.gridx = 0;

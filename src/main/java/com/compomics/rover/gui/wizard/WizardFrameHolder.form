@@ -2,7 +2,7 @@
 <form xmlns="http://www.intellij.com/uidesigner/form/" version="1" bind-to-class="com.compomics.rover.gui.wizard.WizardFrameHolder">
   <grid id="27dc6" binding="jpanContent" layout-manager="GridBagLayout">
     <constraints>
-      <xy x="20" y="20" width="500" height="400"/>
+      <xy x="20" y="20" width="728" height="400"/>
     </constraints>
     <properties/>
     <border type="none"/>
@@ -33,7 +33,17 @@
               <gridbag top="5" left="5" bottom="5" right="5" weightx="0.0" weighty="0.0"/>
             </constraints>
             <properties>
-              <text value="Start the analysis or combine quantitative data from different sources"/>
+              <text value="Combine quantitative data from different sources:"/>
+            </properties>
+          </component>
+          <component id="8d7b6" class="javax.swing.JLabel">
+            <constraints>
+              <grid row="5" column="0" row-span="1" col-span="2" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+              <gridbag top="5" left="5" bottom="5" right="5" weightx="0.0" weighty="0.0"/>
+            </constraints>
+            <properties>
+              <font size="10" style="2"/>
+              <text value="Please cite: Colaert et. al. Rover: a tool to visualize and validate quantitative proteomics data from different sources. Proteomics  2010 Mar;10(6):1226-9."/>
             </properties>
           </component>
           <vspacer id="80614">
@@ -50,21 +60,21 @@
           </vspacer>
           <component id="2b310" class="javax.swing.JButton" binding="btnOpenMulti">
             <constraints>
-              <grid row="4" column="1" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="0" indent="0" use-parent-layout="false"/>
+              <grid row="4" column="1" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
               <gridbag top="5" left="5" bottom="5" right="5" weightx="0.0" weighty="0.0"/>
             </constraints>
             <properties>
               <borderPainted value="true"/>
-              <contentAreaFilled value="false"/>
+              <contentAreaFilled value="true"/>
               <focusPainted value="false"/>
               <icon value="mutliRover.png"/>
               <text value=""/>
-              <toolTipText value="next"/>
+              <toolTipText value="Combine different quantitative projects"/>
             </properties>
           </component>
           <component id="43c88" class="javax.swing.JLabel" binding="lblMemory">
             <constraints>
-              <grid row="3" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+              <grid row="3" column="2" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
               <gridbag weightx="0.0" weighty="0.0"/>
             </constraints>
             <properties>
@@ -79,7 +89,7 @@
           <gridbag top="5" left="5" bottom="5" right="5" weightx="0.0" weighty="0.0"/>
         </constraints>
         <properties>
-          <contentAreaFilled value="false"/>
+          <contentAreaFilled value="true"/>
           <focusPainted value="false"/>
           <icon value="exit.png"/>
           <text value=""/>
@@ -93,7 +103,7 @@
         </constraints>
         <properties>
           <borderPainted value="true"/>
-          <contentAreaFilled value="false"/>
+          <contentAreaFilled value="true"/>
           <focusPainted value="false"/>
           <icon value="forward.png"/>
           <text value=""/>
@@ -106,7 +116,7 @@
           <gridbag top="5" left="5" bottom="5" right="5" weightx="0.0" weighty="0.0"/>
         </constraints>
         <properties>
-          <contentAreaFilled value="false"/>
+          <contentAreaFilled value="true"/>
           <focusPainted value="false"/>
           <icon value="back.png"/>
           <text value=""/>

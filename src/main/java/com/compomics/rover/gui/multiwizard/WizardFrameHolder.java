@@ -16,6 +16,8 @@ import com.compomics.rover.general.quantitation.QuantitativeProtein;
 import com.compomics.util.interfaces.Flamable;
 import com.compomics.mslims.db.accessors.Project;
 
+import com.sun.java.swing.plaf.nimbus.NimbusLookAndFeel;
+
 import javax.swing.*;
 import java.sql.Connection;
 import java.sql.SQLException;
@@ -527,6 +529,11 @@ public class WizardFrameHolder extends JFrame implements Flamable {
     }
 
     public static void main(String[] args) {
+        try {
+            UIManager.setLookAndFeel(new NimbusLookAndFeel());
+        } catch (UnsupportedLookAndFeelException e) {
+            // ignore exception
+        }
         WizardFrameHolder launch = new WizardFrameHolder(true, null);
     }
 
@@ -719,7 +726,7 @@ public class WizardFrameHolder extends JFrame implements Flamable {
         gbc.gridy = 0;
         wizardPanel.add(label1, gbc);
         exitButton = new JButton();
-        exitButton.setContentAreaFilled(false);
+        exitButton.setContentAreaFilled(true);
         exitButton.setFocusPainted(false);
         exitButton.setIcon(new ImageIcon(getClass().getResource("/exit.png")));
         exitButton.setText("");
@@ -732,7 +739,7 @@ public class WizardFrameHolder extends JFrame implements Flamable {
         jpanContent.add(exitButton, gbc);
         nextButton = new JButton();
         nextButton.setBorderPainted(true);
-        nextButton.setContentAreaFilled(false);
+        nextButton.setContentAreaFilled(true);
         nextButton.setFocusPainted(false);
         nextButton.setIcon(new ImageIcon(getClass().getResource("/forward.png")));
         nextButton.setText("");
@@ -744,7 +751,7 @@ public class WizardFrameHolder extends JFrame implements Flamable {
         gbc.insets = new Insets(5, 5, 5, 5);
         jpanContent.add(nextButton, gbc);
         previousButton = new JButton();
-        previousButton.setContentAreaFilled(false);
+        previousButton.setContentAreaFilled(true);
         previousButton.setFocusPainted(false);
         previousButton.setIcon(new ImageIcon(getClass().getResource("/back.png")));
         previousButton.setText("");

@@ -327,7 +327,12 @@ public class MaxQuantEvidenceFile {
                     lIdentification.setCal_mass(lCalMass);
 
                     //set the score
-                    lIdentification.setScore((Double.valueOf(lColumns[(Integer) lMsmsHeaderMap.get("Mascot Score")]).longValue()));
+                    if(lMsmsHeaderMap.get("Mascot Score") != null){
+                        lIdentification.setScore((Double.valueOf(lColumns[(Integer) lMsmsHeaderMap.get("Mascot Score")]).longValue()));
+                    } else {
+                        lIdentification.setScore((Double.valueOf(lColumns[(Integer) lMsmsHeaderMap.get("Score")]).longValue()));
+                    }
+
                     lIdentification.setPep(Double.valueOf(lColumns[(Integer) lMsmsHeaderMap.get("PEP")]).doubleValue());
 
                     //set the type

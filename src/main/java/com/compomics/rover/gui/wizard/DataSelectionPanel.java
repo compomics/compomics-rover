@@ -415,6 +415,15 @@ public class DataSelectionPanel implements Connectable, WizardPanel {
                     rs.close();
                     ps.close();
                     iQuantitationSingelton.setMsLimsPre7_2(false);
+                    try {
+                        ps = iConn.prepareStatement("select * from ms_lims_properties");
+                        rs = ps.executeQuery();
+                        rs.close();
+                        ps.close();
+                        iQuantitationSingelton.setMsLimsPre7_6(false);
+                    } catch (SQLException e) {
+                        iQuantitationSingelton.setMsLimsPre7_6(true);
+                    }
                 } catch (SQLException e) {
                     iQuantitationSingelton.setMsLimsPre7_2(true);
                 }

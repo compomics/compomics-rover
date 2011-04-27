@@ -495,7 +495,7 @@ public class ExportGui extends JFrame {
                     if (iQuantitativeValidationSingelton.isDatabaseMode()) {
                         // database mode => we have identificationid
                         for (int k = 0; k < lComponents.length; k++) {
-                            lTitle = lTitle + lSeparator + lComponents[k] + " identificationid";
+                            lTitle = lTitle + lSeparator + lComponents[k] + " identificationid" + lSeparator + lComponents[k] + " modified sequence";
                         }
                     } else {
                         for (int k = 0; k < lComponents.length; k++) {
@@ -629,25 +629,37 @@ public class ExportGui extends JFrame {
 
                                 }
                                 for (int k = 0; k < lComponents.length; k++) {
-                                    PeptideIdentification lIdentification = lRatioGroup.getIdentificationForType(lComponents[k]);
-                                    if (lIdentification != null) {
+                                    Vector<PeptideIdentification> lIdentifications = lRatioGroup.getIdentificationsForType(lComponents[k]);
+                                    if (lIdentifications != null) {
                                         if (iQuantitativeValidationSingelton.isDatabaseMode()) {
-                                            if (lRatioGroup.getParentCollection().getRoverSource() == RoverSource.MAX_QUANT_MS_LIMS) {
-                                                DefaultPeptideIdentification lIdEx = (DefaultPeptideIdentification) lIdentification;
-                                                lResult = lResult + lSeparator + lIdEx.getId();
-                                            } else {
-                                                IdentificationExtension lIdEx = (IdentificationExtension) lIdentification;
-                                                lResult = lResult + lSeparator + lIdEx.getIdentificationid();
+                                            String lIds = "";
+                                            String lMod = "";
+                                            for (int lk = 0; lk < lIdentifications.size(); lk++) {
+                                                if (lk == 0) {
+                                                    lMod = lIdentifications.get(lk).getModified_sequence();
+                                                    lIds = ((IdentificationExtension) lIdentifications.get(lk)).getIdentificationid() + "";
+                                                } else {
+                                                    lIds = lIds + "|" + ((IdentificationExtension) lIdentifications.get(lk)).getIdentificationid();
+                                                }
                                             }
+                                            lResult = lResult + lSeparator + lIds + lSeparator + lMod;
                                         } else {
-                                            if (lRatioGroup.getParentCollection().getRoverSource() == RoverSource.CENSUS) {
-                                                lResult = lResult + lSeparator + "Y";
-                                            } else {
-                                                lResult = lResult + lSeparator + lIdentification.getScore();
+                                            String lIds = "";
+                                            String lMod = "";
+                                            for (int lk = 0; lk < lIdentifications.size(); lk++) {
+                                                if (lk == 0) {
+                                                    lIds = ((DefaultPeptideIdentification) lIdentifications.get(lk)).getScore() + "";
+                                                } else {
+                                                    lIds = lIds + "|" + ((DefaultPeptideIdentification) lIdentifications.get(lk)).getScore();
+                                                }
                                             }
                                         }
                                     } else {
-                                        lResult = lResult + lSeparator + "NA";
+                                        if (iQuantitativeValidationSingelton.isDatabaseMode()) {
+                                            lResult = lResult + lSeparator + "NA" + lSeparator + "NA";
+                                        } else {
+                                            lResult = lResult + lSeparator + "NA";
+                                        }
                                     }
                                 }
                                 if (hasDistiller) {
