@@ -2,7 +2,7 @@
 <form xmlns="http://www.intellij.com/uidesigner/form/" version="1" bind-to-class="com.compomics.rover.gui.FilterFrame">
   <grid id="27dc6" binding="contentPane" layout-manager="GridBagLayout">
     <constraints>
-      <xy x="20" y="20" width="1280" height="758"/>
+      <xy x="20" y="20" width="709" height="1136"/>
     </constraints>
     <properties/>
     <border type="none"/>
@@ -461,7 +461,7 @@
                     <children>
                       <component id="dad13" class="javax.swing.JCheckBox" binding="chbAccessionSearch">
                         <constraints>
-                          <grid row="5" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+                          <grid row="7" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
                           <gridbag top="5" left="5" bottom="5" right="5" weightx="0.0" weighty="0.0"/>
                         </constraints>
                         <properties>
@@ -470,7 +470,7 @@
                       </component>
                       <component id="be567" class="javax.swing.JTextField" binding="txtProteinAccession">
                         <constraints>
-                          <grid row="5" column="2" row-span="1" col-span="4" vsize-policy="0" hsize-policy="6" anchor="8" fill="1" indent="0" use-parent-layout="false">
+                          <grid row="7" column="2" row-span="1" col-span="5" vsize-policy="0" hsize-policy="6" anchor="8" fill="1" indent="0" use-parent-layout="false">
                             <preferred-size width="150" height="-1"/>
                           </grid>
                           <gridbag top="5" left="5" bottom="5" right="5" weightx="0.0" weighty="0.0"/>
@@ -479,7 +479,7 @@
                       </component>
                       <component id="6401b" class="javax.swing.JCheckBox" binding="chbValidated">
                         <constraints>
-                          <grid row="6" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+                          <grid row="8" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
                           <gridbag top="5" left="5" bottom="5" right="5" weightx="0.0" weighty="0.0"/>
                         </constraints>
                         <properties>
@@ -495,9 +495,18 @@
                           <text value="Protein has invalid ratios"/>
                         </properties>
                       </component>
+                      <component id="7ca4c" class="javax.swing.JCheckBox" binding="chbExcludeYellow">
+                        <constraints>
+                          <grid row="1" column="0" row-span="1" col-span="6" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+                          <gridbag top="5" left="5" bottom="5" right="5" weightx="0.0" weighty="0.0"/>
+                        </constraints>
+                        <properties>
+                          <text value="Protein has only unique or razor peptides (exclude protein with yellow peptides)"/>
+                        </properties>
+                      </component>
                       <component id="31f9f" class="javax.swing.JCheckBox" binding="chbProteinMeanGreater">
                         <constraints>
-                          <grid row="1" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+                          <grid row="2" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
                           <gridbag top="5" left="5" bottom="5" right="5" weightx="0.0" weighty="0.0"/>
                         </constraints>
                         <properties>
@@ -506,7 +515,16 @@
                       </component>
                       <component id="e0267" class="javax.swing.JCheckBox" binding="chbProteinMeanLower">
                         <constraints>
-                          <grid row="4" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+                          <grid row="5" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+                          <gridbag top="5" left="5" bottom="5" right="5" weightx="0.0" weighty="0.0"/>
+                        </constraints>
+                        <properties>
+                          <text value="Protein mean for type"/>
+                        </properties>
+                      </component>
+                      <component id="ad4fc" class="javax.swing.JCheckBox" binding="chbProteinMeanInRange">
+                        <constraints>
+                          <grid row="6" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
                           <gridbag top="5" left="5" bottom="5" right="5" weightx="0.0" weighty="0.0"/>
                         </constraints>
                         <properties>
@@ -515,21 +533,28 @@
                       </component>
                       <component id="e3e1d" class="javax.swing.JComboBox" binding="cmbProteinMeanRatioTypesLarger" custom-create="true">
                         <constraints>
-                          <grid row="1" column="2" row-span="3" col-span="1" vsize-policy="0" hsize-policy="2" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+                          <grid row="2" column="2" row-span="3" col-span="1" vsize-policy="0" hsize-policy="2" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
                           <gridbag top="5" left="5" bottom="5" right="5" weightx="0.0" weighty="0.0"/>
                         </constraints>
                         <properties/>
                       </component>
                       <component id="67cbc" class="javax.swing.JComboBox" binding="cmbProteinMeanRatioTypesSmaller" custom-create="true">
                         <constraints>
-                          <grid row="4" column="2" row-span="1" col-span="1" vsize-policy="0" hsize-policy="2" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+                          <grid row="5" column="2" row-span="1" col-span="1" vsize-policy="0" hsize-policy="2" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+                          <gridbag top="5" left="5" bottom="5" right="5" weightx="0.0" weighty="0.0"/>
+                        </constraints>
+                        <properties/>
+                      </component>
+                      <component id="19a25" class="javax.swing.JComboBox" binding="cmbProteinMeanRatioTypesRange1" custom-create="true">
+                        <constraints>
+                          <grid row="6" column="2" row-span="1" col-span="1" vsize-policy="0" hsize-policy="2" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
                           <gridbag top="5" left="5" bottom="5" right="5" weightx="0.0" weighty="0.0"/>
                         </constraints>
                         <properties/>
                       </component>
                       <component id="d5de1" class="javax.swing.JLabel">
                         <constraints>
-                          <grid row="1" column="3" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="0" fill="0" indent="0" use-parent-layout="false"/>
+                          <grid row="2" column="3" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="0" fill="0" indent="0" use-parent-layout="false"/>
                           <gridbag top="5" left="5" bottom="5" right="5" weightx="0.0" weighty="0.0"/>
                         </constraints>
                         <properties>
@@ -538,42 +563,74 @@
                       </component>
                       <component id="e88bd" class="javax.swing.JLabel">
                         <constraints>
-                          <grid row="4" column="3" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="0" fill="0" indent="0" use-parent-layout="false"/>
+                          <grid row="5" column="3" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="0" fill="0" indent="0" use-parent-layout="false"/>
                           <gridbag top="5" left="5" bottom="5" right="5" weightx="0.0" weighty="0.0"/>
                         </constraints>
                         <properties>
                           <text value="&lt;"/>
                         </properties>
                       </component>
+                      <component id="74ef8" class="javax.swing.JLabel">
+                        <constraints>
+                          <grid row="6" column="3" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="0" fill="0" indent="0" use-parent-layout="false"/>
+                          <gridbag top="5" left="5" bottom="5" right="5" weightx="0.0" weighty="0.0"/>
+                        </constraints>
+                        <properties>
+                          <text value="in range of "/>
+                        </properties>
+                      </component>
                       <component id="154a9" class="javax.swing.JSpinner" binding="spinProteinMeanLarger" custom-create="true">
                         <constraints>
-                          <grid row="1" column="4" row-span="3" col-span="1" vsize-policy="0" hsize-policy="6" anchor="8" fill="1" indent="0" use-parent-layout="false"/>
+                          <grid row="2" column="4" row-span="3" col-span="1" vsize-policy="0" hsize-policy="6" anchor="8" fill="1" indent="0" use-parent-layout="false"/>
                           <gridbag top="5" left="5" bottom="5" right="5" weightx="0.0" weighty="0.0"/>
                         </constraints>
                         <properties/>
                       </component>
                       <component id="63bf8" class="javax.swing.JSpinner" binding="spinProteinMeanSmaller" custom-create="true">
                         <constraints>
-                          <grid row="4" column="4" row-span="1" col-span="1" vsize-policy="0" hsize-policy="6" anchor="8" fill="1" indent="0" use-parent-layout="false"/>
+                          <grid row="5" column="4" row-span="1" col-span="1" vsize-policy="0" hsize-policy="6" anchor="8" fill="1" indent="0" use-parent-layout="false"/>
                           <gridbag top="5" left="5" bottom="5" right="5" weightx="0.0" weighty="0.0"/>
                         </constraints>
                         <properties/>
                       </component>
-                      <hspacer id="6b70b">
+                      <component id="77253" class="javax.swing.JSpinner" binding="spinMeanInRange" custom-create="true">
                         <constraints>
-                          <grid row="0" column="5" row-span="1" col-span="1" vsize-policy="1" hsize-policy="6" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
-                          <gridbag weightx="1.0" weighty="0.0"/>
+                          <grid row="6" column="4" row-span="1" col-span="1" vsize-policy="0" hsize-policy="6" anchor="8" fill="1" indent="0" use-parent-layout="false"/>
+                          <gridbag top="5" left="5" bottom="5" right="5" weightx="0.0" weighty="0.0"/>
                         </constraints>
-                      </hspacer>
+                        <properties/>
+                      </component>
                       <component id="9499e" class="javax.swing.JCheckBox" binding="chbProteinComment">
                         <constraints>
-                          <grid row="7" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+                          <grid row="9" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
                           <gridbag top="5" left="5" bottom="5" right="5" weightx="0.0" weighty="0.0"/>
                         </constraints>
                         <properties>
                           <text value="Find proteins with a comment"/>
                         </properties>
                       </component>
+                      <component id="c3652" class="javax.swing.JLabel">
+                        <constraints>
+                          <grid row="6" column="5" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="0" fill="0" indent="0" use-parent-layout="false"/>
+                          <gridbag top="5" left="5" bottom="5" right="5" weightx="0.0" weighty="0.0"/>
+                        </constraints>
+                        <properties>
+                          <text value="protein mean for type"/>
+                        </properties>
+                      </component>
+                      <component id="27f15" class="javax.swing.JComboBox" binding="cmbProteinMeanRatioTypesRange2" custom-create="true">
+                        <constraints>
+                          <grid row="6" column="6" row-span="1" col-span="1" vsize-policy="0" hsize-policy="2" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+                          <gridbag top="5" left="5" bottom="5" right="5" weightx="0.0" weighty="0.0"/>
+                        </constraints>
+                        <properties/>
+                      </component>
+                      <hspacer id="6b70b">
+                        <constraints>
+                          <grid row="0" column="6" row-span="1" col-span="1" vsize-policy="1" hsize-policy="6" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
+                          <gridbag weightx="1.0" weighty="0.0"/>
+                        </constraints>
+                      </hspacer>
                     </children>
                   </grid>
                 </children>

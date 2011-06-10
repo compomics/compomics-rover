@@ -128,6 +128,8 @@ public class MsfReader {
                                 if (iMsfFile.getSpectra().get(i).getQuanResult().getRatioByRatioType(lRatioTypes.get(t)) != null) {
                                     double lCalRatio = (Math.round(iMsfFile.getSpectra().get(i).getQuanResult().getRatioByRatioType(lRatioTypes.get(t)) * 1000.0)) / 1000.0;
                                     ThermoMsfRatio lRatio = new ThermoMsfRatio(lCalRatio, lType.get(t), true, lRatioGroup, iMsfFile.getSpectra().get(i).getQuanResult(), iMsfFile.getSpectra().get(i).getConnection(), iMsfFile.getSpectra().get(i).getFileId(), iMsfFile.getSpectra().get(i).getParser().getComponents(), iMsfFile.getSpectra().get(i).getParser().getChannelIds());
+                                    lRatio.setNumeratorIntensity(iMsfFile.getSpectra().get(i).getQuanResult().getNumeratorByRatioType(lRatioTypes.get(t)));
+                                    lRatio.setDenominatorIntensity(iMsfFile.getSpectra().get(i).getQuanResult().getDenominatorByRatioType(lRatioTypes.get(t)));
                                     lRatio.setValid(true);
                                     lRatioGroup.addRatio(lRatio);
                                 }

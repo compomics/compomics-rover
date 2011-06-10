@@ -548,7 +548,7 @@ public class ParameterPanel implements WizardPanel {
         //set the peptizer status
         iParent.setPeptizerStatus(chbExcludePeptizer.isSelected());
         //set the msf peptide confidence level
-        if (iParent.getRoverSource() != RoverSource.THERMO_MSF_FILES) {
+        if (iParent.getRoverSource() == RoverSource.THERMO_MSF_FILES) {
             if (highRadioButton.isSelected()) {
                 iParent.setMsfPeptideConfidence(3);
             } else if (mediumRadioButton.isSelected()) {
