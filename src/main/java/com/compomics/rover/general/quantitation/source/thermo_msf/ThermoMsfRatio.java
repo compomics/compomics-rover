@@ -102,6 +102,9 @@ public class ThermoMsfRatio implements Ratio {
      */
     private Vector<Integer> iChannelIds = new Vector<Integer>();
 
+    private double iNumeratorIntensity;
+    private double iDenominatorIntensity;
+
 
     /**
      * Constructs a new DistillerRatio instance.
@@ -334,6 +337,22 @@ public class ThermoMsfRatio implements Ratio {
 
     public int getFileId() {
         return iFileId;
+    }
+
+    public double getNumeratorIntensity() {
+        return iNumeratorIntensity;
+    }
+
+    public void setNumeratorIntensity(double aNominatorIntensity) {
+        iNumeratorIntensity = aNominatorIntensity;
+    }
+
+    public double getDenominatorIntensity() {
+        return iDenominatorIntensity;
+    }
+
+    public void setDenominatorIntensity(double aDenominatorIntensity) {
+        iDenominatorIntensity = aDenominatorIntensity;
     }
 }
 

@@ -1,5 +1,6 @@
 package com.compomics.rover.general.quantitation.sorters;
 
+import com.compomics.rover.general.quantitation.source.thermo_msf.ThermoMsfRatio;
 import org.apache.log4j.Logger;
 
 import com.compomics.rover.general.interfaces.Ratio;
@@ -43,9 +44,15 @@ public class RatioSorterByIntensity implements Comparator<Ratio> {
         if(lInt1 == 0.0){
             lInt1 = o1.getParentRatioGroup().getSummedIntensityForRatioType(iRatioType);
         }
+        if(o1 instanceof ThermoMsfRatio){
+            lInt1 = ((ThermoMsfRatio) o1).getNumeratorIntensity();
+        }
         lInt2 = o2.getParentRatioGroup().getIntensityForComponent(iComponent);
         if(lInt2 == 0){
             lInt2 = o2.getParentRatioGroup().getSummedIntensityForRatioType(iRatioType);
+        }
+        if(o2 instanceof ThermoMsfRatio){
+            lInt2 = ((ThermoMsfRatio) o2).getNumeratorIntensity();
         }
         if(lInt1 > lInt2){
             return 1;
