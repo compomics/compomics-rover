@@ -687,6 +687,8 @@ public class RatioGroupInformationPanel extends JFrame {
                         jpanIdentfication.setBorder(BorderFactory.createTitledBorder(lIdentification.getType() + " component identified"));
                         jpanIdentfication.add(new JLabel("      " + lIdentification.getModified_sequence() + "  score: " + lIdentification.getScore() + "  threshold: " + lIdentification.getIdentitythreshold() + "  homology: " + lIdentification.getHomology() + "  confidence: " + lIdentification.getConfidence()));
                         jpanIdentfication.add(Box.createVerticalStrut(5));
+                        jpanIdentfication.add(new JLabel("      Spectrum: " + lIdentification.getSpectrumFileName()));
+                        jpanIdentfication.add(Box.createVerticalStrut(5));
                         jpanIdentfication.add(new JLabel("      Charge: " + lIdentification.getCharge() + "  precursor mass: " + lIdentification.getPrecursor() + "  exp mass: " + lIdentification.getExp_mass() + "  cal mass: " + lIdentification.getCal_mass() + "  ppm: " + Math.abs(lIdentification.getCal_mass().doubleValue() - lIdentification.getExp_mass().doubleValue()) * 1000000.0 / (lIdentification.getExp_mass().doubleValue())));
                         jpanIdentfication.add(Box.createVerticalStrut(5));
                         if (iRatioGroup.getParentCollection().getRoverSource() == RoverSource.DISTILLER_QUANT_TOOLBOX_MS_LIMS || iRatioGroup.getParentCollection().getRoverSource() == RoverSource.DISTILLER_QUANT_TOOLBOX_ROV) {

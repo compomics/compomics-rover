@@ -103,6 +103,16 @@ public class FilterFrame extends JFrame {
     private JCheckBox chbProteinMeanInRange;
     private JSpinner spinMeanInRange;
     private JComboBox cmbProteinMeanRatioTypesRange2;
+    private JTextField txtModifiedPeptideSequence;
+    private JCheckBox chbModifiedPeptidesSequence;
+    private JCheckBox ChbPeptideInRange;
+    private JCheckBox ChbPeptideOutOfRange;
+    private JComboBox cmbPeptideRatioTypesRange2;
+    private JComboBox cmbPeptideRatioTypesOutRange1;
+    private JComboBox cmbPeptideRatioTypesOutRange2;
+    private JSpinner spinRatioInRange;
+    private JSpinner spinRatioOutRange;
+    private JComboBox cmbPeptideRatioTypesRange1;
 
     /**
      * All the proteins that will be filtered
@@ -234,9 +244,12 @@ public class FilterFrame extends JFrame {
                 boolean usePeptideRatioLower = chbPeptideRatioSmaller.isSelected();
                 boolean useProteinInRange = chbProteinMeanInRange.isSelected();
                 boolean useSingles = chbUseSingles.isSelected();
+                boolean usePeptideRatioInRange = ChbPeptideInRange.isSelected();
+                boolean usePeptideRatioOutRange = ChbPeptideOutOfRange.isSelected();
                 boolean accessionSearch = chbAccessionSearch.isSelected();
                 boolean useRatioComments = chbRatioComment.isSelected();
                 boolean usePeptideSequence = chbPeptidesSequence.isSelected();
+                boolean useModifiedPeptideSequence = chbModifiedPeptidesSequence.isSelected();
                 boolean usePeptideEnding = chbPeptideEnding.isSelected();
                 boolean usePeptideStarting = chbPeptideStarting.isSelected();
                 boolean usePeptideAfter = chbPeptideAfter.isSelected();
@@ -693,6 +706,143 @@ public class FilterFrame extends JFrame {
 
                     }
 
+                    if (usePeptideRatioInRange) {
+                        boolean lExtremePeptideRatioFound = false;
+                        Vector<RatioGroup> lRatioGroups = lProtein.getRatioGroups();
+                        for (int j = 0; j < lRatioGroups.size(); j++) {
+                            Ratio lRatio1 = null;
+                            Ratio lRatio2 = null;
+                            for (int k = 0; k < lRatioGroups.get(j).getNumberOfRatios(); k++) {
+                                Ratio lRatio = lRatioGroups.get(j).getRatio(k);
+                                if (lRatio.getType().equalsIgnoreCase((String) cmbPeptideRatioTypesRange1.getSelectedItem())) {
+                                    //the correct ratio
+                                    if (useOnlyTrueRatios) {
+                                        if (useUniquePeptide) {
+                                            if (lRatioGroups.get(j).getProteinAccessions().length == 1) {
+                                                lRatio1 = lRatio;
+                                            }
+                                        } else {
+                                            lRatio1 = lRatio;
+                                        }
+                                    } else {
+                                        if (useUniquePeptide) {
+                                            lRatio1 = lRatio;
+                                        } else {
+                                            lRatio1 = lRatio;
+                                        }
+                                    }
+                                }
+                                if (lRatio.getType().equalsIgnoreCase((String) cmbPeptideRatioTypesRange2.getSelectedItem())) {
+                                    //the correct ratio
+                                    if (useOnlyTrueRatios) {
+                                        if (useUniquePeptide) {
+                                            if (lRatioGroups.get(j).getProteinAccessions().length == 1) {
+                                                lRatio2 = lRatio;
+                                            }
+                                        } else {
+                                            lRatio2 = lRatio;
+                                        }
+                                    } else {
+                                        if (useUniquePeptide) {
+                                            lRatio2 = lRatio;
+                                        } else {
+                                            lRatio2 = lRatio;
+                                        }
+                                    }
+                                }
+                            }
+                            if (lRatio1 != null && lRatio2 != null) {
+                                if (Math.abs(lRatio1.getRatio(iQuantitativeValidationSingelton.isLog2()) - lRatio2.getRatio(iQuantitativeValidationSingelton.isLog2())) < (Double) spinRatioInRange.getValue()) {
+                                    lExtremePeptideRatioFound = true;
+                                    lRatioGroups.get(j).setSelected(true);
+                                }
+                            }
+                        }
+                        if (lExtremePeptideRatioFound) {
+                            if (firstFilter) {
+                                useThisProtein = true;
+                                firstFilter = false;
+                            } else {
+                                // it is not the first filter
+                                // if it's already true don't change it
+                                // if it's false don't change it either because all the filters must be true
+                            }
+                        } else {
+                            firstFilter = false;
+                            useThisProtein = false;
+                        }
+
+                    }
+
+
+                    if (usePeptideRatioOutRange) {
+                        boolean lExtremePeptideRatioFound = false;
+                        Vector<RatioGroup> lRatioGroups = lProtein.getRatioGroups();
+                        for (int j = 0; j < lRatioGroups.size(); j++) {
+                            Ratio lRatio1 = null;
+                            Ratio lRatio2 = null;
+                            for (int k = 0; k < lRatioGroups.get(j).getNumberOfRatios(); k++) {
+                                Ratio lRatio = lRatioGroups.get(j).getRatio(k);
+                                if (lRatio.getType().equalsIgnoreCase((String) cmbPeptideRatioTypesOutRange1.getSelectedItem())) {
+                                    //the correct ratio
+                                    if (useOnlyTrueRatios) {
+                                        if (useUniquePeptide) {
+                                            if (lRatioGroups.get(j).getProteinAccessions().length == 1) {
+                                                lRatio1 = lRatio;
+                                            }
+                                        } else {
+                                            lRatio1 = lRatio;
+                                        }
+                                    } else {
+                                        if (useUniquePeptide) {
+                                            lRatio1 = lRatio;
+                                        } else {
+                                            lRatio1 = lRatio;
+                                        }
+                                    }
+                                }
+                                if (lRatio.getType().equalsIgnoreCase((String) cmbPeptideRatioTypesOutRange2.getSelectedItem())) {
+                                    //the correct ratio
+                                    if (useOnlyTrueRatios) {
+                                        if (useUniquePeptide) {
+                                            if (lRatioGroups.get(j).getProteinAccessions().length == 1) {
+                                                lRatio2 = lRatio;
+                                            }
+                                        } else {
+                                            lRatio2 = lRatio;
+                                        }
+                                    } else {
+                                        if (useUniquePeptide) {
+                                            lRatio2 = lRatio;
+                                        } else {
+                                            lRatio2 = lRatio;
+                                        }
+                                    }
+                                }
+                            }
+                            if (lRatio1 != null && lRatio2 != null) {
+                                if (Math.abs(lRatio1.getRatio(iQuantitativeValidationSingelton.isLog2()) - lRatio2.getRatio(iQuantitativeValidationSingelton.isLog2())) > (Double) spinRatioOutRange.getValue()) {
+                                    lExtremePeptideRatioFound = true;
+                                    lRatioGroups.get(j).setSelected(true);
+                                }
+                            }
+                        }
+                        if (lExtremePeptideRatioFound) {
+                            if (firstFilter) {
+                                useThisProtein = true;
+                                firstFilter = false;
+                            } else {
+                                // it is not the first filter
+                                // if it's already true don't change it
+                                // if it's false don't change it either because all the filters must be true
+                            }
+                        } else {
+                            firstFilter = false;
+                            useThisProtein = false;
+                        }
+
+                    }
+
 
                     //Use the filter: A protein will be selected if a peptide of that protein has a ratio that is lower than ...
                     if (usePeptideRatioLower) {
@@ -936,6 +1086,7 @@ public class FilterFrame extends JFrame {
                                 if (lValidFound) {
                                     if (lRatioGroups.get(l).getPeptideSequence().toUpperCase().indexOf(lSequenceToMatch.toUpperCase()) > -1) {
                                         peptideSequenceFound = true;
+                                        lRatioGroups.get(l).setSelected(true);
                                     }
                                 }
                             }
@@ -953,6 +1104,7 @@ public class FilterFrame extends JFrame {
                                         if (lValidFound) {
                                             if (lRatioGroups.get(l).getPeptideSequence().toUpperCase().indexOf(lSequenceToMatch.toUpperCase()) > -1) {
                                                 peptideSequenceFound = true;
+                                                lRatioGroups.get(l).setSelected(true);
                                             }
                                         }
                                     }
@@ -962,6 +1114,7 @@ public class FilterFrame extends JFrame {
                                     for (int l = 0; l < lRatioGroups.size(); l++) {
                                         if (lRatioGroups.get(l).getPeptideSequence().toUpperCase().indexOf(lSequenceToMatch.toUpperCase()) > -1) {
                                             peptideSequenceFound = true;
+                                            lRatioGroups.get(l).setSelected(true);
                                         }
                                     }
                                 }
@@ -982,6 +1135,82 @@ public class FilterFrame extends JFrame {
                         }
                     }
 
+
+                    if (useModifiedPeptideSequence && txtModifiedPeptideSequence.getText().length() != 0) {
+                        boolean peptideSequenceFound = false;
+                        Vector<RatioGroup> lRatioGroups = lProtein.getRatioGroups();
+                        String lSequenceToMatch = txtModifiedPeptideSequence.getText();
+                        if (useOnlyTrueRatios) {
+                            for (int l = 0; l < lRatioGroups.size(); l++) {
+                                boolean lValidFound = false;
+                                RatioGroup lRatioGroup = lRatioGroups.get(l);
+                                for (int k = 0; k < lRatioGroup.getNumberOfRatios(); k++) {
+                                    if (lRatioGroup.getRatio(k).getValid()) {
+                                        lValidFound = true;
+                                        k = lProtein.getTypes().length;
+                                    }
+                                }
+                                if (useUniquePeptide && lValidFound && lRatioGroup.getProteinAccessions().length != 1) {
+                                    //it's not unique, set it false
+                                    lValidFound = false;
+                                }
+                                if (lValidFound) {
+                                    for (int m = 0; m < lRatioGroups.get(l).getNumberOfIdentifications(); m++) {
+                                        if (lRatioGroups.get(l).getIdentification(m).getModified_sequence().toUpperCase().indexOf(lSequenceToMatch.toUpperCase()) > -1) {
+                                            peptideSequenceFound = true;
+                                            lRatioGroups.get(l).setSelected(true);
+                                        }
+                                    }
+                                }
+                            }
+
+                        } else {
+                            if (useUniquePeptide) {
+                                for (int j = 0; j < lProtein.getPeptideGroups(true).size(); j++) {
+                                    for (int l = 0; l < lRatioGroups.size(); l++) {
+                                        boolean lValidFound = true;
+                                        RatioGroup lRatioGroup = lRatioGroups.get(l);
+                                        if (lRatioGroup.getProteinAccessions().length != 1) {
+                                            //it's not unique, set it false
+                                            lValidFound = false;
+                                        }
+                                        if (lValidFound) {
+                                            for (int m = 0; m < lRatioGroups.get(l).getNumberOfIdentifications(); m++) {
+                                                if (lRatioGroups.get(l).getIdentification(m).getModified_sequence().toUpperCase().indexOf(lSequenceToMatch.toUpperCase()) > -1) {
+                                                    peptideSequenceFound = true;
+                                                    lRatioGroups.get(l).setSelected(true);
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            } else {
+                                for (int j = 0; j < lProtein.getPeptideGroups(true).size(); j++) {
+                                    for (int l = 0; l < lRatioGroups.size(); l++) {
+                                        for (int m = 0; m < lRatioGroups.get(l).getNumberOfIdentifications(); m++) {
+                                            if (lRatioGroups.get(l).getIdentification(m).getModified_sequence().toUpperCase().indexOf(lSequenceToMatch.toUpperCase()) > -1) {
+                                                peptideSequenceFound = true;
+                                                lRatioGroups.get(l).setSelected(true);
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                        if (peptideSequenceFound) {
+                            if (firstFilter) {
+                                useThisProtein = true;
+                                firstFilter = false;
+                            } else {
+                                // it is not the first filter
+                                // if it's already true don't change it
+                                // if it's false don't change it either because all the filters must be true
+                            }
+                        } else {
+                            firstFilter = false;
+                            useThisProtein = false;
+                        }
+                    }
 
                     //Use the filter: A peptide that ends on a specific amino acid will be used
                     if (usePeptideEnding && txtPeptideEnding.getText().length() != 0) {
@@ -1005,6 +1234,7 @@ public class FilterFrame extends JFrame {
                                 if (lValidFound) {
                                     if (lRatioGroups.get(l).getPeptideSequence().toUpperCase().endsWith(lSequenceToMatch.toUpperCase())) {
                                         peptideSequenceFound = true;
+                                        lRatioGroups.get(l).setSelected(true);
                                     }
                                 }
                             }
@@ -1022,6 +1252,7 @@ public class FilterFrame extends JFrame {
                                         if (lValidFound) {
                                             if (lRatioGroups.get(l).getPeptideSequence().toUpperCase().endsWith(lSequenceToMatch.toUpperCase())) {
                                                 peptideSequenceFound = true;
+                                                lRatioGroups.get(l).setSelected(true);
                                             }
                                         }
                                     }
@@ -1031,6 +1262,7 @@ public class FilterFrame extends JFrame {
                                     for (int l = 0; l < lRatioGroups.size(); l++) {
                                         if (lRatioGroups.get(l).getPeptideSequence().toUpperCase().endsWith(lSequenceToMatch.toUpperCase())) {
                                             peptideSequenceFound = true;
+                                            lRatioGroups.get(l).setSelected(true);
                                         }
                                     }
                                 }
@@ -1073,6 +1305,7 @@ public class FilterFrame extends JFrame {
                                 if (lValidFound) {
                                     if (lRatioGroups.get(l).getPeptideSequence().toUpperCase().startsWith(lSequenceToMatch.toUpperCase())) {
                                         peptideSequenceFound = true;
+                                        lRatioGroups.get(l).setSelected(true);
                                     }
                                 }
                             }
@@ -1090,6 +1323,7 @@ public class FilterFrame extends JFrame {
                                         if (lValidFound) {
                                             if (lRatioGroups.get(l).getPeptideSequence().toUpperCase().startsWith(lSequenceToMatch.toUpperCase())) {
                                                 peptideSequenceFound = true;
+                                                lRatioGroups.get(l).setSelected(true);
                                             }
                                         }
                                     }
@@ -1099,6 +1333,7 @@ public class FilterFrame extends JFrame {
                                     for (int l = 0; l < lRatioGroups.size(); l++) {
                                         if (lRatioGroups.get(l).getPeptideSequence().toUpperCase().startsWith(lSequenceToMatch.toUpperCase())) {
                                             peptideSequenceFound = true;
+                                            lRatioGroups.get(l).setSelected(true);
                                         }
                                     }
                                 }
@@ -1143,6 +1378,7 @@ public class FilterFrame extends JFrame {
                                     if (lValidFound) {
                                         if (lPeptideGroups.get(l).getPreSequence().toUpperCase().startsWith(lSequenceToMatch.toUpperCase())) {
                                             peptideSequenceFound = true;
+                                            lRatioGroups.get(l).setSelected(true);
                                         }
                                     }
                                 }
@@ -1587,12 +1823,16 @@ public class FilterFrame extends JFrame {
             spinPeptideRatioSmaller = new JSpinner(new SpinnerNumberModel(0.00, -10.0, 10.0, 0.05));
             spinPeptideRatioLarger = new JSpinner(new SpinnerNumberModel(0.00, -10.0, 10.0, 0.05));
             spinMeanInRange = new JSpinner(new SpinnerNumberModel(0.00, -10.0, 10.0, 0.05));
+            spinRatioInRange = new JSpinner(new SpinnerNumberModel(0.00, -10.0, 10.0, 0.05));
+            spinRatioOutRange = new JSpinner(new SpinnerNumberModel(0.00, -10.0, 10.0, 0.05));
         } else {
             spinProteinMeanLarger = new JSpinner(new SpinnerNumberModel(1.00, -10.0, 10.0, 0.05));
             spinProteinMeanSmaller = new JSpinner(new SpinnerNumberModel(1.00, -10.0, 10.0, 0.05));
             spinPeptideRatioSmaller = new JSpinner(new SpinnerNumberModel(1.00, -10.0, 10.0, 0.05));
             spinPeptideRatioLarger = new JSpinner(new SpinnerNumberModel(1.00, -10.0, 10.0, 0.05));
             spinMeanInRange = new JSpinner(new SpinnerNumberModel(1.00, -10.0, 10.0, 0.05));
+            spinRatioInRange = new JSpinner(new SpinnerNumberModel(1.00, -10.0, 10.0, 0.05));
+            spinRatioOutRange = new JSpinner(new SpinnerNumberModel(1.00, -10.0, 10.0, 0.05));
         }
         spinSingle = new JSpinner(new SpinnerNumberModel(0.05, 0.0, 1.0, 0.01));
         spinHuberSignificanceHigher = new JSpinner(new SpinnerNumberModel(1.96, 0.0, 5.0, 0.01));
@@ -1600,6 +1840,11 @@ public class FilterFrame extends JFrame {
         cmbProteinMeanRatioTypesLarger = new JComboBox(iTypes);
         cmbProteinMeanRatioTypesSmaller = new JComboBox(iTypes);
         cmbProteinMeanRatioTypesRange1 = new JComboBox(iTypes);
+        cmbProteinMeanRatioTypesRange2 = new JComboBox(iTypes);
+        cmbPeptideRatioTypesRange1 = new JComboBox(iTypes);
+        cmbPeptideRatioTypesRange2 = new JComboBox(iTypes);
+        cmbPeptideRatioTypesOutRange1 = new JComboBox(iTypes);
+        cmbPeptideRatioTypesOutRange2 = new JComboBox(iTypes);
         cmbProteinMeanRatioTypesRange2 = new JComboBox(iTypes);
         cmbPeptideRatioTypesLarger = new JComboBox(iTypes);
         cmbPeptideRatioTypesSmaller = new JComboBox(iTypes);
@@ -1653,7 +1898,7 @@ public class FilterFrame extends JFrame {
         final JLabel label1 = new JLabel();
         label1.setText("");
         gbc = new GridBagConstraints();
-        gbc.gridx = 4;
+        gbc.gridx = 7;
         gbc.gridy = 5;
         gbc.anchor = GridBagConstraints.WEST;
         panel3.add(label1, gbc);
@@ -1663,7 +1908,7 @@ public class FilterFrame extends JFrame {
         gbc = new GridBagConstraints();
         gbc.gridx = 0;
         gbc.gridy = 5;
-        gbc.gridwidth = 2;
+        gbc.gridwidth = 3;
         gbc.anchor = GridBagConstraints.WEST;
         gbc.insets = new Insets(5, 5, 5, 5);
         panel3.add(chbNumberOfAllIdentifications, gbc);
@@ -1672,7 +1917,7 @@ public class FilterFrame extends JFrame {
         gbc = new GridBagConstraints();
         gbc.gridx = 0;
         gbc.gridy = 6;
-        gbc.gridwidth = 2;
+        gbc.gridwidth = 3;
         gbc.anchor = GridBagConstraints.WEST;
         gbc.insets = new Insets(5, 5, 5, 5);
         panel3.add(chbNumberOfDifferentPeptides, gbc);
@@ -1681,7 +1926,7 @@ public class FilterFrame extends JFrame {
         gbc = new GridBagConstraints();
         gbc.gridx = 0;
         gbc.gridy = 7;
-        gbc.gridwidth = 2;
+        gbc.gridwidth = 3;
         gbc.anchor = GridBagConstraints.WEST;
         gbc.insets = new Insets(5, 5, 5, 5);
         panel3.add(chbDiffUniqueRazor, gbc);
@@ -1690,7 +1935,7 @@ public class FilterFrame extends JFrame {
         gbc = new GridBagConstraints();
         gbc.gridx = 0;
         gbc.gridy = 10;
-        gbc.gridwidth = 2;
+        gbc.gridwidth = 3;
         gbc.anchor = GridBagConstraints.WEST;
         gbc.insets = new Insets(5, 5, 5, 5);
         panel3.add(chbUseSingles, gbc);
@@ -1699,7 +1944,7 @@ public class FilterFrame extends JFrame {
         gbc = new GridBagConstraints();
         gbc.gridx = 0;
         gbc.gridy = 8;
-        gbc.gridwidth = 2;
+        gbc.gridwidth = 3;
         gbc.anchor = GridBagConstraints.WEST;
         gbc.insets = new Insets(5, 5, 5, 5);
         panel3.add(chbPeptideRatioLarger, gbc);
@@ -1708,7 +1953,7 @@ public class FilterFrame extends JFrame {
         gbc = new GridBagConstraints();
         gbc.gridx = 0;
         gbc.gridy = 9;
-        gbc.gridwidth = 2;
+        gbc.gridwidth = 3;
         gbc.anchor = GridBagConstraints.WEST;
         gbc.insets = new Insets(5, 5, 5, 5);
         panel3.add(chbPeptideRatioSmaller, gbc);
@@ -1717,7 +1962,7 @@ public class FilterFrame extends JFrame {
         gbc = new GridBagConstraints();
         gbc.gridx = 0;
         gbc.gridy = 12;
-        gbc.gridwidth = 2;
+        gbc.gridwidth = 3;
         gbc.anchor = GridBagConstraints.WEST;
         gbc.insets = new Insets(5, 5, 5, 5);
         panel3.add(chbDiffRatioAndMean, gbc);
@@ -1740,7 +1985,7 @@ public class FilterFrame extends JFrame {
         gbc = new GridBagConstraints();
         gbc.gridx = 0;
         gbc.gridy = 13;
-        gbc.gridwidth = 2;
+        gbc.gridwidth = 3;
         gbc.anchor = GridBagConstraints.WEST;
         gbc.insets = new Insets(5, 5, 5, 5);
         panel3.add(chbHuberSignificanceHigher, gbc);
@@ -1749,7 +1994,7 @@ public class FilterFrame extends JFrame {
         gbc = new GridBagConstraints();
         gbc.gridx = 0;
         gbc.gridy = 14;
-        gbc.gridwidth = 2;
+        gbc.gridwidth = 3;
         gbc.anchor = GridBagConstraints.WEST;
         gbc.insets = new Insets(5, 5, 5, 5);
         panel3.add(chbHuberSignificanceLower, gbc);
@@ -1758,7 +2003,7 @@ public class FilterFrame extends JFrame {
         gbc = new GridBagConstraints();
         gbc.gridx = 0;
         gbc.gridy = 15;
-        gbc.gridwidth = 2;
+        gbc.gridwidth = 3;
         gbc.anchor = GridBagConstraints.WEST;
         gbc.insets = new Insets(5, 5, 5, 5);
         panel3.add(chbRatioComment, gbc);
@@ -1766,7 +2011,7 @@ public class FilterFrame extends JFrame {
         gbc = new GridBagConstraints();
         gbc.gridx = 0;
         gbc.gridy = 4;
-        gbc.gridwidth = 12;
+        gbc.gridwidth = 15;
         gbc.fill = GridBagConstraints.BOTH;
         gbc.insets = new Insets(2, 2, 2, 2);
         panel3.add(separator1, gbc);
@@ -1774,7 +2019,7 @@ public class FilterFrame extends JFrame {
         label2.setFont(new Font(label2.getFont().getName(), Font.ITALIC, label2.getFont().getSize()));
         label2.setText("Use only valid ratios in the following filters");
         gbc = new GridBagConstraints();
-        gbc.gridx = 1;
+        gbc.gridx = 2;
         gbc.gridy = 2;
         gbc.anchor = GridBagConstraints.WEST;
         gbc.insets = new Insets(5, 0, 5, 5);
@@ -1783,37 +2028,37 @@ public class FilterFrame extends JFrame {
         label3.setFont(new Font(label3.getFont().getName(), Font.ITALIC, label3.getFont().getSize()));
         label3.setText("Use only uniquely identified (blue) peptides");
         gbc = new GridBagConstraints();
-        gbc.gridx = 1;
+        gbc.gridx = 2;
         gbc.gridy = 3;
         gbc.anchor = GridBagConstraints.WEST;
         gbc.insets = new Insets(5, 0, 5, 5);
         panel3.add(label3, gbc);
         gbc = new GridBagConstraints();
-        gbc.gridx = 5;
+        gbc.gridx = 8;
         gbc.gridy = 8;
         gbc.anchor = GridBagConstraints.WEST;
         gbc.insets = new Insets(5, 5, 5, 5);
         panel3.add(cmbPeptideRatioTypesLarger, gbc);
         gbc = new GridBagConstraints();
-        gbc.gridx = 5;
+        gbc.gridx = 8;
         gbc.gridy = 9;
         gbc.anchor = GridBagConstraints.WEST;
         gbc.insets = new Insets(5, 5, 5, 5);
         panel3.add(cmbPeptideRatioTypesSmaller, gbc);
         gbc = new GridBagConstraints();
-        gbc.gridx = 5;
+        gbc.gridx = 8;
         gbc.gridy = 5;
         gbc.fill = GridBagConstraints.HORIZONTAL;
         gbc.insets = new Insets(5, 5, 5, 5);
         panel3.add(spinIdentifications, gbc);
         gbc = new GridBagConstraints();
-        gbc.gridx = 5;
+        gbc.gridx = 8;
         gbc.gridy = 6;
         gbc.fill = GridBagConstraints.HORIZONTAL;
         gbc.insets = new Insets(5, 5, 5, 5);
         panel3.add(spinDifferentPeptides, gbc);
         gbc = new GridBagConstraints();
-        gbc.gridx = 5;
+        gbc.gridx = 8;
         gbc.gridy = 7;
         gbc.fill = GridBagConstraints.HORIZONTAL;
         gbc.insets = new Insets(5, 5, 5, 5);
@@ -1821,29 +2066,29 @@ public class FilterFrame extends JFrame {
         final JLabel label4 = new JLabel();
         label4.setText(">");
         gbc = new GridBagConstraints();
-        gbc.gridx = 6;
+        gbc.gridx = 9;
         gbc.gridy = 8;
         panel3.add(label4, gbc);
         final JLabel label5 = new JLabel();
         label5.setText("<");
         gbc = new GridBagConstraints();
-        gbc.gridx = 6;
+        gbc.gridx = 9;
         gbc.gridy = 9;
         panel3.add(label5, gbc);
         gbc = new GridBagConstraints();
-        gbc.gridx = 7;
+        gbc.gridx = 10;
         gbc.gridy = 8;
         gbc.fill = GridBagConstraints.HORIZONTAL;
         gbc.insets = new Insets(5, 5, 5, 5);
         panel3.add(spinPeptideRatioLarger, gbc);
         gbc = new GridBagConstraints();
-        gbc.gridx = 7;
+        gbc.gridx = 10;
         gbc.gridy = 9;
         gbc.fill = GridBagConstraints.HORIZONTAL;
         gbc.insets = new Insets(5, 5, 5, 5);
         panel3.add(spinPeptideRatioSmaller, gbc);
         gbc = new GridBagConstraints();
-        gbc.gridx = 5;
+        gbc.gridx = 8;
         gbc.gridy = 10;
         gbc.gridwidth = 2;
         gbc.fill = GridBagConstraints.HORIZONTAL;
@@ -1852,31 +2097,31 @@ public class FilterFrame extends JFrame {
         jLabelSingle2 = new JLabel();
         jLabelSingle2.setText("is smaller than ");
         gbc = new GridBagConstraints();
-        gbc.gridx = 7;
+        gbc.gridx = 10;
         gbc.gridy = 10;
         gbc.anchor = GridBagConstraints.WEST;
         gbc.insets = new Insets(5, 5, 5, 5);
         panel3.add(jLabelSingle2, gbc);
         gbc = new GridBagConstraints();
-        gbc.gridx = 5;
+        gbc.gridx = 8;
         gbc.gridy = 12;
         gbc.fill = GridBagConstraints.HORIZONTAL;
         gbc.insets = new Insets(5, 5, 5, 5);
         panel3.add(spinnPeptideRatioProteinMeanDiff, gbc);
         gbc = new GridBagConstraints();
-        gbc.gridx = 5;
+        gbc.gridx = 8;
         gbc.gridy = 13;
         gbc.fill = GridBagConstraints.HORIZONTAL;
         gbc.insets = new Insets(5, 5, 5, 5);
         panel3.add(spinHuberSignificanceHigher, gbc);
         gbc = new GridBagConstraints();
-        gbc.gridx = 5;
+        gbc.gridx = 8;
         gbc.gridy = 14;
         gbc.fill = GridBagConstraints.HORIZONTAL;
         gbc.insets = new Insets(5, 5, 5, 5);
         panel3.add(spinHuberSignificanceLower, gbc);
         gbc = new GridBagConstraints();
-        gbc.gridx = 10;
+        gbc.gridx = 13;
         gbc.gridy = 10;
         gbc.anchor = GridBagConstraints.WEST;
         gbc.fill = GridBagConstraints.HORIZONTAL;
@@ -1896,15 +2141,26 @@ public class FilterFrame extends JFrame {
         chbPeptidesSequence.setText("Find peptides with peptide containing");
         gbc = new GridBagConstraints();
         gbc.gridx = 0;
-        gbc.gridy = 16;
+        gbc.gridy = 18;
+        gbc.gridwidth = 2;
         gbc.anchor = GridBagConstraints.WEST;
         gbc.insets = new Insets(5, 5, 5, 5);
         panel3.add(chbPeptidesSequence, gbc);
+        chbModifiedPeptidesSequence = new JCheckBox();
+        chbModifiedPeptidesSequence.setText("Find peptides with modified peptide containing");
+        gbc = new GridBagConstraints();
+        gbc.gridx = 0;
+        gbc.gridy = 19;
+        gbc.gridwidth = 2;
+        gbc.anchor = GridBagConstraints.WEST;
+        gbc.insets = new Insets(5, 5, 5, 5);
+        panel3.add(chbModifiedPeptidesSequence, gbc);
         chbPeptideEnding = new JCheckBox();
         chbPeptideEnding.setText("Find peptides with peptide ending on");
         gbc = new GridBagConstraints();
         gbc.gridx = 0;
-        gbc.gridy = 17;
+        gbc.gridy = 20;
+        gbc.gridwidth = 2;
         gbc.anchor = GridBagConstraints.WEST;
         gbc.insets = new Insets(5, 5, 5, 5);
         panel3.add(chbPeptideEnding, gbc);
@@ -1912,7 +2168,8 @@ public class FilterFrame extends JFrame {
         chbPeptideStarting.setText("Find peptides with peptide starting on");
         gbc = new GridBagConstraints();
         gbc.gridx = 0;
-        gbc.gridy = 18;
+        gbc.gridy = 21;
+        gbc.gridwidth = 2;
         gbc.anchor = GridBagConstraints.WEST;
         gbc.insets = new Insets(5, 5, 5, 5);
         panel3.add(chbPeptideStarting, gbc);
@@ -1920,7 +2177,8 @@ public class FilterFrame extends JFrame {
         chbPeptideAfter.setText("Find peptides with peptide starting after");
         gbc = new GridBagConstraints();
         gbc.gridx = 0;
-        gbc.gridy = 19;
+        gbc.gridy = 22;
+        gbc.gridwidth = 2;
         gbc.anchor = GridBagConstraints.WEST;
         gbc.insets = new Insets(5, 5, 5, 5);
         panel3.add(chbPeptideAfter, gbc);
@@ -1928,7 +2186,8 @@ public class FilterFrame extends JFrame {
         chbPeptideBefore.setText("Find peptides with peptide ending before");
         gbc = new GridBagConstraints();
         gbc.gridx = 0;
-        gbc.gridy = 20;
+        gbc.gridy = 23;
+        gbc.gridwidth = 2;
         gbc.anchor = GridBagConstraints.WEST;
         gbc.insets = new Insets(5, 5, 5, 5);
         panel3.add(chbPeptideBefore, gbc);
@@ -1936,24 +2195,34 @@ public class FilterFrame extends JFrame {
         chbNterm.setText("Find peptides with N-terminal modification");
         gbc = new GridBagConstraints();
         gbc.gridx = 0;
-        gbc.gridy = 21;
+        gbc.gridy = 24;
+        gbc.gridwidth = 2;
         gbc.anchor = GridBagConstraints.WEST;
         gbc.insets = new Insets(5, 5, 5, 5);
         panel3.add(chbNterm, gbc);
         txtPeptideSequence = new JTextField();
         gbc = new GridBagConstraints();
-        gbc.gridx = 1;
-        gbc.gridy = 16;
-        gbc.gridwidth = 10;
+        gbc.gridx = 2;
+        gbc.gridy = 18;
+        gbc.gridwidth = 12;
         gbc.anchor = GridBagConstraints.WEST;
         gbc.fill = GridBagConstraints.HORIZONTAL;
         gbc.insets = new Insets(5, 5, 5, 5);
         panel3.add(txtPeptideSequence, gbc);
+        txtModifiedPeptideSequence = new JTextField();
+        gbc = new GridBagConstraints();
+        gbc.gridx = 2;
+        gbc.gridy = 19;
+        gbc.gridwidth = 12;
+        gbc.anchor = GridBagConstraints.WEST;
+        gbc.fill = GridBagConstraints.HORIZONTAL;
+        gbc.insets = new Insets(5, 5, 5, 5);
+        panel3.add(txtModifiedPeptideSequence, gbc);
         txtPeptideEnding = new JTextField();
         gbc = new GridBagConstraints();
-        gbc.gridx = 1;
-        gbc.gridy = 17;
-        gbc.gridwidth = 10;
+        gbc.gridx = 2;
+        gbc.gridy = 20;
+        gbc.gridwidth = 12;
         gbc.anchor = GridBagConstraints.WEST;
         gbc.fill = GridBagConstraints.HORIZONTAL;
         gbc.insets = new Insets(5, 5, 5, 5);
@@ -1961,9 +2230,9 @@ public class FilterFrame extends JFrame {
         txtPeptideStarting = new JTextField();
         txtPeptideStarting.setText("");
         gbc = new GridBagConstraints();
-        gbc.gridx = 1;
-        gbc.gridy = 18;
-        gbc.gridwidth = 10;
+        gbc.gridx = 2;
+        gbc.gridy = 21;
+        gbc.gridwidth = 12;
         gbc.anchor = GridBagConstraints.WEST;
         gbc.fill = GridBagConstraints.HORIZONTAL;
         gbc.insets = new Insets(5, 5, 5, 5);
@@ -1971,9 +2240,9 @@ public class FilterFrame extends JFrame {
         txtPeptideAfter = new JTextField();
         txtPeptideAfter.setText("");
         gbc = new GridBagConstraints();
-        gbc.gridx = 1;
-        gbc.gridy = 19;
-        gbc.gridwidth = 10;
+        gbc.gridx = 2;
+        gbc.gridy = 22;
+        gbc.gridwidth = 12;
         gbc.anchor = GridBagConstraints.WEST;
         gbc.fill = GridBagConstraints.HORIZONTAL;
         gbc.insets = new Insets(5, 5, 5, 5);
@@ -1981,9 +2250,9 @@ public class FilterFrame extends JFrame {
         txtPeptideBefore = new JTextField();
         txtPeptideBefore.setText("");
         gbc = new GridBagConstraints();
-        gbc.gridx = 1;
-        gbc.gridy = 20;
-        gbc.gridwidth = 10;
+        gbc.gridx = 2;
+        gbc.gridy = 23;
+        gbc.gridwidth = 12;
         gbc.anchor = GridBagConstraints.WEST;
         gbc.fill = GridBagConstraints.HORIZONTAL;
         gbc.insets = new Insets(5, 5, 5, 5);
@@ -1991,17 +2260,17 @@ public class FilterFrame extends JFrame {
         txtNterm = new JTextField();
         txtNterm.setText("");
         gbc = new GridBagConstraints();
-        gbc.gridx = 1;
-        gbc.gridy = 21;
-        gbc.gridwidth = 10;
+        gbc.gridx = 2;
+        gbc.gridy = 24;
+        gbc.gridwidth = 12;
         gbc.anchor = GridBagConstraints.WEST;
         gbc.fill = GridBagConstraints.HORIZONTAL;
         gbc.insets = new Insets(5, 5, 5, 5);
         panel3.add(txtNterm, gbc);
         gbc = new GridBagConstraints();
-        gbc.gridx = 1;
+        gbc.gridx = 2;
         gbc.gridy = 11;
-        gbc.gridwidth = 2;
+        gbc.gridwidth = 4;
         gbc.anchor = GridBagConstraints.WEST;
         gbc.ipadx = 50;
         gbc.insets = new Insets(5, 5, 5, 5);
@@ -2010,9 +2279,9 @@ public class FilterFrame extends JFrame {
         lblMulti1.setForeground(new Color(-65536));
         lblMulti1.setText("You are working with more than one data source.");
         gbc = new GridBagConstraints();
-        gbc.gridx = 1;
+        gbc.gridx = 2;
         gbc.gridy = 0;
-        gbc.gridwidth = 7;
+        gbc.gridwidth = 9;
         gbc.anchor = GridBagConstraints.WEST;
         gbc.insets = new Insets(5, 5, 5, 5);
         panel3.add(lblMulti1, gbc);
@@ -2020,12 +2289,94 @@ public class FilterFrame extends JFrame {
         lblMulti2.setForeground(new Color(-65536));
         lblMulti2.setText("Some filters are specific for one data source");
         gbc = new GridBagConstraints();
-        gbc.gridx = 1;
+        gbc.gridx = 2;
         gbc.gridy = 1;
-        gbc.gridwidth = 10;
+        gbc.gridwidth = 12;
         gbc.anchor = GridBagConstraints.WEST;
         gbc.insets = new Insets(5, 5, 5, 5);
         panel3.add(lblMulti2, gbc);
+        ChbPeptideInRange = new JCheckBox();
+        ChbPeptideInRange.setText("Peptide ratio for type");
+        gbc = new GridBagConstraints();
+        gbc.gridx = 0;
+        gbc.gridy = 16;
+        gbc.anchor = GridBagConstraints.WEST;
+        gbc.insets = new Insets(5, 5, 5, 5);
+        panel3.add(ChbPeptideInRange, gbc);
+        ChbPeptideOutOfRange = new JCheckBox();
+        ChbPeptideOutOfRange.setText("Peptide ratio for type");
+        gbc = new GridBagConstraints();
+        gbc.gridx = 0;
+        gbc.gridy = 17;
+        gbc.anchor = GridBagConstraints.WEST;
+        gbc.insets = new Insets(5, 5, 5, 5);
+        panel3.add(ChbPeptideOutOfRange, gbc);
+        gbc = new GridBagConstraints();
+        gbc.gridx = 1;
+        gbc.gridy = 16;
+        gbc.anchor = GridBagConstraints.WEST;
+        gbc.insets = new Insets(5, 5, 5, 5);
+        panel3.add(cmbPeptideRatioTypesRange1, gbc);
+        gbc = new GridBagConstraints();
+        gbc.gridx = 1;
+        gbc.gridy = 17;
+        gbc.anchor = GridBagConstraints.WEST;
+        gbc.insets = new Insets(5, 5, 5, 5);
+        panel3.add(cmbPeptideRatioTypesOutRange1, gbc);
+        final JLabel label6 = new JLabel();
+        label6.setText("in range of ");
+        gbc = new GridBagConstraints();
+        gbc.gridx = 2;
+        gbc.gridy = 16;
+        gbc.insets = new Insets(5, 5, 5, 5);
+        panel3.add(label6, gbc);
+        final JLabel label7 = new JLabel();
+        label7.setText("out of range of ");
+        gbc = new GridBagConstraints();
+        gbc.gridx = 2;
+        gbc.gridy = 17;
+        gbc.insets = new Insets(5, 5, 5, 5);
+        panel3.add(label7, gbc);
+        gbc = new GridBagConstraints();
+        gbc.gridx = 13;
+        gbc.gridy = 16;
+        gbc.anchor = GridBagConstraints.WEST;
+        gbc.insets = new Insets(5, 5, 5, 5);
+        panel3.add(cmbPeptideRatioTypesRange2, gbc);
+        gbc = new GridBagConstraints();
+        gbc.gridx = 13;
+        gbc.gridy = 17;
+        gbc.anchor = GridBagConstraints.WEST;
+        gbc.insets = new Insets(5, 5, 5, 5);
+        panel3.add(cmbPeptideRatioTypesOutRange2, gbc);
+        final JLabel label8 = new JLabel();
+        label8.setText("peptide ratio for type");
+        gbc = new GridBagConstraints();
+        gbc.gridx = 10;
+        gbc.gridy = 16;
+        gbc.insets = new Insets(5, 5, 5, 5);
+        panel3.add(label8, gbc);
+        final JLabel label9 = new JLabel();
+        label9.setText("peptide ratio for type");
+        gbc = new GridBagConstraints();
+        gbc.gridx = 10;
+        gbc.gridy = 17;
+        gbc.insets = new Insets(5, 5, 5, 5);
+        panel3.add(label9, gbc);
+        gbc = new GridBagConstraints();
+        gbc.gridx = 8;
+        gbc.gridy = 16;
+        gbc.anchor = GridBagConstraints.WEST;
+        gbc.fill = GridBagConstraints.HORIZONTAL;
+        gbc.insets = new Insets(5, 5, 5, 5);
+        panel3.add(spinRatioInRange, gbc);
+        gbc = new GridBagConstraints();
+        gbc.gridx = 8;
+        gbc.gridy = 17;
+        gbc.anchor = GridBagConstraints.WEST;
+        gbc.fill = GridBagConstraints.HORIZONTAL;
+        gbc.insets = new Insets(5, 5, 5, 5);
+        panel3.add(spinRatioOutRange, gbc);
         final JPanel panel4 = new JPanel();
         panel4.setLayout(new GridBagLayout());
         gbc = new GridBagConstraints();
@@ -2121,27 +2472,27 @@ public class FilterFrame extends JFrame {
         gbc.anchor = GridBagConstraints.WEST;
         gbc.insets = new Insets(5, 5, 5, 5);
         panel4.add(cmbProteinMeanRatioTypesRange1, gbc);
-        final JLabel label6 = new JLabel();
-        label6.setText(">");
+        final JLabel label10 = new JLabel();
+        label10.setText(">");
         gbc = new GridBagConstraints();
         gbc.gridx = 3;
         gbc.gridy = 2;
         gbc.insets = new Insets(5, 5, 5, 5);
-        panel4.add(label6, gbc);
-        final JLabel label7 = new JLabel();
-        label7.setText("<");
+        panel4.add(label10, gbc);
+        final JLabel label11 = new JLabel();
+        label11.setText("<");
         gbc = new GridBagConstraints();
         gbc.gridx = 3;
         gbc.gridy = 5;
         gbc.insets = new Insets(5, 5, 5, 5);
-        panel4.add(label7, gbc);
-        final JLabel label8 = new JLabel();
-        label8.setText("in range of ");
+        panel4.add(label11, gbc);
+        final JLabel label12 = new JLabel();
+        label12.setText("in range of ");
         gbc = new GridBagConstraints();
         gbc.gridx = 3;
         gbc.gridy = 6;
         gbc.insets = new Insets(5, 5, 5, 5);
-        panel4.add(label8, gbc);
+        panel4.add(label12, gbc);
         gbc = new GridBagConstraints();
         gbc.gridx = 4;
         gbc.gridy = 2;
@@ -2172,13 +2523,13 @@ public class FilterFrame extends JFrame {
         gbc.anchor = GridBagConstraints.WEST;
         gbc.insets = new Insets(5, 5, 5, 5);
         panel4.add(chbProteinComment, gbc);
-        final JLabel label9 = new JLabel();
-        label9.setText("protein mean for type");
+        final JLabel label13 = new JLabel();
+        label13.setText("protein mean for type");
         gbc = new GridBagConstraints();
         gbc.gridx = 5;
         gbc.gridy = 6;
         gbc.insets = new Insets(5, 5, 5, 5);
-        panel4.add(label9, gbc);
+        panel4.add(label13, gbc);
         gbc = new GridBagConstraints();
         gbc.gridx = 6;
         gbc.gridy = 6;
