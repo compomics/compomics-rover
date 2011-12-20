@@ -487,7 +487,7 @@ public class RatioGroupInformationPanel extends JFrame {
                                                 }
                                             }
                                         }
-
+                                        lQuant.setValid(true);
                                         try {
                                             lQuant.updateLowPriority(iConnMsLims);
                                         } catch (SQLException e) {

@@ -1318,8 +1318,7 @@ public class LoadingPanel implements WizardPanel {
 
                                     //check if the filename, the hitnumber, the ratio and the ratio type is the same
                                     String lQuantFileName = lQuant.getQuantitationFileName().substring(lQuant.getQuantitationFileName().lastIndexOf("\\") + 1);
-
-                                    if (lRatioValue.doubleValue() == lQuant.getRatio() && lRatio.getType().equalsIgnoreCase(lQuant.getType()) && lQuant.getFile_ref().equalsIgnoreCase(String.valueOf(lRatioGroup.getReferenceOfParentHit())) && lQuantFileName.equalsIgnoreCase((String) lClonedCollection.getMetaData(QuantitationMetaType.FILENAME))) {
+                                    if (lQuant.getFile_ref().equalsIgnoreCase(String.valueOf(lRatioGroup.getReferenceOfParentHit())) && lQuantFileName.equalsIgnoreCase((String) lClonedCollection.getMetaData(QuantitationMetaType.FILENAME))) {
                                         lRatio.setQuantitationStoredInDb(lQuant);
                                         //set the valid status from the database and not from the original rov file
                                         lRatio.setValid(lQuant.getValid());
