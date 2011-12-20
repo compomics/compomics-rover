@@ -11,7 +11,6 @@ import com.compomics.rover.general.quantitation.sorters.QuantitativeProteinSorte
 import com.compomics.rover.general.quantitation.source.distiller.DistillerRatioGroup;
 import com.compomics.rover.general.singelton.QuantitativeValidationSingelton;
 import com.compomics.util.sun.SwingWorker;
-import com.sun.jndi.dns.DnsName;
 
 import javax.swing.*;
 import javax.swing.filechooser.FileFilter;
@@ -103,11 +102,12 @@ public class ParameterFinderGui extends JFrame {
 
                     RovFile lRovFile = new RovFile(iFiles.get(i));
                     boolean allOk = lRovFile.unzipRovFile();
+                    //if (allOk != true){txtInfo.append("unzipfail\n");} checked out
                     File lXml = lRovFile.getQuantitationXmlFile();
                     try {
                         if (lXml == null) {
                             txtInfo.append((i + 1) + ". " + iFiles.get(i).getName() + "\tNo quantitation file found" + "\n");
-                        } else {
+                        } else {  
                             FileReader freader = new FileReader(lXml);
                             LineNumberReader lnreader = new LineNumberReader(freader);
                             String lLine = "";
@@ -119,9 +119,9 @@ public class ParameterFinderGui extends JFrame {
                             String lFraction = null;
                             while (lReadFurther == true && (lLine = lnreader.readLine()) != null) {
 
-                                if (lLine.trim().startsWith("<mqm:method ")) {
-                                    lThreshold = lLine.substring(lLine.indexOf("sig_threshold_value=") + 21, lLine.indexOf("\">"));
-                                }
+                                 if (lLine.trim().startsWith("<mqm:method")) {
+                                     lThreshold = lLine.substring(lLine.indexOf("sig_threshold_value=") + 21, lLine.indexOf("\">"));
+                                 }
                                 if (lLine.trim().startsWith("<mqm:quality")) {
                                     lUseFraction = Boolean.valueOf(lLine.substring(lLine.indexOf("isolated_precursor") + 20, lLine.indexOf("\"", lLine.indexOf("isolated_precursor") + 21)));
                                     lFraction = lLine.substring(lLine.indexOf("isolated_precursor_threshold") + 30, lLine.indexOf("\"", lLine.indexOf("isolated_precursor_threshold") + 31));
@@ -132,10 +132,10 @@ public class ParameterFinderGui extends JFrame {
                                     lQuality = lLine.substring(lLine.indexOf("elution_profile_correlation_threshold=") + 39, lLine.indexOf("\" ", lLine.indexOf("elution_profile_correlation_threshold=")));
                                     lCorrelation = lLine.substring(lLine.indexOf("matched_rho=") + 13, lLine.indexOf("\" ", lLine.indexOf("matched_rho=")));
                                     txtInfo.append((i + 1) + ". " + iFiles.get(i).getName() + "\t" + lThreshold + "\t" + lQuality + "\t" + lCorrelation + "\t" + lUseFraction + "\t" + lFraction + "\n");
-                                }
-                            }
+                             }
+                              
                         }
-
+}
                     } catch (FileNotFoundException e) {
                         e.printStackTrace();  
                     } catch (IOException e) {
@@ -187,7 +187,7 @@ public class ParameterFinderGui extends JFrame {
         jpanContent.add(openButton, gbc);
         lblInfo = new JLabel();
         lblInfo.setHorizontalAlignment(0);
-        lblInfo.setText("/");
+        lblInfo.setText("test");
         gbc = new GridBagConstraints();
         gbc.gridx = 2;
         gbc.gridy = 0;

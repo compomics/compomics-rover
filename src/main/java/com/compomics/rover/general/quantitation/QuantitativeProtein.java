@@ -4,7 +4,6 @@ import org.apache.log4j.Logger;
 
 import com.compomics.rover.general.interfaces.Ratio;
 import com.compomics.rover.general.singelton.QuantitativeValidationSingelton;
-import com.compomics.rover.general.quantitation.ReferenceSet;
 import be.proteomics.statlib.descriptive.BasicStats;
 import org.jfree.chart.ChartFactory;
 import org.jfree.chart.JFreeChart;

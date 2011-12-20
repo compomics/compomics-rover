@@ -648,9 +648,9 @@ public class ExportGui extends JFrame {
                                             String lMod = "";
                                             for (int lk = 0; lk < lIdentifications.size(); lk++) {
                                                 if (lk == 0) {
-                                                    lIds = ((DefaultPeptideIdentification) lIdentifications.get(lk)).getScore() + "";
+                                                    lIds = lIdentifications.get(lk).getScore() + "";
                                                 } else {
-                                                    lIds = lIds + "|" + ((DefaultPeptideIdentification) lIdentifications.get(lk)).getScore();
+                                                    lIds = lIds + "|" + lIdentifications.get(lk).getScore();
                                                 }
                                             }
                                         }

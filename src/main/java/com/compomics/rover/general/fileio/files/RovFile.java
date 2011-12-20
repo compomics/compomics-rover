@@ -64,6 +64,26 @@ public class RovFile {
      */
     private String iFilePath;
 
+
+     /*
+     * Static block that deletes the temp folder on startup.
+     */
+    static {
+        // Only run this on class load!
+        try {
+            File lTempfolder = File.createTempFile("temp", "temp").getParentFile();
+            File lTempRovFolder = new File(lTempfolder, "rover");
+            logger.info("Deleting temporary files from '" + lTempRovFolder + "'...");
+            if (lTempRovFolder.exists()) {
+                deleteDir(lTempRovFolder);
+            }
+            logger.info("Deleted temporary files from '" + lTempRovFolder + "'.");
+        } catch(IOException ioe) {
+            logger.warn("Error deleting temporary files!", ioe);
+        }
+    }
+
+
     /**
      * The constructor
      *
@@ -115,28 +135,30 @@ public class RovFile {
 
                 // Unzip the files in the new temp folder
 
-                BufferedOutputStream out = null;
+                BufferedWriter out = null;
                 ZipInputStream in = new ZipInputStream(new BufferedInputStream(new FileInputStream(iOriginalRovFile)));
+                InputStreamReader isr = new InputStreamReader(in);
                 ZipEntry entry;
                 while ((entry = in.getNextEntry()) != null) {
                     int count;
-                    byte data[] = new byte[1000];
+                    char data[] = new char[1000];
 
                     // write the files to the disk
-                    out = new BufferedOutputStream(new FileOutputStream(lTempUnzippedRovFileFolder.getPath() + "/" + entry.getName()), 1000);
+                    out = new BufferedWriter(new FileWriter(lTempUnzippedRovFileFolder.getPath() + "/" + entry.getName()), 1000);
 
-                    while ((count = in.read(data, 0, 1000)) != -1) {
+                    while ((count = isr.read(data, 0, 1000)) != -1) {
                         out.write(data, 0, count);
                     }
                     out.flush();
                     out.close();
                 }
+                isr.close();
                 in.close();
             }
 
             // Ok, all files should have been unzipped  in the lTempUnzippedRovFileFolder by now.
             // Try to find the distiller xml file..
-
+            //TODO import from RovFile Editor here to change bb8 to XML from binary import from editcheck to start zip
             File[] lUnzippedRovFiles = lTempUnzippedRovFileFolder.listFiles();
             boolean lQuantFound = false;
             boolean lDatFileFound = false;
@@ -251,5 +273,25 @@ public class RovFile {
         return iOriginalRovFile.getName();
     }
 
+    /**
+     * This method will delete every file in a directory
+     *
+     * @param dir Directory to delete
+     * @return
+     */
+    private static boolean deleteDir(File dir) {
+        if (dir.isDirectory()) {
+            String[] children = dir.list();
+            for (int i = 0; i < children.length; i++) {
+                boolean success = deleteDir(new File(dir, children[i]));
+                if (!success) {
+                    return false;
+                }
+            }
+        }
+
+        // The directory is now empty so delete it
+        return dir.delete();
+    }
 
 }
