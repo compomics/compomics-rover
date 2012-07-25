@@ -1,0 +1,13 @@
+#labels Featured
+# Short summary of changes for each version of Rover. (starting from version 2.3.7)
+
+Changes in Rover 2.3.8 (July 25 2012)
+
+    DEPENDENCY CHANGE: Updated dependency to MascotDatFile version 3.3
+
+--------------------------------------------------------
+
+Changes in Rover 2.3.7 (June 11 2012):
+
+    DEPENDENCY CHANGE: Updated dependency to ms-lims version 7.7.5.
+    FIX: there was a problem with fetching cross-correlations from census files 
