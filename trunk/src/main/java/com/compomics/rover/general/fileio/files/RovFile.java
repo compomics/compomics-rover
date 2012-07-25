@@ -1,5 +1,7 @@
 package com.compomics.rover.general.fileio.files;
 
+import com.compomics.util.enumeration.CompomicsTools;
+import com.compomics.util.io.PropertiesManager;
 import org.apache.log4j.Logger;
 
 import com.compomics.util.interfaces.Flamable;
@@ -11,7 +13,9 @@ import com.compomics.rover.general.fileio.readers.QuantitationXmlReader;
 import com.compomics.rover.general.fileio.files.DatFile;
 import com.compomics.rover.general.interfaces.PeptideIdentification;
 
+import javax.swing.*;
 import java.io.*;
+import java.util.logging.Level;
 import java.util.zip.ZipInputStream;
 import java.util.zip.ZipEntry;
 import java.util.*;
@@ -158,7 +162,6 @@ public class RovFile {
 
             // Ok, all files should have been unzipped  in the lTempUnzippedRovFileFolder by now.
             // Try to find the distiller xml file..
-            //TODO import from RovFile Editor here to change bb8 to XML from binary import from editcheck to start zip
             File[] lUnzippedRovFiles = lTempUnzippedRovFileFolder.listFiles();
             boolean lQuantFound = false;
             boolean lDatFileFound = false;
@@ -293,5 +296,98 @@ public class RovFile {
         // The directory is now empty so delete it
         return dir.delete();
     }
+    public void editRovFile(File lTempRovFolder){
+        String distillerlocation = mcdChecker();
+        int exitval = -1;
+        try{
+            Runtime rt = Runtime.getRuntime();
+            Process proc = rt.exec("\"" + distillerlocation + "\" \"" + iOriginalRovFile.getAbsolutePath() + "\" -batch -saveQuantXml -quantout \""  + lTempRovFolder.getParent() + "\\rover_data+bb8_edited\"");
+            streamGobbler errorGobbler = new streamGobbler(proc.getErrorStream(), "ERROR");
 
+            // any output
+            streamGobbler outputGobbler = new streamGobbler(proc.getInputStream(), "OUTPUT");
+
+            // kick them off
+            errorGobbler.start();
+            outputGobbler.start();
+
+            // any error
+            exitval = proc.waitFor();
+        } catch (InterruptedException e) {
+            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+        } catch (IOException e) {
+            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+        }
+
+        //if editing succeeds rezip the archive and add file
+        if (exitval == 0) {
+            iQuantitationXmlFile = new File(lTempRovFolder.getAbsoluteFile()+"/rover_data+bb8_edited");
+        }
+        else { logger.error("there was a problem with mascot distiller processing the rov files");}
+    }
+    private String mcdChecker(){
+        Properties props = PropertiesManager.getInstance().getProperties(CompomicsTools.ROVER,"rover.properties");
+        boolean checkChosen = false;
+        JFileChooser fc = new JFileChooser("C:\\Program Files\\Matrix Science\\Mascot Distiller");
+        mcdFileFilter mcdfilter = new mcdFileFilter();
+        fc.setFileFilter(mcdfilter);
+        if(props.getProperty("distillerlocation") == null) {
+            while (!checkChosen) {
+                JOptionPane.showMessageDialog(null, "It seems you are using rov files generated with Mascot Distiller 2.4. \n To work with the new files, please select the location of the Mascot Distiller executable");
+                fc.showOpenDialog(new JFrame());
+                if (fc.getSelectedFile().exists()) {
+                    props.put("distillerlocation", fc.getSelectedFile().getAbsolutePath());
+                    PropertiesManager.getInstance().updateProperties(CompomicsTools.ROVER,"rover.properties",props);
+                    checkChosen = true;
+                    return fc.getSelectedFile().getAbsolutePath();
+                } else {
+                    int ClosePane = JOptionPane.showConfirmDialog(null, "Do you want to stop selecting Mascot Distiller?", "warning", JOptionPane.QUESTION_MESSAGE, JOptionPane.YES_NO_OPTION);
+                    if (ClosePane == JOptionPane.NO_OPTION) {
+                    } else if (ClosePane == JOptionPane.YES_OPTION) {
+                        return null;
+                    }
+                }
+            }
+        } else {
+            String value = props.getProperty("distillerlocation");
+            if (!(new File(value)).exists()) {
+                JOptionPane.showMessageDialog(null,"the location of Mascot Distiller does not seem to exist anymore, please select the new location of Mascot Distiller");
+                if (fc.getSelectedFile().exists()) {
+                    props.put("distillerlocation",fc.getSelectedFile().getAbsolutePath());
+                    PropertiesManager.getInstance().updateProperties(CompomicsTools.ROVER,"rover.properties",props);
+                    return fc.getSelectedFile().getAbsolutePath();
+                }
+            }
+        }
+        return props.getProperty("distillerlocation");
+
+    }
+    private class streamGobbler extends Thread {
+
+        private InputStream is;
+        private String type;
+        private OutputStream os;
+
+        streamGobbler(InputStream is, String type) {
+            this(is, type, null);
+        }
+
+        streamGobbler(InputStream is, String type, OutputStream redirect) {
+            this.is = is;
+            this.type = type;
+            this.os = redirect;
+        }
+    }
+    private class mcdFileFilter extends javax.swing.filechooser.FileFilter {
+
+        @Override
+        public boolean accept(File f) {
+            return f.isDirectory() || f.getName().toLowerCase().endsWith(".exe");
+        }
+
+        @Override
+        public String getDescription() {
+            return ".exe files";
+        }
+    }
 }

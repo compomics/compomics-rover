@@ -1741,8 +1741,21 @@ public class LoadingPanel implements WizardPanel {
                 //problem with rov file
                 iParent.passHotPotato(new Throwable("A problem with the .rov file '" + lRovFile.getRovFilePath() + "' was detected!\nThis .rov file will not be used"));
             } else {
-                //no problem
-                lRovFiles.add(lRovFile);
+                try{
+                LineNumberReader lnr = new LineNumberReader(new BufferedReader(new FileReader(lRovFile.getQuantitationXmlFile())));
+                    if (lnr.readLine().contains("xml version")){
+                        //no problem
+                        lRovFiles.add(lRovFile);
+                    }
+                    else {
+                        //file not converted to xml convert with mascot
+                        lRovFile.editRovFile(new File(lRovFile.getRovFilePath()));
+                        lRovFiles.add(lRovFile);
+                    }
+                } catch (IOException ioe) {
+
+                }
+
             }
         }
         //Show in the gui that we found all the rov files

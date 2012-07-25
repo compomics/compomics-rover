@@ -91,23 +91,25 @@ public class CensusOut {
                     lPeptide.put("regression_factor", lElements[4]);
                     //set the determination factor
                     lPeptide.put("determination_factor", lElements[5]);
+                    //set pvalue
+                    lPeptide.put("p_value",lElements[6]);
                     //set xcorr
-                    lPeptide.put("xcorr", lElements[6]);
+                    lPeptide.put("xcorr", lElements[7]);
                     //set deltaCN
-                    lPeptide.put("detlaCN", lElements[7]);
+                    lPeptide.put("detlaCN", lElements[8]);
                     //set SAM_INT
-                    lPeptide.put("sam_int", lElements[8]);
+                    lPeptide.put("sam_int", lElements[9]);
                     //set REF_INT
-                    lPeptide.put("ref_int", lElements[9]);
+                    lPeptide.put("ref_int", lElements[10]);
                     //set area_ratio
-                    lPeptide.put("area_ratio", lElements[10]);
+                    lPeptide.put("area_ratio", lElements[11]);
                     //set profile score
-                    lPeptide.put("profile_score", lElements[11]);
+                    lPeptide.put("profile_score", lElements[12]);
                     //set filename
-                    lPeptide.put("filename", lElements[12]);
+                    lPeptide.put("filename", lElements[13]);
                     //set scan
-                    lPeptide.put("scan", lElements[13]);
-                    //set cn
+                    lPeptide.put("scan", lElements[14]);
+                    //set cs
                     lPeptide.put("cn", lElements[14]);
 
                     //add the hashmap to the vector
