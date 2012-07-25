@@ -1,10 +1,9 @@
 package com.compomics.rover.test;
 
+import com.compomics.rover.test.io.*;
 import junit.framework.TestCase;
 import junit.framework.Test;
 import junit.framework.TestSuite;
-import com.compomics.rover.test.io.TestDistillerQuantitationFile;
-import com.compomics.rover.test.io.TestITraqQuantitationFromDatFile;
 
 /**
  * Created by IntelliJ IDEA.
@@ -27,6 +26,9 @@ public class FullSuite  extends TestCase {
 
         ts.addTest(new TestSuite(TestDistillerQuantitationFile.class));
         ts.addTest(new TestSuite(TestITraqQuantitationFromDatFile.class));
+        ts.addTest(new TestSuite(TestCensusQuantitationFile.class));
+        ts.addTest(new TestSuite(TestMsfQuantitationFile.class));
+        //ts.addTest(new TestSuite(TestMaxQuantQuantitationFile.class));
 
         return ts;
     }

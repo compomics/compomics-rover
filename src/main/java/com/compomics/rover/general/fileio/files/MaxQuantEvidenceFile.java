@@ -43,6 +43,8 @@ public class MaxQuantEvidenceFile {
      */
     private Flamable iFlamable;
 
+    private boolean tripleSilac = false;
+
     /**
      * Constructor
      *
@@ -63,7 +65,6 @@ public class MaxQuantEvidenceFile {
         //hashmap with the header titles and their positions
         HashMap lHeaderMap = new HashMap();
         //boolean that indicates if we are using triple silac
-        boolean lTripleSilac = false;
 
 
         //we will read the file line by line, on every line their is a peptide identification
@@ -93,7 +94,7 @@ public class MaxQuantEvidenceFile {
                     String[] lHeader = line.split("\t");
                     for (int i = 0; i < lHeader.length; i++) {
                         if (lHeader[i].equalsIgnoreCase("Intensity M")) {
-                            lTripleSilac = true;
+                            tripleSilac = true;
                         }
                         lHeaderMap.put(lHeader[i], i);
                     }
@@ -103,7 +104,7 @@ public class MaxQuantEvidenceFile {
                     lTypes.add("H/L");
                     lComponents.add("Light");
                     lComponents.add("Heavy");
-                    if (lTripleSilac) {
+                    if (tripleSilac) {
                         lTypes.add("M/L");
                         lTypes.add("H/M");
                         lComponents.add("Medium");
@@ -130,25 +131,44 @@ public class MaxQuantEvidenceFile {
 
 
                         //set the type
-                        Integer lTypeInt = (Integer) lHeaderMap.get("SILAC State");
                         boolean lSILAC = true;
-                        if(lTypeInt!= null){
-                            String lType = new String(lColumns[lTypeInt]);
-                            if (lType.length() == 0) {
-                                lSILAC = false;
-                            }
-                        } else {
-                            Integer lRatioInt = (Integer) lHeaderMap.get("Ratio H/L");
-                            if(lRatioInt>= lColumns.length){
-                                lSILAC = false;
-                            } else {
-                                String lRatio = new String(lColumns[lRatioInt]);
-                                if (lRatio.length() == 0) {
+                        if (lHeaderMap.containsKey("SILAC State")){
+                            Integer lTypeInt = (Integer) lHeaderMap.get("SILAC State");
+                            if(lTypeInt!= null){
+                                String lType = new String(lColumns[lTypeInt]);
+                                if (lType.length() == 0) {
                                     lSILAC = false;
                                 }
+                            } else {
+                                Integer lRatioInt = (Integer) lHeaderMap.get("Ratio H/L");
+                                if(lRatioInt>= lColumns.length){
+                                    lSILAC = false;
+                                } else {
+                                    String lRatio = new String(lColumns[lRatioInt]);
+                                    if (lRatio.length() == 0) {
+                                        lSILAC = false;
+                                    }
+                                }
+                            }
+                        } else if (lHeaderMap.containsKey("Labeling State")) {
+                             if (lHeaderMap.containsKey("Labeling State") && !tripleSilac) {
+                                if (Integer.parseInt(lColumns[(Integer)lHeaderMap.get("Labeling State")])== 0){
+                                    String lType = "Light";
+                                } else if (Integer.parseInt(lColumns[(Integer)lHeaderMap.get("Labeling State")]) == 1){
+                                    String lType = "Heavy";
+                                }
+                                lSILAC = true;
+                            } else if (lHeaderMap.containsKey("Labeling State") && tripleSilac){
+                                if (Integer.parseInt(lColumns[(Integer)lHeaderMap.get("Labeling State")]) == 0){
+                                    String lType = "Light";
+                                } else if (Integer.parseInt(lColumns[(Integer)lHeaderMap.get("Labeling State")]) == 1){
+                                    String lType = "Medium";
+                                } else if (Integer.parseInt(lColumns[(Integer)lHeaderMap.get("Labeling State")]) == 2){
+                                    String lType = "Heavy";
+                                }
+                                lSILAC = true;
                             }
                         }
-
                         //only if we found a silac identification we will create  a ratio group
                         if (lSILAC && ((Integer) lHeaderMap.get("Intensity H")).intValue() < lColumns.length) {
 
@@ -190,7 +210,7 @@ public class MaxQuantEvidenceFile {
                                     lGroup.addRatio(lHLRatio);
                                 }
                                 //find the other ratios if it's triple silac
-                                if (lTripleSilac) {
+                                if (tripleSilac) {
                                     if(((String)lColumns[((Integer) lHeaderMap.get("Ratio H/M")).intValue()]).length() != 0){
                                         MaxQuantRatio lHMRatio;
                                         if (lRatioSignificanceAFound) {
@@ -333,16 +353,33 @@ public class MaxQuantEvidenceFile {
                         lIdentification.setScore((Double.valueOf(lColumns[(Integer) lMsmsHeaderMap.get("Score")]).longValue()));
                     }
 
-                    lIdentification.setPep(Double.valueOf(lColumns[(Integer) lMsmsHeaderMap.get("PEP")]).doubleValue());
+                    lIdentification.setPep(Double.valueOf(lColumns[(Integer) lMsmsHeaderMap.get("PEP")]));
 
                     //set the type
-                    String lType = new String(lColumns[(Integer) lMsmsHeaderMap.get("SILAC State")]);
-                    boolean lSILAC = true;
-                    if (lType.length() == 0) {
-                        lSILAC = false;
+                    if (lMsmsHeaderMap.containsKey("SILAC State")) {
+                        String lType = lColumns[(Integer) lMsmsHeaderMap.get("SILAC State")];
+                        boolean lSILAC = true;
+                        if (lType.length() == 0) {
+                            lSILAC = false;
+                        }
+                        lIdentification.setType(lType);
+                    } else if (lMsmsHeaderMap.containsKey("Labeling State") && !tripleSilac) {
+                            if (Integer.parseInt(lColumns[(Integer)lMsmsHeaderMap.get("Labeling State")])== 0){
+                                lIdentification.setType("Light");
+                            } else if (Integer.parseInt(lColumns[(Integer)lMsmsHeaderMap.get("Labeling State")]) == 1){
+                                lIdentification.setType("Heavy");
+                            }
+                            boolean lSILAC = true;
+                    } else if (lMsmsHeaderMap.containsKey("Labeling State") && tripleSilac){
+                        if (Integer.parseInt(lColumns[(Integer)lMsmsHeaderMap.get("Labeling State")]) == 0){
+                            lIdentification.setType("Light");
+                        } else if (Integer.parseInt(lColumns[(Integer)lMsmsHeaderMap.get("Labeling State")]) == 1){
+                            lIdentification.setType("Medium");
+                        } else if (Integer.parseInt(lColumns[(Integer)lMsmsHeaderMap.get("Labeling State")]) == 2){
+                            lIdentification.setType("Heavy");
+                        }
+                        boolean lSILAC = true;
                     }
-                    lIdentification.setType(lType);
-
                     //set the title
                     lIdentification.setSpectrumFileName(new String(lColumns[(Integer) lMsmsHeaderMap.get("Raw File")]) + ".MQ." + new String(lColumns[(Integer) lMsmsHeaderMap.get("Scan Number")]) + "." + lColumns[(Integer) lMsmsHeaderMap.get("Charge")]);
 

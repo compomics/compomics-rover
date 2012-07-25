@@ -3028,7 +3028,7 @@ public class LoadingPanel implements WizardPanel {
                 String[] lRatioTypes = new String[lRatioList.size()];
                 lRatioList.toArray(lRatioTypes);
 
-                //7.B get the types of the ratios from the first distiller ratio collecion
+                //7.B get the types of the components from the first distiller ratio collection
                 Vector<String> lComponentList = lRatioGroupCollection.get(0).getComponentTypes();
                 String[] lComponentTypes = new String[lComponentList.size()];
                 lComponentList.toArray(lComponentTypes);
