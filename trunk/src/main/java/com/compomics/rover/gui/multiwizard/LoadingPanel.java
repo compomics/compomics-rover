@@ -23,8 +23,8 @@ import com.compomics.rover.general.fileio.files.RovFile;
 import com.compomics.rover.general.fileio.files.MaxQuantEvidenceFile;
 import com.compomics.util.interfaces.Flamable;
 import com.compomics.util.sun.SwingWorker;
-import com.compomics.mslims.db.accessors.Identification_to_quantitation;
-import com.compomics.mslims.db.accessors.Quantitation_file;
+import com.compomics.mslimsdb.accessors.Identification_to_quantitation;
+import com.compomics.mslimsdb.accessors.Quantitation_file;
 
 import javax.swing.*;
 import java.awt.*;
@@ -251,7 +251,7 @@ public class LoadingPanel implements WizardPanel {
      * This method start the data acquisition process for different dat files
      */
     public void startThermoMsf(int aIndex) {
-        final int iIndex = aIndex;
+        /*final int iIndex = aIndex;
         //create a new swing worker
         final Flamable lFlamable = iParent;
 
@@ -402,7 +402,7 @@ public class LoadingPanel implements WizardPanel {
         //_____Do garbage collection______
         System.gc();
 
-
+*/
     }
 
 

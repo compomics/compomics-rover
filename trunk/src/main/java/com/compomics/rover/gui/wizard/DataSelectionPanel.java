@@ -4,8 +4,8 @@ import com.compomics.util.enumeration.CompomicsTools;
 import com.compomics.util.io.PropertiesManager;
 import org.apache.log4j.Logger;
 
-import com.compomics.mslims.db.accessors.Project;
-import com.compomics.mslims.db.accessors.Protocol;
+import com.compomics.mslimsdb.accessors.Project;
+import com.compomics.mslimsdb.accessors.Protocol;
 import com.compomics.util.gui.dialogs.ConnectionDialog;
 import com.compomics.util.interfaces.Connectable;
 import com.compomics.rover.general.enumeration.RoverSource;

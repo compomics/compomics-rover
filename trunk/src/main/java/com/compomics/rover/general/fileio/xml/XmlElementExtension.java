@@ -1,10 +1,14 @@
 package com.compomics.rover.general.fileio.xml;
 
+import java.io.IOException;
 import org.apache.log4j.Logger;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.StringTokenizer;
 import java.util.Vector;
+import psidev.psi.tools.xxindex.StandardXpathAccess;
+import psidev.psi.tools.xxindex.index.IndexElement;
 
 /**
  * Created by IntelliJ IDEA.

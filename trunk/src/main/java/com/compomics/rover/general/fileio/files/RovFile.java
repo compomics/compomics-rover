@@ -10,12 +10,10 @@ import com.compomics.rover.general.quantitation.RatioGroupCollection;
 import com.compomics.rover.general.quantitation.source.distiller.DistillerRatioGroup;
 import com.compomics.rover.general.quantitation.source.distiller.DistillerPeptide;
 import com.compomics.rover.general.fileio.readers.QuantitationXmlReader;
-import com.compomics.rover.general.fileio.files.DatFile;
 import com.compomics.rover.general.interfaces.PeptideIdentification;
 
 import javax.swing.*;
 import java.io.*;
-import java.util.logging.Level;
 import java.util.zip.ZipInputStream;
 import java.util.zip.ZipEntry;
 import java.util.*;

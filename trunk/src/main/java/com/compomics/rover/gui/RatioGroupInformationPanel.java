@@ -5,7 +5,6 @@ import com.compomics.rover.general.quantitation.source.MaxQuant.MaxQuantRatio;
 import com.compomics.rover.general.quantitation.source.thermo_msf.MsfLimsRatio;
 import com.compomics.rover.general.quantitation.source.thermo_msf.MsfLimsRatioGroup;
 import com.compomics.rover.general.quantitation.source.thermo_msf.ThermoMsfRatio;
-import com.compomics.thermo_msf_parser.msf.*;
 import com.compomics.util.gui.spectrum.DefaultSpectrumAnnotation;
 import com.compomics.util.gui.spectrum.SpectrumPanel;
 import org.apache.log4j.Logger;
@@ -944,7 +943,7 @@ public class RatioGroupInformationPanel extends JFrame {
                 jpanGraphs.add(lInt);
                 jpanGraphs.add(Box.createVerticalStrut(5));
                 jpanGraphs.setBackground(Color.white);
-            }  else if (iRatioGroup.getParentCollection().getRoverSource() == RoverSource.THERMO_MSF_FILES) {
+            } /* else if (iRatioGroup.getParentCollection().getRoverSource() == RoverSource.THERMO_MSF_FILES) {
                 try{
                     ThermoMsfRatio lRatio = (ThermoMsfRatio) iRatioGroup.getRatio(0);
 
@@ -1075,7 +1074,7 @@ public class RatioGroupInformationPanel extends JFrame {
                     e.printStackTrace();
                 }
 
-            } else if (iRatioGroup.getParentCollection().getRoverSource() == RoverSource.THERMO_MSF_LIMS) {
+            }*/ else if (iRatioGroup.getParentCollection().getRoverSource() == RoverSource.THERMO_MSF_LIMS) {
                 MsfLimsRatio lRatio = (MsfLimsRatio) iRatioGroup.getRatio(0);
 
                 MsfLimsRatioGroup lRatioGroup = (MsfLimsRatioGroup) lRatio.getParentRatioGroup();

@@ -2,21 +2,16 @@ package com.compomics.rover.general.quantitation;
 
 import org.apache.log4j.Logger;
 
-import com.compomics.rover.general.quantitation.sorters.RatioSorterByIntensity;
-import com.compomics.rover.general.quantitation.sorters.RatioSorterByRatio;
 import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
 import org.jfree.data.xy.XYSeries;
 import org.jfree.data.xy.XYSeriesCollection;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Vector;
 import java.util.HashMap;
 
-import com.compomics.rover.general.quantitation.RatioGroup;
 import com.compomics.rover.general.interfaces.Ratio;
-import be.proteomics.statlib.descriptive.BasicStats;
-import com.compomics.rover.general.quantitation.QuantitativeProtein;
+import com.compomics.statlib.descriptive.BasicStats;
 import com.compomics.rover.general.singelton.QuantitativeValidationSingelton;
 
 

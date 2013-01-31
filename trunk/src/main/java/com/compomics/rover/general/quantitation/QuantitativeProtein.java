@@ -4,7 +4,7 @@ import org.apache.log4j.Logger;
 
 import com.compomics.rover.general.interfaces.Ratio;
 import com.compomics.rover.general.singelton.QuantitativeValidationSingelton;
-import be.proteomics.statlib.descriptive.BasicStats;
+import com.compomics.statlib.descriptive.BasicStats;
 import org.jfree.chart.ChartFactory;
 import org.jfree.chart.JFreeChart;
 import org.jfree.chart.axis.NumberAxis;
@@ -497,21 +497,21 @@ public class QuantitativeProtein {
      */
     public double getProteinZScore(String aType, int aMultipleSourceIndex){
         double lResult;
-        double lProteinRatioMean = 0.0;
+        double summedRatios = 0.0;
         int lNumberOfRatiosUsed = 0;
 
         for (int i = 0; i < iPeptideGroups.size(); i++) {
             if(iPeptideGroups.get(i).isUsedInCalculations()){
                 Vector<Double> lRatios = iPeptideGroups.get(i).getRatioValuesForType(aType,true, aMultipleSourceIndex);
                 for(int j = 0; j<lRatios.size(); j ++){
-                    lProteinRatioMean = lProteinRatioMean + lRatios.get(j);
+                    summedRatios = summedRatios + lRatios.get(j);
                     lNumberOfRatiosUsed = lNumberOfRatiosUsed + 1;
 
                 }
             }
         }
 
-        double lMean = lProteinRatioMean / (double)lNumberOfRatiosUsed;
+        double lMean = summedRatios / (double)lNumberOfRatiosUsed;
         ReferenceSet lReferenceSet = iQuantitativeValidationSingelton.getReferenceSet();
         HashMap lHuber = lReferenceSet.getHuberEstimatorsForType(aType);
         Double lRefMean = (Double) lHuber.get("mean");

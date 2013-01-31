@@ -5,7 +5,6 @@ import org.apache.log4j.Logger;
 import com.compomics.rover.general.enumeration.QuantitationMetaType;
 import com.compomics.rover.general.enumeration.DataType;
 import com.compomics.rover.general.enumeration.RoverSource;
-import com.compomics.rover.general.quantitation.source.distiller.DistillerRatioGroup;
 
 import java.util.ArrayList;
 import java.util.HashMap;
