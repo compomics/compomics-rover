@@ -3,7 +3,7 @@ package com.compomics.rover.general.db.accessors;
 import com.compomics.rover.general.singelton.QuantitativeValidationSingelton;
 import org.apache.log4j.Logger;
 
-import com.compomics.mslims.db.accessors.Quantitation;
+import com.compomics.mslimsdb.accessors.Quantitation;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -151,6 +151,10 @@ public class QuantitationExtension extends Quantitation{
         ps.close();
 
         return temp;
+    }
+
+    public String getComment() {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 
 }

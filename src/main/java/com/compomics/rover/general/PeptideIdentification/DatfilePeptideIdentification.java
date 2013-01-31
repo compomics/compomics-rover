@@ -2,11 +2,9 @@ package com.compomics.rover.general.PeptideIdentification;
 
 import org.apache.log4j.Logger;
 
-import com.compomics.mslims.db.accessors.Identification;
+import com.compomics.mslimsdb.accessors.Identification;
 import com.compomics.rover.general.interfaces.PeptideIdentification;
 
-import java.sql.ResultSet;
-import java.sql.SQLException;
 import java.util.HashMap;
 
 /**

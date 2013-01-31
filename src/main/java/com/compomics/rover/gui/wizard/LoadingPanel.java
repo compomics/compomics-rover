@@ -29,9 +29,9 @@ import com.compomics.rover.gui.QuantitationValidationGUI;
 import com.compomics.rover.gui.MatchRatioWithComponent;
 import com.compomics.util.interfaces.Flamable;
 import com.compomics.util.sun.SwingWorker;
-import com.compomics.mslims.db.accessors.Identification_to_quantitation;
-import com.compomics.mslims.db.accessors.Quantitation_file;
-import be.proteomics.statlib.descriptive.BasicStats;
+import com.compomics.mslimsdb.accessors.Identification_to_quantitation;
+import com.compomics.mslimsdb.accessors.Quantitation_file;
+import com.compomics.statlib.descriptive.BasicStats;
 import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
 
 import javax.swing.*;
@@ -588,7 +588,7 @@ public class LoadingPanel implements WizardPanel {
                     Collections.sort(lProteins, new QuantitativeProteinSorterByRatioGroupNumbers());
 
 
-                    //get the reference set size from the singelton
+                    //get the reference set size from the singleton
                     int lReferenceSetSize = iQuantitativeValidationSingelton.getNumberOfProteinsInReferenceSet();
                     if (iQuantitativeValidationSingelton.getReferenceSetEnum() == ReferenceSetEnum.ALL) {
                         lReferenceSetSize = lProteins.size();
@@ -2274,7 +2274,7 @@ public class LoadingPanel implements WizardPanel {
      */
     public void startThermoMsf() {
 
-        SwingWorker lStarter = new SwingWorker() {
+        /*SwingWorker lStarter = new SwingWorker() {
             public Boolean construct() {
                 QuantitativeValidationSingelton iQuantitativeValidationSingelton = QuantitativeValidationSingelton.getInstance();
                 iQuantitativeValidationSingelton.setUseOnlyValidRatioForProteinMean(true);
@@ -2495,7 +2495,7 @@ public class LoadingPanel implements WizardPanel {
 
         };
         lStarter.start();
-
+*/
     }
 
     /**

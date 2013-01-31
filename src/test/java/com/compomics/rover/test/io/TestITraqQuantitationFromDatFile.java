@@ -1,17 +1,17 @@
 package com.compomics.rover.test.io;
 
-import junit.TestCaseLM;
-import junit.framework.Assert;
-import com.compomics.rover.general.quantitation.RatioGroupCollection;
-import com.compomics.rover.general.quantitation.RatioGroup;
+import com.compomics.mascotdatfile.util.mascot.MascotDatfile;
 import com.compomics.rover.general.enumeration.QuantitationMetaType;
 import com.compomics.rover.general.fileio.readers.Mdf_iTraqReader;
 import com.compomics.rover.general.interfaces.PeptideIdentification;
-import com.compomics.mascotdatfile.util.mascot.MascotDatfile;
+import com.compomics.rover.general.quantitation.RatioGroup;
+import com.compomics.rover.general.quantitation.RatioGroupCollection;
+import com.compomics.util.junit.TestCaseLM;
+import junit.framework.Assert;
+import junit.framework.TestCase;
 
-import java.util.ArrayList;
-import java.util.Vector;
 import java.io.File;
+import java.util.Vector;
 
 /**
  * Created by IntelliJ IDEA.
@@ -19,7 +19,7 @@ import java.io.File;
  * Date: 2-apr-2009
  * Time: 10:58:29
  */
-public class TestITraqQuantitationFromDatFile  extends TestCaseLM {
+public class TestITraqQuantitationFromDatFile  extends TestCase {
 
     public TestITraqQuantitationFromDatFile() {
         this("test case for the iTRAQ quantitations from a mascot result file.");
@@ -36,7 +36,7 @@ public class TestITraqQuantitationFromDatFile  extends TestCaseLM {
 
         MascotDatfile lMdf = null;
 
-        String lITRAQTestFile = getFullFilePath("F001657.dat");
+        String lITRAQTestFile = TestCaseLM.getFullFilePath("F001657.dat");
         Mdf_iTraqReader lReader = new Mdf_iTraqReader(new File(lITRAQTestFile), null, null );
         lReader.setThreshold(0.95);
 

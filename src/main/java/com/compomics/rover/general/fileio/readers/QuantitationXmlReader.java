@@ -7,9 +7,7 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.List;
 import java.util.Vector;
-import java.util.ArrayList;
 
-import com.compomics.rover.general.quantitation.RatioType;
 import com.compomics.rover.general.singelton.QuantitativeValidationSingelton;
 import psidev.psi.tools.xxindex.index.StandardXpathIndex;
 import psidev.psi.tools.xxindex.index.XmlXpathIndexer;
@@ -186,7 +184,7 @@ public class QuantitationXmlReader {
             // and the 'ratio' (L/H, ..) name from the quantitation file.
 
             //4.Get the component types from the xml file
-            Vector<XmlElementExtension> lComponentElements = getXmlElements(index, access, "/quantitationResults/mqm:quantitation/mqm:method/mqm:component");
+            Vector<XmlElementExtension> lComponentElements = getXmlElements(index, access, "/quantitationResults/quantitation/method/component");
             Vector lComponentList = new Vector();
             for(int i = 0; i<lComponentElements.size(); i ++){
                 lComponentList.add(lComponentElements.get(i).getAttribute("name"));
@@ -194,7 +192,7 @@ public class QuantitationXmlReader {
             iRatioGroupCollection.setComponentTypes(lComponentList);
 
             //5.Get the ratio types from the xml file
-            Vector<XmlElementExtension> lRatioElements = getXmlElements(index, access, "/quantitationResults/mqm:quantitation/mqm:method/mqm:report_ratio");
+            Vector<XmlElementExtension> lRatioElements = getXmlElements(index, access, "/quantitationResults/quantitation/method/report_ratio");
             Vector lRatioList = new Vector();
             for(int i = 0; i<lRatioElements.size(); i ++){
                 String lRatioType = lRatioElements.get(i).getAttribute("name");
@@ -204,8 +202,6 @@ public class QuantitationXmlReader {
                 for(int j = 0; j<lRatioTypeChildren.size(); j ++){
                     lComponents.add(lRatioTypeChildren.get(j).getAttribute("name"));
                 }
-                String[] lComponentsArray = new String[lComponents.size()];
-                lComponents.toArray(lComponentsArray);
             }
             iRatioGroupCollection.setRatioTypes(lRatioList);
 

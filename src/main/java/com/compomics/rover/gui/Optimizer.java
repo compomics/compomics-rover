@@ -2,7 +2,7 @@ package com.compomics.rover.gui;
 
 import org.apache.log4j.Logger;
 
-import be.proteomics.statlib.descriptive.BasicStats;
+import com.compomics.statlib.descriptive.BasicStats;
 import com.compomics.rover.general.enumeration.RoverSource;
 import com.compomics.rover.general.fileio.files.MaxQuantEvidenceFile;
 import com.compomics.rover.general.interfaces.Ratio;

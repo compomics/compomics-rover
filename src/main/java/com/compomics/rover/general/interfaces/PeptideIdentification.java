@@ -1,6 +1,5 @@
 package com.compomics.rover.general.interfaces;
 
-import org.apache.log4j.Logger;
 
 /**
  * Created by IntelliJ IDEA.

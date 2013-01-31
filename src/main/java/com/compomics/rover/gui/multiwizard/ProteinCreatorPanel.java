@@ -20,7 +20,7 @@ import com.compomics.rover.general.sequenceretriever.TairSequenceRetriever;
 import com.compomics.rover.gui.MatchRatioWithComponent;
 import com.compomics.rover.gui.QuantitationValidationGUI;
 import com.compomics.util.sun.SwingWorker;
-import be.proteomics.statlib.descriptive.BasicStats;
+import com.compomics.statlib.descriptive.BasicStats;
 import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
 
 import javax.swing.*;

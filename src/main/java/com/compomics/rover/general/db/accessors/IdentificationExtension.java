@@ -3,8 +3,8 @@ package com.compomics.rover.general.db.accessors;
 import com.compomics.rover.general.singelton.QuantitativeValidationSingelton;
 import org.apache.log4j.Logger;
 
-import com.compomics.mslims.db.accessors.Identification;
-import com.compomics.mslims.db.accessors.Identification_to_quantitation;
+import com.compomics.mslimsdb.accessors.Identification;
+import com.compomics.mslimsdb.accessors.Identification_to_quantitation;
 import com.compomics.rover.general.interfaces.PeptideIdentification;
 
 import java.util.HashMap;

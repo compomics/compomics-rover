@@ -1,8 +1,5 @@
 package com.compomics.rover.general.interfaces;
 
-import org.apache.log4j.Logger;
-
-import com.compomics.rover.general.quantitation.source.distiller.DistillerRatioGroup;
 import com.compomics.rover.general.quantitation.RatioGroup;
 
 /**

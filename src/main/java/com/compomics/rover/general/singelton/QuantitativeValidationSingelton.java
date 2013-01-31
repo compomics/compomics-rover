@@ -24,7 +24,6 @@ import java.util.zip.ZipInputStream;
 
 import org.apache.commons.math.special.Erf;
 import org.apache.commons.math.MathException;
-import sun.net.www.protocol.http.AuthCache;
 
 
 /**

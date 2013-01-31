@@ -4,11 +4,9 @@ import org.apache.log4j.Logger;
 
 import com.compomics.rover.general.interfaces.Ratio;
 import com.compomics.rover.general.interfaces.PeptideIdentification;
-import com.compomics.rover.general.quantitation.source.distiller.DistillerRatio;
 
 import java.util.ArrayList;
 import java.util.Vector;
-import java.util.StringTokenizer;
 
 /**
  * Created by IntelliJ IDEA.

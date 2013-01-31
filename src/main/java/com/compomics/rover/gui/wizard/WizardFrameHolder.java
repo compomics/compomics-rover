@@ -1,31 +1,25 @@
 package com.compomics.rover.gui.wizard;
 
+import com.compomics.mslimsdb.accessors.Project;
+import com.compomics.rover.general.enumeration.ProteinDatabaseType;
 import com.compomics.rover.general.enumeration.ReferenceSetEnum;
-import com.compomics.util.enumeration.CompomicsTools;
-import com.compomics.util.io.PropertiesManager;
-import com.jgoodies.looks.plastic.PlasticLookAndFeel;
-import com.jgoodies.looks.plastic.PlasticXPLookAndFeel;
-import com.jgoodies.looks.plastic.theme.SkyKrupp;
+import com.compomics.rover.general.enumeration.RoverSource;
+import com.compomics.rover.general.interfaces.WizardPanel;
+import com.compomics.rover.general.singelton.QuantitativeValidationSingelton;
+import com.compomics.util.interfaces.Flamable;
 import com.sun.java.swing.plaf.nimbus.NimbusLookAndFeel;
 import org.apache.log4j.Logger;
 
-import com.compomics.rover.general.interfaces.WizardPanel;
-import com.compomics.rover.general.enumeration.RoverSource;
-import com.compomics.rover.general.enumeration.ProteinDatabaseType;
-import com.compomics.rover.general.singelton.QuantitativeValidationSingelton;
-import com.compomics.util.interfaces.Flamable;
-import com.compomics.mslims.db.accessors.Project;
-
 import javax.swing.*;
-import java.sql.Connection;
-import java.sql.SQLException;
-import java.awt.event.ActionListener;
+import java.awt.*;
 import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
-import java.awt.*;
 import java.io.File;
 import java.io.IOException;
+import java.sql.Connection;
+import java.sql.SQLException;
 import java.util.Vector;
 
 /**
@@ -139,7 +133,7 @@ public class WizardFrameHolder extends JFrame implements Flamable {
                 close();
             }
         });
-        //action listener for the mutli button
+        //action listener for the multi button
         btnOpenMulti.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 com.compomics.rover.gui.multiwizard.WizardFrameHolder launch = new com.compomics.rover.gui.multiwizard.WizardFrameHolder(true, null);
@@ -372,7 +366,7 @@ public class WizardFrameHolder extends JFrame implements Flamable {
      *
      * @return iProject
      */
-    public Project getSelectedProject() {
+    public Project getSelectedProject()  {
         return iProject;
     }
 
@@ -472,7 +466,7 @@ public class WizardFrameHolder extends JFrame implements Flamable {
     }
 
     public static void main(String[] args) {
-        PropertiesManager.getInstance().updateLog4jConfiguration(logger, CompomicsTools.ROVER);
+        //PropertiesManager.getInstance().updateLog4jConfiguration(logger, CompomicsTools.ROVER);
         logger.info("Rover started");
         try {
             UIManager.setLookAndFeel(new NimbusLookAndFeel());

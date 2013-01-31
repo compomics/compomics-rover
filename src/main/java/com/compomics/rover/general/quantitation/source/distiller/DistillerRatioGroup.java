@@ -10,7 +10,6 @@ import com.compomics.rover.general.interfaces.Ratio;
 import com.compomics.rover.general.singelton.QuantitativeValidationSingelton;
 
 import java.util.Vector;
-import java.util.ArrayList;
 import java.io.IOException;
 import java.awt.*;
 

@@ -1,18 +1,10 @@
 package com.compomics.rover.general;
 
 
-import com.compomics.rover.gui.wizard.WizardFrameHolder;
 import com.compomics.util.enumeration.CompomicsTools;
 import com.compomics.util.io.PropertiesManager;
-import com.compomics.util.io.StartBrowser;
-import com.jgoodies.looks.plastic.PlasticLookAndFeel;
-import com.jgoodies.looks.plastic.PlasticXPLookAndFeel;
-import com.jgoodies.looks.plastic.theme.SkyKrupp;
-import org.apache.log4j.Logger;
-import org.apache.log4j.RollingFileAppender;
 
 
-import javax.swing.*;
 import java.io.File;
 import java.io.IOException;
 import java.util.Properties;
@@ -25,8 +17,6 @@ import java.util.Properties;
  * @author Kenny Helsens
  */
 public class RoverStarter {
-
-    private boolean debug = false;
 
 
     /**

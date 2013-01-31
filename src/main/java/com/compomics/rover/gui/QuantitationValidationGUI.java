@@ -863,6 +863,7 @@ public class QuantitationValidationGUI extends JFrame {
                             lProteinInfoPanel.add(Box.createVerticalStrut(2));
                             lProteinInfoPanel.add(new JLabel("   Protein Z-score " + lTypes[i] + " : " + (Math.round(iProtein.getProteinZScore(lTypes[i], -1) * 1000.0) / 1000.0)));
                             lProteinInfoPanel.add(Box.createVerticalStrut(2));
+                            //lProteinInfoLabel.add(new JLabel("   Protein information  : " + iProtein.);
                         }
                         //add the label to a temp panel with X axis layout
                         JPanel lTemp = new JPanel();

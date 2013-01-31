@@ -3,7 +3,7 @@ package com.compomics.rover.gui.multiwizard;
 import com.compomics.rover.general.enumeration.ReferenceSetEnum;
 import org.apache.log4j.Logger;
 
-import com.compomics.mslims.db.accessors.Project;
+import com.compomics.mslimsdb.accessors.Project;
 import com.compomics.rover.general.interfaces.WizardPanel;
 import com.compomics.rover.general.enumeration.RoverSource;
 import com.compomics.rover.general.enumeration.ProteinDatabaseType;
@@ -14,7 +14,6 @@ import com.compomics.rover.general.quantitation.RatioGroupCollection;
 import com.compomics.rover.general.quantitation.QuantitativeProtein;
 
 import com.compomics.util.interfaces.Flamable;
-import com.compomics.mslims.db.accessors.Project;
 
 import com.sun.java.swing.plaf.nimbus.NimbusLookAndFeel;
 
@@ -29,7 +28,6 @@ import java.awt.*;
 import java.io.File;
 import java.io.IOException;
 import java.util.Vector;
-import java.util.ArrayList;
 
 /**
  * Created by IntelliJ IDEA.
