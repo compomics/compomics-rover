@@ -1,5 +1,29 @@
 #labels Featured
-# Short summary of changes for each version of Rover. (starting from version 2.3.7)
+# Short summary of changes for each version of Rover. (starting from version 2.3.7). Internal changes mean non-release worthy or viable changes that still warant a version change
+
+Changes in Rover 2.3.12 (May 20 2012)
+
+    FIX: Fixed broken launching because of java update 1.7.21
+
+--------------------------------------------------------
+
+Changes in Rover 2.3.11 (internal change)
+
+    FEATURE: Launch of rewrite of Rover to modularize the different parts and start with comformity with new Colims database scheme
+
+--------------------------------------------------------
+
+Changes in Rover 2.3.10 (internal change)
+
+    FEATURE: Implemented changes created by new low memory usage of thermo-msf-parser
+
+--------------------------------------------------------
+
+Changes in Rover 2.3.9 (internal change)
+
+    DEPENDENCY CHANGE: Updated dependency to Ms-Lims 7.7.8
+
+--------------------------------------------------------
 
 Changes in Rover 2.3.8 (July 25 2012)
 
