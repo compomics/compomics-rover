@@ -3,32 +3,31 @@ package com.compomics.rover.general.fileio.readers;
 import com.compomics.rover.general.PeptideIdentification.DefaultPeptideIdentification;
 import com.compomics.rover.general.enumeration.DataType;
 import com.compomics.rover.general.enumeration.QuantitationMetaType;
-import com.compomics.rover.general.interfaces.MsfFileInterface;
 import com.compomics.rover.general.quantitation.RatioGroup;
 import com.compomics.rover.general.quantitation.RatioGroupCollection;
 import com.compomics.rover.general.quantitation.RatioType;
 import com.compomics.rover.general.quantitation.source.thermo_msf.ThermoMsfRatio;
-import com.compomics.thermo_msf_parser.Parser;
-import com.compomics.thermo_msf_parser.gui.MsfFile;
-import com.compomics.thermo_msf_parser.msf.Peptide;
-import com.compomics.thermo_msf_parser.msf.PeptideLowMem;
-import com.compomics.thermo_msf_parser.msf.Protein;
-import com.compomics.thermo_msf_parser.msf.ProteinLowMem;
-import com.compomics.thermo_msf_parser.msf.ProteinLowMemController;
-import com.compomics.thermo_msf_parser.msf.RatioTypeLowMem;
-import com.compomics.thermo_msf_parser.msf.RatioTypeLowMemController;
-import com.compomics.thermo_msf_parser.msf.RawFileLowMemController;
-import com.compomics.thermo_msf_parser.msf.ScoreType;
-import com.compomics.thermo_msf_parser.msf.ScoreTypeLowMem;
-import com.compomics.thermo_msf_parser.msf.ScoreTypeLowMemController;
-import com.compomics.thermo_msf_parser.msf.Spectrum;
-import com.compomics.thermo_msf_parser.msf.SpectrumLowMem;
-import com.compomics.thermo_msf_parser.msf.SpectrumLowMemController;
-
+import com.compomics.thermo_msf_parser_API.highmeminstance.Parser;
+import com.compomics.thermo_msf_parser_API.highmeminstance.Peptide;
+import com.compomics.thermo_msf_parser_API.highmeminstance.Protein;
+import com.compomics.thermo_msf_parser_API.highmeminstance.ScoreType;
+import com.compomics.thermo_msf_parser_API.highmeminstance.Spectrum;
+import com.compomics.thermo_msf_parser_API.lowmeminstance.controllers.ProteinLowMemController;
+import com.compomics.thermo_msf_parser_API.lowmeminstance.controllers.RatioTypeLowMemController;
+import com.compomics.thermo_msf_parser_API.lowmeminstance.controllers.RawFileLowMemController;
+import com.compomics.thermo_msf_parser_API.lowmeminstance.controllers.ScoreTypeLowMemController;
+import com.compomics.thermo_msf_parser_API.lowmeminstance.controllers.SpectrumLowMemController;
+import com.compomics.thermo_msf_parser_API.lowmeminstance.model.MsfFile;
+import com.compomics.thermo_msf_parser_API.lowmeminstance.model.PeptideLowMem;
+import com.compomics.thermo_msf_parser_API.lowmeminstance.model.ProteinLowMem;
+import com.compomics.thermo_msf_parser_API.lowmeminstance.model.RatioTypeLowMem;
+import com.compomics.thermo_msf_parser_API.lowmeminstance.model.ScoreTypeLowMem;
+import com.compomics.thermo_msf_parser_API.lowmeminstance.model.SpectrumLowMem;
 
 import java.io.*;
 import java.sql.*;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Vector;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -50,7 +49,7 @@ public class MsfReader {
     private int iConfidenceLevel;
     private boolean iOnlyHighestScoring;
     private boolean iOnlyLowestScoring;
-    private MsfFileInterface msfFileOfInterest;
+    private final MsfFileInterface msfFileOfInterest;
     
     //TODO: find out if inner classes can implement interfaces. if so write interface and make msfFileOfInterest a field that is an implementation of the interface
 
@@ -61,7 +60,7 @@ public class MsfReader {
         this.iOnlyLowestScoring = lOnlyLowestScoring;
         this.iMsfFile = new MsfFile(new File(iMsfFileLocation));
         iRatioGroupCollection = null;
-        msfFileWithoutParser msfFileOfInterest= new msfFileWithoutParser(); 
+        msfFileOfInterest= new msfFileWithoutParser(); 
     }
 
     public MsfReader(Parser lParsedMsfFile, String lMsfFileLocation, int lConfidenceLevel, boolean lOnlyHighestScoring, boolean lOnlyLowestScoring) throws ClassNotFoundException, SQLException, IOException {
@@ -74,25 +73,19 @@ public class MsfReader {
         this.msfFileOfInterest = new msfFileWithParser();
     }
 
-    //wut dis do?
-    public MsfReader(int lConfidenceLevel, boolean lOnlyHighestScoring, boolean lOnlyLowestScoring){
-        this.iConfidenceLevel = lConfidenceLevel;
-        this.iOnlyHighestScoring = lOnlyHighestScoring;
-        this.iOnlyLowestScoring = lOnlyLowestScoring;
-    }
-
     public RatioGroupCollection getRatioGroupCollection(){
         return msfFileOfInterest.getRatioGroupCollection();
     }
     
     public RatioGroupCollection getRatioGroupCollection(Vector<String> aComponentsVector,Vector<Integer> aChannelIdsVector,Vector ratioTypes,Vector spectraVector) {
-        return msfFileOfInterest.getRatioGroupCollection(aComponentsVector,aChannelIdsVector,ratioTypes,spectraVector);
+        return msfFileOfInterest.getRatioGroupCollection();
+    }
+
+    private static interface MsfFileInterface {
+
+        public RatioGroupCollection getRatioGroupCollection();
     }
     
-    
-    public static void main(String[] args) throws Exception {
-        new MsfReader("C:\\niklaas\\data\\02_11\\proteomdiscoverer\\V192_RT1_10_training_TOP10_4ppm.msf", 3, true, false);
-}
     
    //check if inner classes can add additional imports
     private class msfFileWithoutParser implements MsfFileInterface{
@@ -108,9 +101,9 @@ public class MsfReader {
                     Vector<String> lComp = new Vector<String>();
                     Vector<Integer> lChannelIds = new Vector<Integer>();
                     Vector<String> lType = new Vector<String>();
-                    Vector<RatioTypeLowMem> lRatioTypes = ratioTypeLowMemInstance.parseRatioTypes(iMsfFile.getConnection());
+                    List<RatioTypeLowMem> lRatioTypes = ratioTypeLowMemInstance.parseRatioTypes(iMsfFile);
                     iRatioGroupCollection = new RatioGroupCollection(DataType.PROTEOME_DISCOVERER);
-                    Vector<ScoreTypeLowMem> lScores = scoreTypeInstance.getScoreTypes(iMsfFile.getConnection());
+                    List<ScoreTypeLowMem> lScores = scoreTypeInstance.getScoreTypes(iMsfFile);
                     for (RatioTypeLowMem aRatioType : lRatioTypes){
                         lComp.addAll(aRatioType.getComponents());
                         lChannelIds.addAll(aRatioType.getChannelIds());
@@ -129,7 +122,7 @@ public class MsfReader {
                         }
                     }
                    
-                    Vector<SpectrumLowMem> spectra = spectrumLowMemInstance.getAllSpectra(iMsfFile.getConnection());
+                    List<SpectrumLowMem> spectra = spectrumLowMemInstance.getAllSpectra(iMsfFile);
                     //create for every peptide a ratiogroup and add it to the ratiogroup collection
                     for (int i = 0; i < spectra.size(); i++) {
 
@@ -170,7 +163,7 @@ public class MsfReader {
                                     for (int t = 0; t < lRatioTypes.size(); t++) {
                                         if (spectra.get(i).getQuanResult().getRatioByRatioType(lRatioTypes.get(t)) != null) {
                                             Double lCalRatio = (Math.round(spectra.get(i).getQuanResult().getRatioByRatioType(lRatioTypes.get(t)) * 1000.0)) / 1000.0;
-                                            ThermoMsfRatio lRatio = new ThermoMsfRatio(lCalRatio, lType.get(t), true, lRatioGroup, spectra.get(i).getQuanResult(), spectra.get(i).getConnection(), spectra.get(i).getFileId(), lComp, lChannelIds);
+                                            ThermoMsfRatio lRatio = new ThermoMsfRatio(lCalRatio, lType.get(t), true, lRatioGroup, spectra.get(i).getQuanResult(), spectra.get(i).getFileId(), lComp, lChannelIds);
                                             lRatio.setNumeratorIntensity(spectra.get(i).getQuanResult().getNumeratorByRatioType(lRatioTypes.get(t)));
                                             lRatio.setDenominatorIntensity(spectra.get(i).getQuanResult().getDenominatorByRatioType(lRatioTypes.get(t)));
                                             lRatio.setValid(true);
@@ -192,8 +185,8 @@ public class MsfReader {
                                     lid.setValid(new Integer(1).intValue());
                                     lid.setPrecursor(spectra.get(i).getMz());
                                     lid.setCharge(Integer.valueOf(spectra.get(i).getCharge()));
-                                    lid.setSpectrumFileName(rawFileLowMemInstance.getRawFileNameForFileID(spectra.get(i).getFileId(), iMsfFile.getConnection()));
-                                    Vector<ProteinLowMem> lProteins = lPeptide.getProteins();
+                                    lid.setSpectrumFileName(rawFileLowMemInstance.getRawFileNameForFileID(spectra.get(i).getFileId(), iMsfFile));
+                                    List<ProteinLowMem> lProteins = lPeptide.getProteins();
 
                                     String lIsoforms = "";
                                     if (lProteins.size() > 1) {
@@ -202,10 +195,10 @@ public class MsfReader {
                                         }
                                     }
                                     lid.setIsoforms(lIsoforms);
-                                    if(proteinLowMemInstance.getAccessionFromProteinID(lProteins.get(0).getProteinID(),iMsfFile.getConnection()) == null){
+                                    if(proteinLowMemInstance.getAccessionFromProteinID(lProteins.get(0).getProteinID(),iMsfFile) == null){
                                         lid.setAccession(proteinLowMemInstance.getUtilProteinForProteinID(lProteins.get(0).getProteinID(), iMsfFile.getConnection()).getHeader().getDescription());
                                     } else {
-                                        lid.setAccession(proteinLowMemInstance.getAccessionFromProteinID(lProteins.get(0).getProteinID(), iMsfFile.getConnection()));
+                                        lid.setAccession(proteinLowMemInstance.getAccessionFromProteinID(lProteins.get(0).getProteinID(), iMsfFile));
                                     }
 
 
@@ -234,7 +227,7 @@ public class MsfReader {
     public RatioGroupCollection getRatioGroupCollection(Vector<String> aComponentsVector,Vector<Integer> aChannelIdsVector,Vector ratioTypes,Vector spectraVector) {
         if(iRatioGroupCollection == null){
                 iRatioGroupCollection = new RatioGroupCollection(DataType.PROTEOME_DISCOVERER);
-                Vector<ScoreTypeLowMem> lScores = scoreTypeInstance.getScoreTypes(iMsfFile.getConnection());    
+                List<ScoreTypeLowMem> lScores = scoreTypeInstance.getScoreTypes(iMsfFile);    
                 Vector<RatioTypeLowMem> ratiotypes = ratioTypes; 
                 Vector<String> lComp = aComponentsVector;
                 Vector<String> lType = new Vector<String>();
@@ -298,7 +291,7 @@ public class MsfReader {
                                 for (int t = 0; t < lRatioTypes.size(); t++) {
                                     if (lSpectrumVector.get(i).getQuanResult().getRatioByRatioType(lRatioTypes.get(t)) != null) {
                                         double lCalRatio = (Math.round(lSpectrumVector.get(i).getQuanResult().getRatioByRatioType(lRatioTypes.get(t)) * 1000.0)) / 1000.0;
-                                        ThermoMsfRatio lRatio = new ThermoMsfRatio(lCalRatio, lType.get(t), true, lRatioGroup, lSpectrumVector.get(i).getQuanResult(), lSpectrumVector.get(i).getConnection(), lSpectrumVector.get(i).getFileId(),lComp, aChannelIdsVector);
+                                        ThermoMsfRatio lRatio = new ThermoMsfRatio(lCalRatio, lType.get(t), true, lRatioGroup, lSpectrumVector.get(i).getQuanResult(), lSpectrumVector.get(i).getFileId(),lComp, aChannelIdsVector);
                                         lRatio.setNumeratorIntensity(lSpectrumVector.get(i).getQuanResult().getNumeratorByRatioType(lRatioTypes.get(t)));
                                         lRatio.setDenominatorIntensity(lSpectrumVector.get(i).getQuanResult().getDenominatorByRatioType(lRatioTypes.get(t)));
                                         lRatio.setValid(true);
@@ -320,8 +313,8 @@ public class MsfReader {
                                 lid.setValid(new Integer(1).intValue());
                                 lid.setPrecursor(lSpectrumVector.get(i).getMz());
                                 lid.setCharge(Integer.valueOf(lSpectrumVector.get(i).getCharge()));
-                                lid.setSpectrumFileName(rawFileLowMemInstance.getRawFileNameForFileID(lSpectrumVector.get(i).getFileId(), iMsfFile.getConnection()));
-                                Vector<ProteinLowMem> lProteins = lPeptide.getProteins();
+                                lid.setSpectrumFileName(rawFileLowMemInstance.getRawFileNameForFileID(lSpectrumVector.get(i).getFileId(), iMsfFile));
+                                List<ProteinLowMem> lProteins = lPeptide.getProteins();
 
                                 String lIsoforms = "";
                                 if (lProteins.size() > 1) {
@@ -362,7 +355,7 @@ public class MsfReader {
      
     }
     
- private class msfFileWithParser implements MsfFileInterface {
+ private class msfFileWithParser implements MsfFileInterface{
  
      
         public RatioGroupCollection getRatioGroupCollection() {
@@ -370,8 +363,8 @@ public class MsfReader {
 
             iRatioGroupCollection = new RatioGroupCollection(DataType.PROTEOME_DISCOVERER);
 
-            Vector<String> lComp = iParsedMsfFile.getComponents();
-            Vector<Integer> lChannelIds = iParsedMsfFile.getChannelIds();
+            List<String> lComp = iParsedMsfFile.getComponents();
+            List<Integer> lChannelIds = iParsedMsfFile.getChannelIds();
             Vector<String> lType = new Vector<String>();
             for (int i = 0; i < iParsedMsfFile.getRatioTypes().size(); i++) {
                 lType.add(iParsedMsfFile.getRatioTypes().get(i).getRatioType());
@@ -383,7 +376,7 @@ public class MsfReader {
             String lFileName = (new File(iMsfFileLocation)).getName();
             iRatioGroupCollection.putMetaData(QuantitationMetaType.FILENAME, lFileName);
 
-            Vector<ScoreType> lScores = iParsedMsfFile.getScoreTypes();
+            List<ScoreType> lScores = iParsedMsfFile.getScoreTypes();
             Vector<ScoreType> lScoreTypes = new Vector<ScoreType>();
             for (int i = 0; i < lScores.size(); i++) {
                 if (lScores.get(i).getIsMainScore() == 1) {
@@ -391,7 +384,7 @@ public class MsfReader {
                 }
             }
 
-            Vector<com.compomics.thermo_msf_parser.msf.RatioType> lRatioTypes = iParsedMsfFile.getRatioTypes();
+            List<com.compomics.thermo_msf_parser_API.highmeminstance.RatioType> lRatioTypes = iParsedMsfFile.getRatioTypes();
 
             //create for every peptide a ratiogroup and add it to the ratiogroup collection
             for (int i = 0; i < iParsedMsfFile.getSpectra().size(); i++) {
@@ -435,7 +428,7 @@ public class MsfReader {
                             for (int t = 0; t < lRatioTypes.size(); t++) {
                                 if (iParsedMsfFile.getSpectra().get(i).getQuanResult().getRatioByRatioType(lRatioTypes.get(t)) != null) {
                                     Double lCalRatio = (Math.round(iParsedMsfFile.getSpectra().get(i).getQuanResult().getRatioByRatioType(lRatioTypes.get(t)) * 1000.0)) / 1000.0;
-                                    ThermoMsfRatio lRatio = new ThermoMsfRatio(lCalRatio, lType.get(t), true, lRatioGroup, iParsedMsfFile.getSpectra().get(i).getQuanResult(), iParsedMsfFile.getSpectra().get(i).getConnection(), iParsedMsfFile.getSpectra().get(i).getFileId(), iParsedMsfFile.getSpectra().get(i).getParser().getComponents(), iParsedMsfFile.getSpectra().get(i).getParser().getChannelIds());
+                                    ThermoMsfRatio lRatio = new ThermoMsfRatio(lCalRatio, lType.get(t), true, lRatioGroup, iParsedMsfFile.getSpectra().get(i).getQuanResult(), iParsedMsfFile.getSpectra().get(i).getFileId(), iParsedMsfFile.getSpectra().get(i).getParser().getComponents(), iParsedMsfFile.getSpectra().get(i).getParser().getChannelIds());
                                     lRatio.setNumeratorIntensity(iParsedMsfFile.getSpectra().get(i).getQuanResult().getNumeratorByRatioType(lRatioTypes.get(t)));
                                     lRatio.setDenominatorIntensity(iParsedMsfFile.getSpectra().get(i).getQuanResult().getDenominatorByRatioType(lRatioTypes.get(t)));
                                     lRatio.setValid(true);
@@ -458,7 +451,7 @@ public class MsfReader {
                             lid.setPrecursor(iParsedMsfFile.getSpectra().get(i).getMz());
                             lid.setCharge(Integer.valueOf(iParsedMsfFile.getSpectra().get(i).getCharge()));
                             lid.setSpectrumFileName(iParsedMsfFile.getSpectra().get(i).getSpectrumTitle());
-                            Vector<Protein> lProteins = lPeptide.getProteins();
+                            List<Protein> lProteins = lPeptide.getProteins();
 
                             String lIsoforms = "";
                             if (lProteins.size() > 1) {
@@ -512,7 +505,7 @@ public class MsfReader {
             String lFileName = (new File(iMsfFileLocation)).getName();
             iRatioGroupCollection.putMetaData(QuantitationMetaType.FILENAME, lFileName);
 
-            Vector<ScoreType> lScores = iParsedMsfFile.getScoreTypes();
+            List<ScoreType> lScores = iParsedMsfFile.getScoreTypes();
             Vector<ScoreType> lScoreTypes = new Vector<ScoreType>();
             for (int i = 0; i < lScores.size(); i++) {
                 if (lScores.get(i).getIsMainScore() == 1) {
@@ -520,7 +513,7 @@ public class MsfReader {
                 }
             }
 
-            Vector<com.compomics.thermo_msf_parser.msf.RatioType> lRatioTypes = ratioTypes;
+            Vector<com.compomics.thermo_msf_parser_API.highmeminstance.RatioType> lRatioTypes = ratioTypes;
             Vector<Spectrum> lSpectrumVector = spectraVector;
             //create for every peptide a ratiogroup and add it to the ratiogroup collection
             for (int i = 0; i < lSpectrumVector.size(); i++) {
@@ -562,7 +555,7 @@ public class MsfReader {
                             for (int t = 0; t < lRatioTypes.size(); t++) {
                                 if (lSpectrumVector.get(i).getQuanResult().getRatioByRatioType(lRatioTypes.get(t)) != null) {
                                     double lCalRatio = (Math.round(lSpectrumVector.get(i).getQuanResult().getRatioByRatioType(lRatioTypes.get(t)) * 1000.0)) / 1000.0;
-                                    ThermoMsfRatio lRatio = new ThermoMsfRatio(lCalRatio, lType.get(t), true, lRatioGroup, lSpectrumVector.get(i).getQuanResult(), lSpectrumVector.get(i).getConnection(), lSpectrumVector.get(i).getFileId(),lComp, aChannelIdsVector);
+                                    ThermoMsfRatio lRatio = new ThermoMsfRatio(lCalRatio, lType.get(t), true, lRatioGroup, lSpectrumVector.get(i).getQuanResult(), lSpectrumVector.get(i).getFileId(),lComp, aChannelIdsVector);
                                     lRatio.setNumeratorIntensity(lSpectrumVector.get(i).getQuanResult().getNumeratorByRatioType(lRatioTypes.get(t)));
                                     lRatio.setDenominatorIntensity(lSpectrumVector.get(i).getQuanResult().getDenominatorByRatioType(lRatioTypes.get(t)));
                                     lRatio.setValid(true);
@@ -584,7 +577,7 @@ public class MsfReader {
                             lid.setPrecursor(lSpectrumVector.get(i).getMz());
                             lid.setCharge(Integer.valueOf(lSpectrumVector.get(i).getCharge()));
                             lid.setSpectrumFileName(lSpectrumVector.get(i).getSpectrumTitle());
-                            Vector<Protein> lProteins = lPeptide.getProteins();
+                            List<Protein> lProteins = lPeptide.getProteins();
 
                             String lIsoforms = "";
                             if (lProteins.size() > 1) {

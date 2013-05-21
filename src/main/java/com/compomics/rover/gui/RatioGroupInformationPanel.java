@@ -22,16 +22,21 @@ import com.compomics.rover.general.enumeration.QuantitationMetaType;
 import com.compomics.rover.general.enumeration.RatioComment;
 import com.compomics.rover.general.enumeration.RoverSource;
 import com.compomics.rover.general.PeptideIdentification.DefaultPeptideIdentification;
+import java.awt.Color;
+import java.awt.Dimension;
 import org.jfree.chart.ChartPanel;
 
 import javax.swing.*;
-import java.awt.*;
 import java.awt.Event;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.IOException;
 import java.sql.Connection;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Vector;
 
 /**
@@ -844,7 +849,7 @@ public class RatioGroupInformationPanel extends JFrame {
                 }
 
             } else if(iRatioGroup.getParentCollection().getRoverSource() == RoverSource.THERMO_MSF_LIMS){
-                Vector<String> lComp = (Vector<String>) iRatioGroup.getParentCollection().getComponentTypes().clone();
+                List<String> lComp = (List<String>) ((ArrayList<String>)iRatioGroup.getParentCollection().getComponentTypes()).clone();
                 lComp.add("Not defined");
                 for (int i = 0; i < iRatioGroup.getParentCollection().getComponentTypes().size(); i++) {
                     PeptideIdentification lIdentification = iRatioGroup.getIdentificationForType(iRatioGroup.getParentCollection().getComponentTypes().get(i));

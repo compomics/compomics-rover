@@ -23,6 +23,11 @@ import com.compomics.rover.general.interfaces.Ratio;
 import com.compomics.rover.general.interfaces.PeptideIdentification;
 import com.compomics.rover.general.db.accessors.IdentificationExtension;
 import com.compomics.util.sun.SwingWorker;
+import com.lowagie.text.Document;
+import com.lowagie.text.DocumentException;
+import com.lowagie.text.FontFactory;
+import com.lowagie.text.PageSize;
+import com.lowagie.text.Paragraph;
 
 import javax.swing.*;
 import javax.swing.border.TitledBorder;
@@ -30,17 +35,22 @@ import java.util.Vector;
 import java.util.HashMap;
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
-import java.awt.*;
 import java.awt.Font;
 import java.awt.geom.Rectangle2D;
 import java.io.*;
 
-import com.lowagie.text.*;
 import com.lowagie.text.Rectangle;
 import com.lowagie.text.pdf.PdfWriter;
 import com.lowagie.text.pdf.PdfContentByte;
 import com.lowagie.text.pdf.PdfTemplate;
 import com.lowagie.text.pdf.DefaultFontMapper;
+import java.awt.Color;
+import java.awt.Graphics2D;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.awt.Insets;
+import java.util.List;
+import java.util.logging.Level;
 
 /**
  * Created by IntelliJ IDEA.
@@ -252,7 +262,12 @@ public class ExportGui extends JFrame {
                     // step 1 create a document
                     Document document = new Document(PageSize.A4, 50, 50, 50, 50);
                     // step 2 create a writer
-                    PdfWriter writer = PdfWriter.getInstance(document, new FileOutputStream(lPath));
+                    PdfWriter writer = null;
+                    try {
+                        writer = PdfWriter.getInstance(document, new FileOutputStream(lPath));
+                    } catch (DocumentException ex) {
+                        java.util.logging.Logger.getLogger(ExportGui.class.getName()).log(Level.SEVERE, null, ex);
+                    }
                     // step 3 open the document
                     document.open();
                     // step 4 create the PDFContenteByte
@@ -446,7 +461,7 @@ public class ExportGui extends JFrame {
                     //get the ratiotypes
                     String[] lTypes = iQuantitativeValidationSingelton.getReferenceSet().getTypes();
                     //get the ratio components
-                    Vector<String> lComponentsVector = iQuantitativeValidationSingelton.getComponentTypes();
+                    List<String> lComponentsVector = iQuantitativeValidationSingelton.getComponentTypes();
                     String[] lComponents = new String[lComponentsVector.size()];
                     lComponentsVector.toArray(lComponents);
                     //create the writer

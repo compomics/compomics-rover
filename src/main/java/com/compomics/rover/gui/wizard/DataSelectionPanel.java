@@ -6,11 +6,11 @@ import org.apache.log4j.Logger;
 
 import com.compomics.mslimsdb.accessors.Project;
 import com.compomics.mslimsdb.accessors.Protocol;
-import com.compomics.util.gui.dialogs.ConnectionDialog;
 import com.compomics.util.interfaces.Connectable;
 import com.compomics.rover.general.enumeration.RoverSource;
 import com.compomics.rover.general.interfaces.WizardPanel;
 import com.compomics.rover.general.singelton.QuantitativeValidationSingelton;
+import com.compomics.rover.gui.ConnectionDialog;
 
 import javax.swing.*;
 import javax.swing.border.TitledBorder;

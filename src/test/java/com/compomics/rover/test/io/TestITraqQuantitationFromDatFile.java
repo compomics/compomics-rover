@@ -11,6 +11,7 @@ import junit.framework.Assert;
 import junit.framework.TestCase;
 
 import java.io.File;
+import java.util.List;
 import java.util.Vector;
 
 /**
@@ -46,7 +47,7 @@ public class TestITraqQuantitationFromDatFile  extends TestCase {
 
         Assert.assertEquals(lRatioGroupCollection.size(), 135);
 
-        Vector lComponentTypes = lRatioGroupCollection.getComponentTypes();
+        List lComponentTypes = lRatioGroupCollection.getComponentTypes();
         Assert.assertEquals(lComponentTypes.size(), 4);
         Assert.assertEquals("114", lComponentTypes.get(0));
         Assert.assertEquals("115", lComponentTypes.get(1));

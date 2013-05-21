@@ -4,12 +4,15 @@ import org.apache.log4j.Logger;
 
 import com.compomics.rover.general.singelton.QuantitativeValidationSingelton;
 import com.compomics.rover.general.quantitation.RatioType;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.awt.Insets;
 
 import javax.swing.*;
 import java.util.Vector;
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
-import java.awt.*;
+import java.util.List;
 
 /**
  * Created by IntelliJ IDEA.
@@ -29,7 +32,7 @@ public class MatchRatioWithComponent extends JFrame {
     private JTextField medianTextField;
 
     private Vector<String> iRatios;
-    private Vector<String> iComponents;
+    private List<String> iComponents;
     private Vector<JCheckBox> iCheckBoxes = new Vector<JCheckBox>();
     private Vector<JCheckBox> iUnregulatedCheckBoxes = new Vector<JCheckBox>();
     private int iRatioCount = 0;

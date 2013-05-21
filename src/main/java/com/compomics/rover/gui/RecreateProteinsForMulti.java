@@ -18,6 +18,9 @@ import com.compomics.rover.general.sequenceretriever.NcbiSequenceRetriever;
 import com.compomics.rover.general.sequenceretriever.TairSequenceRetriever;
 import com.compomics.rover.general.interfaces.Ratio;
 import com.compomics.util.sun.SwingWorker;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.awt.Insets;
 
 import javax.swing.*;
 import java.util.Vector;
@@ -26,8 +29,8 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
-import java.awt.*;
 import java.sql.Connection;
+import java.util.List;
 import java.util.concurrent.atomic.AtomicReference;
 
 /**
@@ -118,7 +121,7 @@ public class RecreateProteinsForMulti extends JFrame {
                             //use the found collections to recreate the proteins
                             //get stuff from the parent
                             Vector<String> lProteinAccessions = iQuantitativeValidationSingelton.getProteinAccessions();
-                            Vector<String> lComponentTypesList = iQuantitativeValidationSingelton.getComponentTypes();
+                            List<String> lComponentTypesList = iQuantitativeValidationSingelton.getComponentTypes();
                             String[] lComponentTypes = new String[lComponentTypesList.size()];
                             lComponentTypesList.toArray(lComponentTypes);
                             Vector<String> lRatioTypesList = iQuantitativeValidationSingelton.getRatioTypes();

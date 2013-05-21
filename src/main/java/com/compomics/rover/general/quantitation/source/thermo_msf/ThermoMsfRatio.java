@@ -4,11 +4,12 @@ import com.compomics.rover.general.db.accessors.QuantitationExtension;
 import com.compomics.rover.general.interfaces.Ratio;
 import com.compomics.rover.general.quantitation.RatioGroup;
 import com.compomics.rover.general.singelton.QuantitativeValidationSingelton;
-import com.compomics.thermo_msf_parser.msf.QuanResult;
-import com.compomics.thermo_msf_parser.msf.QuanResultLowMem;
+import com.compomics.thermo_msf_parser_API.highmeminstance.QuanResult;
+import com.compomics.thermo_msf_parser_API.lowmeminstance.model.QuanResultLowMem;
 import org.apache.log4j.Logger;
 
 import java.sql.Connection;
+import java.util.List;
 import java.util.Vector;
 
 /**
@@ -115,17 +116,28 @@ public class ThermoMsfRatio implements Ratio {
      * @param aValid            The valid status for this ratio
      * @param aParentRatioGroup The parent RatioGroup
      */
-    public ThermoMsfRatio(Double aRatio, String aType, boolean aValid, RatioGroup aParentRatioGroup, QuanResult lQuanResult, Connection lConn, int lFileId, Vector<String> lComp, Vector<Integer> lChannels) {
+    public ThermoMsfRatio(Double aRatio, String aType, boolean aValid, RatioGroup aParentRatioGroup, QuanResult lQuanResult, int lFileId, Vector<String> lComp, Vector<Integer> lChannels) {
         this.iRatio = aRatio;
         this.iOriginalRatio = aRatio;
         this.iType = aType;
         this.iValid = aValid;
         this.iParentRatioGroup = aParentRatioGroup;
         this.iQuanResult = lQuanResult;
-        this.iConnection = lConn;
         this.iFileId = lFileId;
         this.iComponents = lComp;
         this.iChannelIds = lChannels;
+    }
+    
+        public ThermoMsfRatio(Double aRatio, String aType, boolean aValid, RatioGroup aParentRatioGroup, QuanResult lQuanResult, int lFileId, List<String> lComp, List<Integer> lChannels) {
+        this.iRatio = aRatio;
+        this.iOriginalRatio = aRatio;
+        this.iType = aType;
+        this.iValid = aValid;
+        this.iParentRatioGroup = aParentRatioGroup;
+        this.iQuanResult = lQuanResult;
+        this.iFileId = lFileId;
+        this.iComponents.addAll(lComp);
+        this.iChannelIds.addAll(lChannels);
     }
     
     
@@ -137,14 +149,13 @@ public class ThermoMsfRatio implements Ratio {
      * @param aValid            The valid status for this ratio
      * @param aParentRatioGroup The parent RatioGroup
      */
-    public ThermoMsfRatio(Double aRatio, String aType, boolean aValid, RatioGroup aParentRatioGroup, QuanResultLowMem lQuanResult, Connection lConn, int lFileId, Vector<String> lComp, Vector<Integer> lChannels) {
+    public ThermoMsfRatio(Double aRatio, String aType, boolean aValid, RatioGroup aParentRatioGroup, QuanResultLowMem lQuanResult, int lFileId, Vector<String> lComp, Vector<Integer> lChannels) {
         this.iRatio = aRatio;
         this.iOriginalRatio = aRatio;
         this.iType = aType;
         this.iValid = aValid;
         this.iParentRatioGroup = aParentRatioGroup;
         this.iQuanResult = new QuanResult(lQuanResult.getQuanResultId());
-        this.iConnection = lConn;
         this.iFileId = lFileId;
         this.iComponents = lComp;
         this.iChannelIds = lChannels;
