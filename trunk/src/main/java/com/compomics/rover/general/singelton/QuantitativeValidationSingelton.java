@@ -19,6 +19,7 @@ import com.compomics.rover.general.interfaces.Ratio;
 import java.io.*;
 import java.util.Vector;
 import java.util.HashMap;
+import java.util.List;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
@@ -130,7 +131,7 @@ public class QuantitativeValidationSingelton {
     /**
      * The component types
      */
-    private Vector<String> iComponentsTypes;
+    private List<String> iComponentsTypes;
     /**
      * the mathed ratio types
      */
@@ -800,11 +801,11 @@ public class QuantitativeValidationSingelton {
         return iRatioTypes;
     }
 
-    public void setComponentTypes(Vector<String> lComponentsTypes) {
+    public void setComponentTypes(List<String> lComponentsTypes) {
         this.iComponentsTypes = lComponentsTypes;
     }
 
-    public Vector<String> getComponentTypes() {
+    public List<String> getComponentTypes() {
         return iComponentsTypes;
     }
     public Vector<RoverSource> getRoverSources() {

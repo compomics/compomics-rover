@@ -25,9 +25,15 @@ import com.compomics.util.interfaces.Flamable;
 import com.compomics.util.sun.SwingWorker;
 import com.compomics.mslimsdb.accessors.Identification_to_quantitation;
 import com.compomics.mslimsdb.accessors.Quantitation_file;
+import java.awt.Dimension;
+import java.awt.Font;
+import java.awt.Graphics;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.awt.Image;
+import java.awt.Insets;
 
 import javax.swing.*;
-import java.awt.*;
 import java.util.*;
 import java.util.zip.GZIPInputStream;
 import java.util.zip.ZipInputStream;
@@ -690,7 +696,7 @@ public class LoadingPanel implements WizardPanel {
             iCollectionRatios.add(lRatioTypes);
 
             //7.B get the types of the ratios from the first distiller ratio collecion
-            Vector<String> lComponentList = lRatioGroupCollection.getComponentTypes();
+            List<String> lComponentList = lRatioGroupCollection.getComponentTypes();
             String[] lComponentTypes = new String[lComponentList.size()];
             lComponentList.toArray(lComponentTypes);
             iCollectionComponents.add(lComponentTypes);
@@ -1022,7 +1028,7 @@ public class LoadingPanel implements WizardPanel {
                     iCollectionRatios.add(lRatioTypes);
 
                     //7.B get the types of the ratios from the first distiller ratio collecion
-                    Vector<String> lComponentList = lRatioGroupCollection[0].getComponentTypes();
+                    List<String> lComponentList = lRatioGroupCollection[0].getComponentTypes();
                     String[] lComponentTypes = new String[lComponentList.size()];
                     lComponentList.toArray(lComponentTypes);
                     iCollectionComponents.add(lComponentTypes);
@@ -1373,7 +1379,7 @@ public class LoadingPanel implements WizardPanel {
             iCollectionRatios.add(lRatioTypes);
 
             //7.B get the types of the ratios from the first distiller ratio collecion
-            Vector<String> lComponentList = lRatioGroupCollection[0].getComponentTypes();
+            List<String> lComponentList = lRatioGroupCollection[0].getComponentTypes();
             String[] lComponentTypes = new String[lComponentList.size()];
             lComponentList.toArray(lComponentTypes);
             iCollectionComponents.add(lComponentTypes);
@@ -1690,7 +1696,7 @@ public class LoadingPanel implements WizardPanel {
             iCollectionRatios.add(lRatioTypes);
 
             //7.B get the types of the ratios from the first distiller ratio collecion
-            Vector<String> lComponentList = lRatioGroupCollection[0].getComponentTypes();
+            List<String> lComponentList = lRatioGroupCollection[0].getComponentTypes();
             String[] lComponentTypes = new String[lComponentList.size()];
             lComponentList.toArray(lComponentTypes);
             iCollectionComponents.add(lComponentTypes);
@@ -1891,7 +1897,7 @@ public class LoadingPanel implements WizardPanel {
         iCollectionRatios.add(lRatioTypes);
 
         //7.B get the types of the ratios from the first distiller ratio collecion
-        Vector<String> lComponentList = lRovFileTemp.getRatioGroupCollection().getComponentTypes();
+        List<String> lComponentList = lRovFileTemp.getRatioGroupCollection().getComponentTypes();
         String[] lComponentTypes = new String[lComponentList.size()];
         lComponentList.toArray(lComponentTypes);
         iCollectionComponents.add(lComponentTypes);
@@ -2022,7 +2028,7 @@ public class LoadingPanel implements WizardPanel {
         iCollectionRatios.add(lRatioTypes);
 
         //7.B get the types of the ratios from the first distiller ratio collecion
-        Vector<String> lComponentList = lRatioGroupCollection.get(0).getComponentTypes();
+        List<String> lComponentList = lRatioGroupCollection.get(0).getComponentTypes();
         String[] lComponentTypes = new String[lComponentList.size()];
         lComponentList.toArray(lComponentTypes);
         iCollectionComponents.add(lComponentTypes);
@@ -2152,7 +2158,7 @@ public class LoadingPanel implements WizardPanel {
         iCollectionRatios.add(lRatioTypes);
 
         //7.B get the types of the ratios from the first distiller ratio collecion
-        Vector<String> lComponentList = lRatioGroupCollection.get(0).getComponentTypes();
+        List<String> lComponentList = lRatioGroupCollection.get(0).getComponentTypes();
         String[] lComponentTypes = new String[lComponentList.size()];
         lComponentList.toArray(lComponentTypes);
         iCollectionComponents.add(lComponentTypes);
@@ -2277,7 +2283,7 @@ public class LoadingPanel implements WizardPanel {
         iCollectionRatios.add(lRatioTypes);
 
         //7.B get the types of the ratios from the first distiller ratio collecion
-        Vector<String> lComponentList = lRatioGroupCollection.get(0).getComponentTypes();
+        List<String> lComponentList = lRatioGroupCollection.get(0).getComponentTypes();
         String[] lComponentTypes = new String[lComponentList.size()];
         lComponentList.toArray(lComponentTypes);
         iCollectionComponents.add(lComponentTypes);
@@ -2402,7 +2408,7 @@ public class LoadingPanel implements WizardPanel {
         iCollectionRatios.add(lRatioTypes);
 
         //7.B get the types of the ratios from the first distiller ratio collecion
-        Vector<String> lComponentList = lRatioGroupCollection.get(0).getComponentTypes();
+        List<String> lComponentList = lRatioGroupCollection.get(0).getComponentTypes();
         String[] lComponentTypes = new String[lComponentList.size()];
         lComponentList.toArray(lComponentTypes);
         iCollectionComponents.add(lComponentTypes);
@@ -2633,7 +2639,7 @@ public class LoadingPanel implements WizardPanel {
         iCollectionRatios.add(lRatioTypes);
 
         //7.B get the types of the ratios from the first distiller ratio collecion
-        Vector<String> lComponentList = lRatioGroupCollection.get(0).getComponentTypes();
+        List<String> lComponentList = lRatioGroupCollection.get(0).getComponentTypes();
         String[] lComponentTypes = new String[lComponentList.size()];
         lComponentList.toArray(lComponentTypes);
         iCollectionComponents.add(lComponentTypes);

@@ -8,6 +8,7 @@ import com.compomics.rover.general.enumeration.RoverSource;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Set;
 import java.util.Vector;
 
@@ -31,7 +32,7 @@ public class RatioGroupCollection extends ArrayList{
     /**
      * The distinct components of this collection. (ex: heavy, light, ..)
      */
-    private Vector<String> iComponentTypes;
+    private List<String> iComponentTypes;
 
     /**
      * The distinct ratios of this collection (ex: H/L)
@@ -77,7 +78,7 @@ public class RatioGroupCollection extends ArrayList{
      * Returns the list with component types.
      * @return ArrayList with component types. (ex: heavy, light)
      */
-    public Vector<String> getComponentTypes() {
+    public List<String> getComponentTypes() {
         return iComponentTypes;
     }
 
@@ -85,7 +86,7 @@ public class RatioGroupCollection extends ArrayList{
      * Set the list with component types.
      * @param aComponentTypes The ArrayList with component types. (ex:heavy, light)
      */
-    public void setComponentTypes(final Vector aComponentTypes) {
+    public void setComponentTypes(final List aComponentTypes) {
         iComponentTypes = aComponentTypes;
     }
 

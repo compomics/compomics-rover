@@ -10,7 +10,7 @@
 
     <!-- Set the version number for the whole project -->
     <properties>
-        <version.number>2.3.11</version.number>
+        <version.number>2.3.12</version.number>
         <logging.level.default>ALL</logging.level.default>
         <logging.file.path.name>rover-log4j.log</logging.file.path.name>
         <logging.file.max.size>5000KB</logging.file.max.size>
@@ -265,7 +265,7 @@
         <dependency>
             <groupId>com.compomics</groupId>
             <artifactId>utilities</artifactId>
-            <version>3.10.3</version>
+            <version>3.13.5</version>
             <type>jar</type>
         </dependency>
         <!-- This project depends on the ms_lims JAR file.
@@ -284,14 +284,7 @@
             <version>3.4.3</version>
             <type>jar</type>
         </dependency>
-        <!-- This project depends on the thermo-msf-parser JAR file.
-        -->
-        <dependency>
-            <groupId>com.compomics</groupId>
-            <artifactId>thermo_msf_parser</artifactId>
-            <version>2.0</version>
-            <type>jar</type>
-        </dependency>
+
         <!-- This project depends on the commons-io JAR file.
           -->
         <dependency>
@@ -371,6 +364,12 @@
             <groupId>com.jgoodies</groupId>
             <artifactId>looks</artifactId>
             <version>2.2.2</version>
+            <type>jar</type>
+        </dependency>
+        <dependency>
+            <groupId>com.compomics.thermo_msf_parser</groupId>
+            <artifactId>thermo_msf_parser_API</artifactId>
+            <version>2.0.3</version>
             <type>jar</type>
         </dependency>
     </dependencies>

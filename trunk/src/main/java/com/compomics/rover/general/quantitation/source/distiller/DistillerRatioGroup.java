@@ -8,10 +8,11 @@ import com.compomics.rover.general.quantitation.RatioType;
 import com.compomics.rover.general.interfaces.PeptideIdentification;
 import com.compomics.rover.general.interfaces.Ratio;
 import com.compomics.rover.general.singelton.QuantitativeValidationSingelton;
+import java.awt.Color;
 
 import java.util.Vector;
 import java.io.IOException;
-import java.awt.*;
+import java.util.List;
 
 import org.jfree.chart.JFreeChart;
 import org.jfree.chart.ChartFactory;
@@ -332,7 +333,7 @@ public class DistillerRatioGroup extends RatioGroup {
         //create dateset
 
         // row keys...
-        Vector<String> lRowKeys = iParentCollection.getComponentTypes();
+        List<String> lRowKeys = iParentCollection.getComponentTypes();
 
         // column keys...
         String lColumn = "Absolute intensity";

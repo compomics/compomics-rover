@@ -22,6 +22,7 @@ import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Vector;
 
 /**
@@ -80,7 +81,7 @@ public class Optimizer {
         lRatioList.toArray(lRatioTypes);
 
         //7.B get the types of the ratios from the first distiller ratio collecion
-        Vector<String> lComponentList = lRatioGroupCollection.get(0).getComponentTypes();
+        List<String> lComponentList = lRatioGroupCollection.get(0).getComponentTypes();
         String[] lComponentTypes = new String[lComponentList.size()];
         lComponentList.toArray(lComponentTypes);
 

@@ -8,9 +8,10 @@ import com.compomics.rover.general.quantitation.RatioGroupCollection;
 import com.compomics.rover.general.quantitation.RatioType;
 import com.compomics.rover.general.singelton.QuantitativeValidationSingelton;
 import com.compomics.rover.general.interfaces.Ratio;
+import java.awt.Color;
+import java.util.List;
 
 import java.util.Vector;
-import java.awt.*;
 
 import org.jfree.chart.JFreeChart;
 import org.jfree.chart.ChartFactory;
@@ -150,7 +151,7 @@ public class MaxQuantRatioGroup  extends RatioGroup {
         //create dateset
 
         // row keys...
-        Vector<String> lRowKeys = iParentCollection.getComponentTypes();
+        List<String> lRowKeys = iParentCollection.getComponentTypes();
 
         // column keys...
         String lColumn = "Absolute intensity";
