@@ -1,7 +1,7 @@
 # Rover
 
  * [Project Description](#project-description)
- * [Downloads](#downloads)
+ * [Download](#download)
  * [Project Support](#project-support)
 
 ----
@@ -21,7 +21,7 @@ Manual validation of regulated proteins in quantitative proteomics has always be
 
 ----
 
-## Downloads
+## Download
 You can find the latest version [here](http://genesis.ugent.be/downloadredirect.php?toolname=compomics-rover).
 
 [Go to top of page](#rover)
