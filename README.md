@@ -2,7 +2,6 @@
 
  * [Project Description](#project-description)
  * [Downloads](#downloads)
- * [Usage](#usage)
  * [Project Support](#project-support)
 
 ----
