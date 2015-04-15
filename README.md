@@ -11,11 +11,11 @@
 Manual validation of regulated proteins in quantitative proteomics has always been a tedious process. Here we present Rover, a tool to facilitate this process. Rover accepts quantitative data from different sources such as Mascot Distiller and MaxQuant. In an intuitive environment, Rover visualizes the quantitative data in such a way that the user can select and validate proteins in comparisons to the whole experiment and in the context of the protein inference problem. 
 
 ### Citation
-_ Colaert, N., Helsens, K., Impens, F., Vandekerckhove, J., Gevaert, K. (2010). Rover: a tool to visualize and validate quantitative proteomics data from different sources. Proteomics [see PubMed](http://www.ncbi.nlm.nih.gov/pubmed/20058247)*.
+*Colaert, N., Helsens, K., Impens, F., Vandekerckhove, J., Gevaert, K. (2010). Rover: a tool to visualize and validate quantitative proteomics data from different sources. Proteomics [see PubMed](http://www.ncbi.nlm.nih.gov/pubmed/20058247)*.
 
 *Combination of different quantification can now also be done with Rover:* 
 
-_ Colaert N, Van Huele C, Degroeve S, Staes A, Vandekerckhove J, Gevaert K, Martens L. Combining quantitative proteomics data processing workflows for greater sensitivity. Nat Methods. [see PubMed](http://www.ncbi.nlm.nih.gov/pubmed/21552256).
+*Colaert N, Van Huele C, Degroeve S, Staes A, Vandekerckhove J, Gevaert K, Martens L. Combining quantitative proteomics data processing workflows for greater sensitivity. Nat Methods. [see PubMed](http://www.ncbi.nlm.nih.gov/pubmed/21552256).*
 
 [Go to top of page](#jtraml)
 
