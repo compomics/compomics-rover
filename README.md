@@ -30,7 +30,7 @@ You can find the latest version [here](http://genesis.ugent.be/downloadredirect.
 
 ## Project Support
 
-The jTraML project is grateful for the support by:
+The rover project is grateful for the support by:
 
 | Compomics | VIB | Ghent University|
 |:--:|:--:|:--:|
