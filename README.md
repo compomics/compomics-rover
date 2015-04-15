@@ -13,7 +13,7 @@ Manual validation of regulated proteins in quantitative proteomics has always be
 ### Citation
 *Colaert, N., Helsens, K., Impens, F., Vandekerckhove, J., Gevaert, K. (2010). Rover: a tool to visualize and validate quantitative proteomics data from different sources. Proteomics [see PubMed](http://www.ncbi.nlm.nih.gov/pubmed/20058247)*.
 
-*Combination of different quantification can now also be done with Rover:* 
+**Combination of different quantification can now also be done with Rover:** 
 
 *Colaert N, Van Huele C, Degroeve S, Staes A, Vandekerckhove J, Gevaert K, Martens L. Combining quantitative proteomics data processing workflows for greater sensitivity. Nat Methods. [see PubMed](http://www.ncbi.nlm.nih.gov/pubmed/21552256).*
 
