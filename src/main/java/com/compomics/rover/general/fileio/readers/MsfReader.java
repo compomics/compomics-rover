@@ -189,12 +189,12 @@ public class MsfReader {
                                     String lIsoforms = "";
                                     if (lProteins.size() > 1) {
                                         for (int j = 1; j < lProteins.size(); j++) {
-                                            lIsoforms = lIsoforms + proteinLowMemInstance.getUtilProteinForProteinID(lProteins.get(j).getProteinID(), iMsfFile.getConnection()).getHeader().getAccession()+ " ,";
+                                            lIsoforms = lIsoforms + proteinLowMemInstance.getUtilProteinForProteinID(lProteins.get(j).getProteinID(), iMsfFile).getHeader().getAccession()+ " ,";
                                         }
                                     }
                                     lid.setIsoforms(lIsoforms);
                                     if(proteinLowMemInstance.getAccessionFromProteinID(lProteins.get(0).getProteinID(),iMsfFile) == null){
-                                        lid.setAccession(proteinLowMemInstance.getUtilProteinForProteinID(lProteins.get(0).getProteinID(), iMsfFile.getConnection()).getHeader().getDescription());
+                                        lid.setAccession(proteinLowMemInstance.getUtilProteinForProteinID(lProteins.get(0).getProteinID(), iMsfFile).getHeader().getDescription());
                                     } else {
                                         lid.setAccession(proteinLowMemInstance.getAccessionFromProteinID(lProteins.get(0).getProteinID(), iMsfFile));
                                     }
@@ -317,14 +317,14 @@ public class MsfReader {
                                 String lIsoforms = "";
                                 if (lProteins.size() > 1) {
                                     for (int j = 1; j < lProteins.size(); j++) {
-                                        lIsoforms = lIsoforms + proteinLowMemInstance.getUtilProteinForProteinID(lProteins.get(j).getProteinID(),iMsfFile.getConnection()).getHeader().getAccession() + " ,";
+                                        lIsoforms = lIsoforms + proteinLowMemInstance.getUtilProteinForProteinID(lProteins.get(j).getProteinID(),iMsfFile).getHeader().getAccession() + " ,";
                                     }
                                 }
                                 lid.setIsoforms(lIsoforms);
-                                if(proteinLowMemInstance.getUtilProteinForProteinID(lProteins.get(0).getProteinID(),iMsfFile.getConnection()).getHeader().getAccession() == null){
-                                    lid.setAccession(proteinLowMemInstance.getUtilProteinForProteinID(lProteins.get(0).getProteinID(),iMsfFile.getConnection()).getHeader().getDescription());
+                                if(proteinLowMemInstance.getUtilProteinForProteinID(lProteins.get(0).getProteinID(),iMsfFile).getHeader().getAccession() == null){
+                                    lid.setAccession(proteinLowMemInstance.getUtilProteinForProteinID(lProteins.get(0).getProteinID(),iMsfFile).getHeader().getDescription());
                                 } else {
-                                    lid.setAccession(proteinLowMemInstance.getUtilProteinForProteinID(lProteins.get(0).getProteinID(),iMsfFile.getConnection()).getHeader().getAccession());
+                                    lid.setAccession(proteinLowMemInstance.getUtilProteinForProteinID(lProteins.get(0).getProteinID(),iMsfFile).getHeader().getAccession());
                                 }
 
 
